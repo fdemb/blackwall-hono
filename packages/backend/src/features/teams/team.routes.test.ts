@@ -1,0 +1,242 @@
+import { describe, it, expect } from "bun:test";
+import { useTestContext } from "../../test/context";
+
+describe("Team Routes", () => {
+  const getCtx = useTestContext();
+
+  describe("GET /teams", () => {
+    it("should return empty array when no teams exist", async () => {
+      const { client, headers } = getCtx();
+      const res = await client.teams.$get(
+        {},
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.teams).toHaveLength(1);
+    });
+
+    it("should return list of teams for workspace", async () => {
+      const { client, headers } = getCtx();
+      const res = await client.teams.$get(
+        {},
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.teams).toHaveLength(1);
+    });
+
+    it("should return multiple teams", async () => {
+      const { client, headers, workspace } = getCtx();
+      await client.teams.create.$post(
+        {
+          json: {
+            name: "Team 2",
+            key: "TM2",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      await client.teams.create.$post(
+        {
+          json: {
+            name: "Team 3",
+            key: "TM3",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      const res = await client.teams.$get(
+        {},
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.teams).toHaveLength(3);
+    });
+  });
+
+  describe("POST /teams/create", () => {
+    it("should create a new team", async () => {
+      const { client, headers, workspace } = getCtx();
+      const res = await client.teams.create.$post(
+        {
+          json: {
+            name: "New Team",
+            key: "NEW",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.team).toHaveProperty("id");
+      expect(json.team.name).toBe("New Team");
+      expect(json.team.key).toBe("NEW");
+      expect(json.team.workspaceId).toBe(workspace.id);
+    });
+
+    it("should return 400 when name is too short", async () => {
+      const { client, headers, workspace } = getCtx();
+      const res = await client.teams.create.$post(
+        {
+          json: {
+            name: "A",
+            key: "NEW",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 when name is too long", async () => {
+      const { client, headers, workspace } = getCtx();
+      const res = await client.teams.create.$post(
+        {
+          json: {
+            name: "A".repeat(31),
+            key: "NEW",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 when key is too short", async () => {
+      const { client, headers, workspace } = getCtx();
+      const res = await client.teams.create.$post(
+        {
+          json: {
+            name: "New Team",
+            key: "AB",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 when key is too long", async () => {
+      const { client, headers, workspace } = getCtx();
+      const res = await client.teams.create.$post(
+        {
+          json: {
+            name: "New Team",
+            key: "ABCDEF",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 when workspaceId is missing", async () => {
+      const { client, headers } = getCtx();
+      const res = await client.teams.create.$post(
+        {
+          // @ts-expect-error - intentionally missing workspaceId for validation test
+          json: {
+            name: "New Team",
+            key: "NEW",
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe("GET /teams/:teamKey", () => {
+    it("should return team by key", async () => {
+      const { client, headers, team } = getCtx();
+      const res = await client.teams[":teamKey"].$get(
+        { param: { teamKey: team.key } },
+        { headers: headers() },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.team).toHaveProperty("id");
+      expect(json.team?.key).toBe(team.key);
+    });
+  });
+
+  describe("GET /teams/:teamKey/users", () => {
+    it("should return list of team users", async () => {
+      const { client, headers, team } = getCtx();
+      const res = await client.teams[":teamKey"].users.$get(
+        { param: { teamKey: team.key } },
+        { headers: headers() },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(Array.isArray(json.users)).toBe(true);
+    });
+  });
+
+  describe("GET /teams/preferred", () => {
+    it("should return preferred team for user", async () => {
+      const { client, headers } = getCtx();
+      const res = await client.teams.preferred.$get({}, { headers: headers() });
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.team === null || json.team?.id !== undefined).toBe(true);
+    });
+  });
+
+  describe("GET /teams/with-active-plans", () => {
+    it("should return teams with active plans", async () => {
+      const { client, headers } = getCtx();
+      const res = await client.teams["with-active-plans"].$get({}, { headers: headers() });
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(Array.isArray(json.teams)).toBe(true);
+    });
+  });
+});

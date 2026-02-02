@@ -1,0 +1,12 @@
+{
+  "name": "@blackwall/shared",
+  "private": true,
+  "type": "module",
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

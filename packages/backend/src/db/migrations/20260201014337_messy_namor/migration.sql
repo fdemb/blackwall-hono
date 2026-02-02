@@ -1,0 +1,19 @@
+CREATE INDEX `issue_plan_created_by_id_idx` ON `issue_plan` (`created_by_id`);--> statement-breakpoint
+CREATE INDEX `issue_plan_team_id_idx` ON `issue_plan` (`team_id`);--> statement-breakpoint
+CREATE INDEX `label_workspace_id_idx` ON `label` (`workspace_id`);--> statement-breakpoint
+CREATE INDEX `issue_workspace_id_idx` ON `issue` (`workspace_id`);--> statement-breakpoint
+CREATE INDEX `issue_team_id_idx` ON `issue` (`team_id`);--> statement-breakpoint
+CREATE INDEX `issue_created_by_id_idx` ON `issue` (`created_by_id`);--> statement-breakpoint
+CREATE INDEX `issue_assigned_to_id_idx` ON `issue` (`assigned_to_id`);--> statement-breakpoint
+CREATE INDEX `issue_plan_id_idx` ON `issue` (`plan_id`);--> statement-breakpoint
+CREATE INDEX `issue_attachment_issue_id_idx` ON `issue_attachment` (`issue_id`);--> statement-breakpoint
+CREATE INDEX `issue_attachment_created_by_id_idx` ON `issue_attachment` (`created_by_id`);--> statement-breakpoint
+CREATE INDEX `issue_comment_issue_id_idx` ON `issue_comment` (`issue_id`);--> statement-breakpoint
+CREATE INDEX `issue_comment_author_id_idx` ON `issue_comment` (`author_id`);--> statement-breakpoint
+CREATE INDEX `account_user_id_idx` ON `account` (`user_id`);--> statement-breakpoint
+CREATE INDEX `session_user_id_idx` ON `session` (`user_id`);--> statement-breakpoint
+CREATE INDEX `team_active_plan_id_idx` ON `team` (`active_plan_id`);--> statement-breakpoint
+CREATE INDEX `user_last_workspace_id_idx` ON `user` (`last_workspace_id`);--> statement-breakpoint
+CREATE INDEX `user_last_team_id_idx` ON `user` (`last_team_id`);--> statement-breakpoint
+CREATE INDEX `workspace_invitation_workspace_id_idx` ON `workspace_invitation` (`workspace_id`);--> statement-breakpoint
+CREATE INDEX `workspace_invitation_created_by_id_idx` ON `workspace_invitation` (`created_by_id`);

@@ -1,0 +1,16 @@
+import { api } from "@/lib/api";
+import { query } from "@solidjs/router";
+
+export const boardLoader = query(async (teamKey: string) => {
+  const res = await api.issues.$get({
+    query: {
+      teamKey,
+      statusFilters: ["to_do", "in_progress", "done"],
+      onlyOnActivePlan: true,
+    },
+  });
+
+  const { issues } = await res.json();
+
+  return issues;
+}, "boardIssues");
