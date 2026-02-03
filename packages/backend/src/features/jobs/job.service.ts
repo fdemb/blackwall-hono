@@ -1,7 +1,35 @@
-import type { JobStatus } from "../../db/schema/job.schema";
+import type { Job, JobStatus } from "../../db/schema/job.schema";
 import { jobData } from "./job.data";
 
 type JobHandler<T = unknown> = (payload: T) => Promise<void>;
+
+type ProcessResult = {
+    job: Job;
+    success: boolean;
+    error?: string;
+    handlerFound: boolean;
+};
+
+type WorkerLogger = {
+    info: (message: string) => void;
+    error: (message: string) => void;
+};
+
+type WorkerOptions = {
+    queue: string;
+    pollIntervalMs?: number;
+    staleCheckIntervalMs?: number;
+    cleanupIntervalMs?: number;
+    lockDurationMs?: number;
+    signal?: AbortSignal;
+    logger?: Partial<WorkerLogger>;
+};
+
+type ProcessOptions = {
+    queue: string;
+    lockDurationMs?: number;
+    onStart?: (job: Job) => void;
+};
 
 const handlers = new Map<string, JobHandler>();
 
@@ -108,6 +136,42 @@ async function getJobById(id: string) {
     return jobData.getJobById(id);
 }
 
+function resolveLogger(logger?: Partial<WorkerLogger>): WorkerLogger {
+    return {
+        info: logger?.info ?? ((message) => console.log(message)),
+        error: logger?.error ?? ((message) => console.error(message)),
+    };
+}
+
+async function processNextJob(options: ProcessOptions): Promise<ProcessResult | null> {
+    const job = await claimJob(options.queue, options.lockDurationMs);
+    if (!job) return null;
+
+    options.onStart?.(job);
+
+    const handler = getHandler(job.type);
+    if (!handler) {
+        await failJob(job.id, `No handler registered for job type: ${job.type}`);
+        return {
+            job,
+            success: false,
+            error: `No handler registered for job type: ${job.type}`,
+            handlerFound: false,
+        };
+    }
+
+    try {
+        const payload = JSON.parse(job.payload);
+        await handler(payload);
+        await completeJob(job.id);
+        return { job, success: true, handlerFound: true };
+    } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        await failJob(job.id, errorMessage);
+        return { job, success: false, error: errorMessage, handlerFound: true };
+    }
+}
+
 /**
  * Claim and process a job from a queue using its registered handler.
  * @param queue queue name
@@ -115,25 +179,73 @@ async function getJobById(id: string) {
  * @returns processing result with job and success status, or null if no job
  */
 async function processJob(queue: string, lockDurationMs = 30_000) {
-    const job = await claimJob(queue, lockDurationMs);
-    if (!job) return null;
+    const result = await processNextJob({ queue, lockDurationMs });
+    if (!result) return null;
+    return { job: result.job, success: result.success, error: result.error };
+}
 
-    const handler = getHandler(job.type);
-    if (!handler) {
-        await failJob(job.id, `No handler registered for job type: ${job.type}`);
-        return { job, success: false, error: `No handler registered for job type: ${job.type}` };
+async function runWorker(options: WorkerOptions) {
+    const {
+        queue,
+        pollIntervalMs = 1000,
+        staleCheckIntervalMs = 30_000,
+        cleanupIntervalMs = 60 * 60 * 1000,
+        lockDurationMs = 30_000,
+        signal,
+        logger,
+    } = options;
+
+    const log = resolveLogger(logger);
+
+    log.info(`[worker] Starting worker for queue: ${queue}`);
+
+    let lastStaleCheck = 0;
+    let lastCleanup = 0;
+
+    while (!signal?.aborted) {
+        const now = Date.now();
+
+        if (now - lastStaleCheck > staleCheckIntervalMs) {
+            const recovered = await recoverStaleJobs();
+            if (recovered > 0) {
+                log.info(`[worker] Recovered ${recovered} stale job(s)`);
+            }
+            lastStaleCheck = now;
+        }
+
+        if (now - lastCleanup > cleanupIntervalMs) {
+            await cleanupJobs();
+            lastCleanup = now;
+        }
+
+        const result = await processNextJob({
+            queue,
+            lockDurationMs,
+            onStart: (job) => {
+                log.info(`[worker] Processing ${job.type} (${job.id}), attempt ${job.attempts}`);
+            },
+        });
+
+        if (!result) {
+            await Bun.sleep(pollIntervalMs);
+            continue;
+        }
+
+        if (result.success) {
+            log.info(`[worker] Completed ${result.job.id}`);
+            continue;
+        }
+
+        if (!result.handlerFound) {
+            log.error(`[worker] No handler for job type: ${result.job.type}`);
+        }
+
+        if (result.error) {
+            log.error(`[worker] Failed ${result.job.id}: ${result.error}`);
+        }
     }
 
-    try {
-        const payload = JSON.parse(job.payload);
-        await handler(payload);
-        await completeJob(job.id);
-        return { job, success: true };
-    } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        await failJob(job.id, errorMessage);
-        return { job, success: false, error: errorMessage };
-    }
+    log.info("[worker] Stopped");
 }
 
 /**
@@ -156,7 +268,9 @@ export const jobService = {
     listJobs,
     getJobById,
     processJob,
+    processNextJob,
+    runWorker,
     clearHandlers,
 };
 
-export type { JobHandler };
+export type { JobHandler, ProcessResult, WorkerOptions };

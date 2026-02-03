@@ -23,7 +23,10 @@ program
   );
 
 program.action(async (options) => {
-  const result = await jobService.processJob(options.queue, options.lockDurationMs);
+  const result = await jobService.processNextJob({
+    queue: options.queue,
+    lockDurationMs: options.lockDurationMs,
+  });
 
   if (!result) {
     printJson({ processed: false });
