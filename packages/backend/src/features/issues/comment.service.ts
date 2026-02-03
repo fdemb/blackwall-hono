@@ -2,6 +2,7 @@ import { HTTPException } from "hono/http-exception";
 import type { JSONContent } from "@tiptap/core";
 import { issueData } from "./issue.data";
 import { commentData } from "./comment.data";
+import { jobService } from "../jobs/job.service";
 
 /**
  * Get an issue by its key or throw a 404 error.
@@ -31,11 +32,25 @@ export async function createComment(input: {
 }) {
   const issue = await getIssueOrThrow(input.workspaceId, input.issueKey);
 
-  return commentData.createComment({
+  const comment = await commentData.createComment({
     issue,
     authorId: input.userId,
     content: input.content,
   });
+
+  const recipientIds =
+    issue.assignedToId && issue.assignedToId !== input.userId ? [issue.assignedToId] : [];
+
+  await jobService.addJob({
+    type: "comment-email",
+    queue: "email",
+    payload: {
+      commentId: comment.id,
+      recipientIds,
+    },
+  });
+
+  return comment;
 }
 
 /**

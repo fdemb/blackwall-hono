@@ -15,7 +15,6 @@ import {
 import { labelRoutes } from "./features/issues/label.routes";
 import { issuePlanRoutes } from "./features/issue-plans/issue-plan.routes";
 import { timeEntryRoutes } from "./features/time-entries/time-entry.routes";
-import { jobRoutes } from "./features/jobs/job.routes";
 import { globalSearchRoutes } from "./features/global-search/global-search.routes";
 import { settingsRoutes } from "./features/settings/settings.routes";
 import {
@@ -46,7 +45,6 @@ const app = new Hono<AppEnv>()
   .route("/invitations", publicInvitationRoutes)
   // Protected routes (auth middleware inside each)
   .route("/workspaces", workspaceRoutes)
-  .route("/jobs", jobRoutes)
   .route("/invitations", protectedInvitationRoutes)
   // Protected per-workspace routes (auth + workspace middleware inside each)
   .route("/teams", teamRoutes)

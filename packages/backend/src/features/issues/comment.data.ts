@@ -47,6 +47,23 @@ export async function getCommentById(input: { commentId: string; issueId: string
   });
 }
 
+export async function getCommentWithAuthorAndIssue(commentId: string) {
+  return db.query.issueComment.findFirst({
+    where: {
+      id: commentId,
+      deletedAt: { isNull: true },
+    },
+    with: {
+      author: true,
+      issue: {
+        with: {
+          workspace: true,
+        },
+      },
+    },
+  });
+}
+
 export async function softDeleteComment(input: {
   commentId: string;
   issue: Issue;
@@ -75,5 +92,6 @@ export async function softDeleteComment(input: {
 export const commentData = {
   createComment,
   getCommentById,
+  getCommentWithAuthorAndIssue,
   softDeleteComment,
 };
