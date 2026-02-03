@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { zValidator } from "../../lib/validator";
-import { z } from "zod";
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod"; // explicit import if not already there, though validator handles it, it's safer for inline schemas
 import { issueService } from "./issue.service";
 import { labelService } from "./label.service";
 import type { AppEnv } from "../../lib/hono-env";
@@ -13,6 +13,8 @@ import {
   updateIssueSchema,
   bulkUpdateIssuesSchema,
   bulkDeleteIssuesSchema,
+  issueListSchema,
+  issueResponseSchema,
 } from "./issue.zod";
 
 const issueRoutes = new Hono<AppEnv>()
@@ -21,92 +23,167 @@ const issueRoutes = new Hono<AppEnv>()
   /**
    * GET / - List issues for a team with optional filters.
    */
-  .get("/", zValidator("query", listIssuesQuerySchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { teamKey, statusFilters, onlyOnActivePlan } = c.req.valid("query");
+  .get(
+    "/",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "List issues for a team",
+      responses: {
+        200: {
+          description: "List of issues",
+          content: { "application/json": { schema: resolver(issueListSchema) } },
+        },
+      },
+    }),
+    validator("query", listIssuesQuerySchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey, statusFilters, onlyOnActivePlan } = c.req.valid("query");
 
-    const issues = await issueService.listIssuesForTeam({
-      workspaceId: workspace.id,
-      teamKey,
-      userId: user.id,
-      statusFilters,
-      onlyOnActivePlan,
-    });
+      const issues = await issueService.listIssuesForTeam({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+        statusFilters,
+        onlyOnActivePlan,
+      });
 
-    return c.json({ issues });
-  })
+      return c.json({ issues });
+    })
   /**
    * POST / - Create a new issue.
    */
-  .post("/", zValidator("json", createIssueSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { teamKey, issue } = c.req.valid("json");
+  .post(
+    "/",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Create a new issue",
+      responses: {
+        200: {
+          description: "Created issue",
+          content: { "application/json": { schema: resolver(issueResponseSchema) } },
+        },
+      },
+    }),
+    validator("json", createIssueSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey, issue } = c.req.valid("json");
 
-    const created = await issueService.createIssue({
-      workspaceId: workspace.id,
-      teamKey,
-      userId: user.id,
-      issue,
-    });
+      const created = await issueService.createIssue({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+        issue,
+      });
 
-    return c.json({ issue: created });
-  })
+      return c.json({ issue: created });
+    })
   /**
    * GET /my - List all issues assigned to the current user.
    */
-  .get("/my", async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
+  .get(
+    "/my",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "List assigned issues",
+      responses: {
+        200: {
+          description: "List of assigned issues",
+          content: { "application/json": { schema: resolver(issueListSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
 
-    const issues = await issueService.listIssuesAssignedToUser({
-      workspaceId: workspace.id,
-      userId: user.id,
-    });
+      const issues = await issueService.listIssuesAssignedToUser({
+        workspaceId: workspace.id,
+        userId: user.id,
+      });
 
-    return c.json({ issues });
-  })
+      return c.json({ issues });
+    })
   /**
    * GET /:issueKey - Get an issue by its key.
    */
-  .get("/:issueKey", zValidator("param", issueParamsSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { issueKey } = c.req.valid("param");
+  .get(
+    "/:issueKey",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Get an issue by key",
+      responses: {
+        200: {
+          description: "Issue details",
+          content: { "application/json": { schema: resolver(issueResponseSchema) } },
+        },
+        404: { description: "Issue not found" },
+      },
+    }),
+    validator("param", issueParamsSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { issueKey } = c.req.valid("param");
 
-    const issue = await issueService.getIssueByKey({
-      workspaceId: workspace.id,
-      issueKey,
-      userId: user.id,
-    });
+      const issue = await issueService.getIssueByKey({
+        workspaceId: workspace.id,
+        issueKey,
+        userId: user.id,
+      });
 
-    return c.json({ issue });
-  })
+      return c.json({ issue });
+    })
   /**
    * PATCH /bulk - Update multiple issues at once.
    */
-  .patch("/bulk", zValidator("json", bulkUpdateIssuesSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { issueIds, updates } = c.req.valid("json");
+  .patch(
+    "/bulk",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Bulk update issues",
+      responses: {
+        200: {
+          description: "Updated issues",
+          content: { "application/json": { schema: resolver(issueListSchema) } },
+        },
+      },
+    }),
+    validator("json", bulkUpdateIssuesSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { issueIds, updates } = c.req.valid("json");
 
-    const updated = await issueService.updateIssuesBulk({
-      workspaceId: workspace.id,
-      issueIds,
-      userId: user.id,
-      updates,
-    });
+      const updated = await issueService.updateIssuesBulk({
+        workspaceId: workspace.id,
+        issueIds,
+        userId: user.id,
+        updates,
+      });
 
-    return c.json({ issues: updated });
-  })
+      return c.json({ issues: updated });
+    })
   /**
    * PATCH /:issueKey - Update an existing issue.
    */
   .patch(
     "/:issueKey",
-    zValidator("param", issueParamsSchema),
-    zValidator("json", updateIssueSchema),
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Update an issue",
+      responses: {
+        200: {
+          description: "Updated issue",
+          content: { "application/json": { schema: resolver(issueResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", issueParamsSchema),
+    validator("json", updateIssueSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -126,42 +203,78 @@ const issueRoutes = new Hono<AppEnv>()
   /**
    * DELETE /bulk - Soft delete multiple issues at once.
    */
-  .delete("/bulk", zValidator("json", bulkDeleteIssuesSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { issueIds } = c.req.valid("json");
+  .delete(
+    "/bulk",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Bulk delete issues",
+      responses: {
+        200: {
+          description: "Deletion success message",
+          content: { "application/json": { schema: resolver(z.object({ message: z.string() })) } },
+        },
+      },
+    }),
+    validator("json", bulkDeleteIssuesSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { issueIds } = c.req.valid("json");
 
-    const issues = await issueService.softDeleteIssuesBulk({
-      workspaceId: workspace.id,
-      issueIds,
-      userId: user.id,
-    });
+      const issues = await issueService.softDeleteIssuesBulk({
+        workspaceId: workspace.id,
+        issueIds,
+        userId: user.id,
+      });
 
-    return c.json({ message: `${issues.length} issues deleted` });
-  })
+      return c.json({ message: `${issues.length} issues deleted` });
+    })
   /**
    * DELETE /:issueKey - Soft delete an issue.
    */
-  .delete("/:issueKey", zValidator("param", issueParamsSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { issueKey } = c.req.valid("param");
+  .delete(
+    "/:issueKey",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Delete an issue",
+      responses: {
+        200: {
+          description: "Deletion success message",
+          content: { "application/json": { schema: resolver(z.object({ message: z.string() })) } },
+        },
+      },
+    }),
+    validator("param", issueParamsSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { issueKey } = c.req.valid("param");
 
-    await issueService.deleteIssue({
-      workspaceId: workspace.id,
-      issueKey,
-      userId: user.id,
-    });
+      await issueService.deleteIssue({
+        workspaceId: workspace.id,
+        issueKey,
+        userId: user.id,
+      });
 
-    return c.json({ message: "Issue deleted" });
-  })
+      return c.json({ message: "Issue deleted" });
+    })
   /**
    * POST /:issueKey/labels - Add a label to an issue.
    */
   .post(
     "/:issueKey/labels",
-    zValidator("param", issueParamsSchema),
-    zValidator("json", z.object({ labelId: z.string() })),
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Add label to issue",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("param", issueParamsSchema),
+    validator("json", z.object({ labelId: z.string() })),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -189,7 +302,17 @@ const issueRoutes = new Hono<AppEnv>()
    */
   .delete(
     "/:issueKey/labels/:labelId",
-    zValidator("param", issueParamsSchema.extend({ labelId: z.string() })),
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Remove label from issue",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("param", issueParamsSchema.extend({ labelId: z.string() })),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;

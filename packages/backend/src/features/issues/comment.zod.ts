@@ -18,3 +18,19 @@ export const deleteCommentParamsSchema = z.object({
 });
 
 export type DeleteCommentParams = z.infer<typeof deleteCommentParamsSchema>;
+
+export const commentSchema = z.object({
+  id: z.string(),
+  content: z.any(), // JSONContent
+  issueId: z.string(),
+  userId: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  deletedAt: z.number().nullable().optional(),
+  user: z.object({ id: z.string(), name: z.string().nullable(), image: z.string().nullable() }).optional(),
+});
+
+export const commentResponseSchema = z.object({
+  comment: commentSchema,
+});
+

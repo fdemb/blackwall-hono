@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import { zValidator } from "../../lib/validator";
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import { attachmentService } from "./attachment.service";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
@@ -9,6 +10,7 @@ import {
   associateAttachmentsSchema,
   deleteAttachmentParamsSchema,
   getAttachmentParamsSchema,
+  attachmentResponseSchema,
 } from "./attachment.zod";
 import { HTTPException } from "hono/http-exception";
 
@@ -18,59 +20,94 @@ const attachmentRoutes = new Hono<AppEnv>()
   /**
    * POST /:issueKey/attachments - Upload an attachment to an issue.
    */
-  .post("/:issueKey/attachments", zValidator("param", attachmentParamsSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { issueKey } = c.req.valid("param");
+  .post(
+    "/:issueKey/attachments",
+    describeRoute({
+      tags: ["Attachments"],
+      summary: "Upload attachment to issue",
+      responses: {
+        200: {
+          description: "Uploaded attachment",
+          content: { "application/json": { schema: resolver(attachmentResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", attachmentParamsSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { issueKey } = c.req.valid("param");
 
-    const formData = await c.req.formData();
-    const file = formData.get("file");
+      const formData = await c.req.formData();
+      const file = formData.get("file");
 
-    if (!(file instanceof File)) {
-      throw new HTTPException(400, { message: "Expected file" });
-    }
+      if (!(file instanceof File)) {
+        throw new HTTPException(400, { message: "Expected file" });
+      }
 
-    const attachment = await attachmentService.uploadAttachment({
-      workspaceSlug: workspace.slug,
-      workspaceId: workspace.id,
-      issueKey,
-      userId: user.id,
-      file,
-    });
+      const attachment = await attachmentService.uploadAttachment({
+        workspaceSlug: workspace.slug,
+        workspaceId: workspace.id,
+        issueKey,
+        userId: user.id,
+        file,
+      });
 
-    return c.json({ attachment });
-  })
+      return c.json({ attachment });
+    })
   /**
    * POST /attachments - Upload an orphan attachment (not linked to any issue yet).
    */
-  .post("/attachments", async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
+  .post(
+    "/attachments",
+    describeRoute({
+      tags: ["Attachments"],
+      summary: "Upload orphan attachment",
+      responses: {
+        200: {
+          description: "Uploaded attachment",
+          content: { "application/json": { schema: resolver(attachmentResponseSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
 
-    const formData = await c.req.formData();
-    const file = formData.get("file");
+      const formData = await c.req.formData();
+      const file = formData.get("file");
 
-    if (!(file instanceof File)) {
-      throw new HTTPException(400, { message: "Expected file" });
-    }
+      if (!(file instanceof File)) {
+        throw new HTTPException(400, { message: "Expected file" });
+      }
 
-    const attachment = await attachmentService.uploadAttachment({
-      workspaceSlug: workspace.slug,
-      workspaceId: workspace.id,
-      issueKey: null,
-      userId: user.id,
-      file,
-    });
+      const attachment = await attachmentService.uploadAttachment({
+        workspaceSlug: workspace.slug,
+        workspaceId: workspace.id,
+        issueKey: null,
+        userId: user.id,
+        file,
+      });
 
-    return c.json({ attachment });
-  })
+      return c.json({ attachment });
+    })
   /**
    * POST /:issueKey/attachments/associate - Associate orphan attachments with an issue.
    */
   .post(
     "/:issueKey/attachments/associate",
-    zValidator("param", attachmentParamsSchema),
-    zValidator("json", associateAttachmentsSchema),
+    describeRoute({
+      tags: ["Attachments"],
+      summary: "Associate attachments with issue",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("param", attachmentParamsSchema),
+    validator("json", associateAttachmentsSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -92,7 +129,17 @@ const attachmentRoutes = new Hono<AppEnv>()
    */
   .get(
     "/:issueKey/attachments/:attachmentId",
-    zValidator("param", deleteAttachmentParamsSchema),
+    describeRoute({
+      tags: ["Attachments"],
+      summary: "Get attachment details",
+      responses: {
+        200: {
+          description: "Attachment details",
+          content: { "application/json": { schema: resolver(attachmentResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", deleteAttachmentParamsSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const { issueKey, attachmentId } = c.req.valid("param");
@@ -111,7 +158,17 @@ const attachmentRoutes = new Hono<AppEnv>()
    */
   .delete(
     "/:issueKey/attachments/:attachmentId",
-    zValidator("param", deleteAttachmentParamsSchema),
+    describeRoute({
+      tags: ["Attachments"],
+      summary: "Delete attachment",
+      responses: {
+        200: {
+          description: "Success message",
+          content: { "application/json": { schema: resolver(z.object({ message: z.string() })) } },
+        },
+      },
+    }),
+    validator("param", deleteAttachmentParamsSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -136,7 +193,17 @@ const attachmentDownloadRoutes = new Hono<AppEnv>()
   .use("*", workspaceMiddleware)
   .get(
     "/attachments/:attachmentId/download",
-    zValidator("param", getAttachmentParamsSchema),
+    describeRoute({
+      tags: ["Attachments"],
+      summary: "Download attachment",
+      responses: {
+        200: {
+          description: "Attachment download details",
+          content: { "application/json": { schema: resolver(attachmentResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", getAttachmentParamsSchema),
     async (c) => {
       const user = c.get("user")!;
       const { attachmentId } = c.req.valid("param");

@@ -1,12 +1,12 @@
 import * as z from "zod";
 import { useAppForm } from "@/context/form-context";
-import { useNavigate } from "@solidjs/router";
+import { action, redirect, useAction, useNavigate } from "@solidjs/router";
 import { add } from "date-fns";
 import { api } from "@/lib/api";
 import type { InferDbType } from "@blackwall/backend/src/db/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { TanStackTextArea, TanStackTextField } from "@/components/ui/text-field";
-import { CalendarDate, getLocalTimeZone } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, parseDate } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
@@ -29,39 +29,43 @@ type PlanFormProps = {
     buttonText: string;
 };
 
+const createPlanAction = action(async (workspaceSlug: string, teamKey: string, value: { name: string; goal: string | null; startDate: string; endDate: string; onUndoneIssues: "moveToBacklog" | "moveToNewPlan" }) => {
+    await api["issue-plans"].teams[":teamKey"].plans.$post({
+        param: { teamKey },
+        json: {
+            name: value.name,
+            goal: value.goal,
+            startDate: value.startDate,
+            endDate: value.endDate,
+            onUndoneIssues: value.onUndoneIssues,
+        },
+    });
+
+    redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
+});
+
 export function PlanForm(props: PlanFormProps) {
-    const navigate = useNavigate();
+    const _action = useAction(createPlanAction);
 
     const form = useAppForm(() => ({
         defaultValues: {
             name: "",
             goal: null as string | null,
-            startDate: new Date(),
-            endDate: add(new Date(), { weeks: 2 }),
+            startDate: new Date().toISOString(),
+            endDate: add(new Date(), { weeks: 2 }).toISOString(),
             onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewPlan",
         },
         validators: {
             onSubmit: z.object({
                 name: z.string().min(1, "Name is required"),
                 goal: z.string().nullable(),
-                startDate: z.date(),
-                endDate: z.date(),
+                startDate: z.iso.date(),
+                endDate: z.iso.date(),
                 onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
             }),
         },
         onSubmit: async ({ value }) => {
-            await api["issue-plans"].teams[":teamKey"].plans.$post({
-                param: { teamKey: props.teamKey },
-                json: {
-                    name: value.name,
-                    goal: value.goal,
-                    startDate: value.startDate,
-                    endDate: value.endDate,
-                    onUndoneIssues: value.onUndoneIssues,
-                },
-            });
-
-            navigate(`/${props.workspaceSlug}/team/${props.teamKey}/issues/board`);
+            await _action(props.workspaceSlug, props.teamKey, value);
         },
     }));
 
@@ -103,18 +107,14 @@ export function PlanForm(props: PlanFormProps) {
                     <form.AppField name="startDate">
                         {(field) => {
                             const calendarDate = () =>
-                                new CalendarDate(
-                                    field().state.value.getFullYear(),
-                                    field().state.value.getMonth() + 1,
-                                    field().state.value.getDate(),
-                                );
+                                parseDate(field().state.value)
 
                             return (
                                 <div class="flex flex-col gap-2 w-full">
                                     <Label for={field().name}>Start date</Label>
                                     <DatePicker
                                         selected={calendarDate()}
-                                        onSelect={(date) => field().handleChange(date.toDate(getLocalTimeZone()))}
+                                        onSelect={(date) => field().handleChange(date.toString())}
                                     />
                                 </div>
                             );
@@ -124,18 +124,14 @@ export function PlanForm(props: PlanFormProps) {
                     <form.AppField name="endDate">
                         {(field) => {
                             const calendarDate = () =>
-                                new CalendarDate(
-                                    field().state.value.getFullYear(),
-                                    field().state.value.getMonth() + 1,
-                                    field().state.value.getDate(),
-                                );
+                                parseDate(field().state.value);
 
                             return (
                                 <div class="flex flex-col gap-2 w-full">
                                     <Label for={field().name}>End date</Label>
                                     <DatePicker
                                         selected={calendarDate()}
-                                        onSelect={(date) => field().handleChange(date.toDate(getLocalTimeZone()))}
+                                        onSelect={(date) => field().handleChange(date.toString())}
                                     />
                                 </div>
                             );

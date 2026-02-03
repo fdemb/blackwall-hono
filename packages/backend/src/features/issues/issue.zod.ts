@@ -62,3 +62,33 @@ export const bulkDeleteIssuesSchema = z.object({
 });
 
 export type BulkDeleteIssues = z.infer<typeof bulkDeleteIssuesSchema>;
+
+// Response Schemas
+export const issueSchema = z.object({
+  id: z.string(),
+  key: z.string(),
+  summary: z.string(),
+  description: z.any().nullable().optional(),
+  status: z.enum(issueStatusValues),
+  priority: z.enum(issuePriorityValues),
+  teamId: z.string(),
+  createdById: z.string(),
+  assignedToId: z.string().nullable().optional(),
+  planId: z.string().nullable().optional(),
+  estimationPoints: z.number().nullable().optional(),
+  order: z.number(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  deletedAt: z.number().nullable().optional(),
+  // Add simplified relations if needed, often full objects are returned
+  team: z.object({ id: z.string(), key: z.string(), name: z.string() }).optional(),
+});
+
+export const issueListSchema = z.object({
+  issues: z.array(issueSchema),
+});
+
+export const issueResponseSchema = z.object({
+  issue: issueSchema,
+});
+

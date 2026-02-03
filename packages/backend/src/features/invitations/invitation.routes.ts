@@ -1,4 +1,5 @@
-import { zValidator } from "../../lib/validator";
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import { Hono } from "hono";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
@@ -10,6 +11,10 @@ import {
   createInvitationSchema,
   invitationTokenParamsSchema,
   registerAndAcceptInvitationSchema,
+  invitationResponseSchema,
+  publicInvitationResponseSchema,
+  authResponseSchema,
+  acceptInvitationResponseSchema,
 } from "./invitation.zod";
 import { HTTPException } from "hono/http-exception";
 
@@ -22,7 +27,17 @@ const invitationRoutes = new Hono<AppEnv>()
   .use("*", workspaceMiddleware)
   .post(
     "/",
-    zValidator("json", createInvitationSchema),
+    describeRoute({
+      tags: ["Invitations"],
+      summary: "Create and send invitation",
+      responses: {
+        200: {
+          description: "Invitation sent",
+          content: { "application/json": { schema: resolver(invitationResponseSchema) } },
+        },
+      },
+    }),
+    validator("json", createInvitationSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -47,32 +62,55 @@ const publicInvitationRoutes = new Hono<AppEnv>()
   /**
    * GET /:token - Get invitation details by token (public).
    */
-  .get("/:token", zValidator("param", invitationTokenParamsSchema), async (c) => {
-    const { token } = c.req.valid("param");
-
-    const invitation = await invitationService.getInvitationByToken(token);
-
-    if (!invitation) {
-      throw new HTTPException(404, { message: "Invitation not found or expired" });
-    }
-
-    return c.json({
-      invitation: {
-        email: invitation.email,
-        workspace: {
-          displayName: invitation.workspace.displayName,
-          slug: invitation.workspace.slug,
+  .get(
+    "/:token",
+    describeRoute({
+      tags: ["Invitations"],
+      summary: "Get invitation details",
+      responses: {
+        200: {
+          description: "Invitation details",
+          content: { "application/json": { schema: resolver(publicInvitationResponseSchema) } },
         },
       },
-    });
-  })
+    }),
+    validator("param", invitationTokenParamsSchema),
+    async (c) => {
+      const { token } = c.req.valid("param");
+
+      const invitation = await invitationService.getInvitationByToken(token);
+
+      if (!invitation) {
+        throw new HTTPException(404, { message: "Invitation not found or expired" });
+      }
+
+      return c.json({
+        invitation: {
+          email: invitation.email,
+          workspace: {
+            displayName: invitation.workspace.displayName,
+            slug: invitation.workspace.slug,
+          },
+        },
+      });
+    })
   /**
    * POST /:token/register - Register a new user and accept an invitation.
    */
   .post(
     "/:token/register",
-    zValidator("param", invitationTokenParamsSchema),
-    zValidator("json", registerAndAcceptInvitationSchema),
+    describeRoute({
+      tags: ["Invitations"],
+      summary: "Register and accept invitation",
+      responses: {
+        200: {
+          description: "User registered and invitation accepted",
+          content: { "application/json": { schema: resolver(authResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", invitationTokenParamsSchema),
+    validator("json", registerAndAcceptInvitationSchema),
     async (c) => {
       const { token } = c.req.valid("param");
       const { name, password } = c.req.valid("json");
@@ -118,7 +156,17 @@ const protectedInvitationRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
   .post(
     "/:token/accept",
-    zValidator("param", invitationTokenParamsSchema),
+    describeRoute({
+      tags: ["Invitations"],
+      summary: "Accept invitation (logged in)",
+      responses: {
+        200: {
+          description: "Invitation accepted",
+          content: { "application/json": { schema: resolver(acceptInvitationResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", invitationTokenParamsSchema),
     async (c) => {
       const user = c.get("user")!;
       const { token } = c.req.valid("param");

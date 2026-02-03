@@ -4,7 +4,10 @@ import { z } from "zod";
 import { AppError } from "./errors";
 
 export const errorHandler = (err: Error | HTTPException, c: Context) => {
-  console.log("=== Caught Error ===", err);
+  if (process.env.NODE_ENV === "development") {
+    console.log("=== Caught Error ===");
+    console.error(err);
+  }
 
   if (err instanceof AppError) {
     return c.text(err.message, err.statusCode);

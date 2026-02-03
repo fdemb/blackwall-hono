@@ -24,3 +24,21 @@ export const getAttachmentParamsSchema = z.object({
 });
 
 export type GetAttachmentParams = z.infer<typeof getAttachmentParamsSchema>;
+
+export const attachmentSchema = z.object({
+  id: z.string(),
+  originalName: z.string(),
+  mimeType: z.string(),
+  size: z.number(),
+  path: z.string(),
+  issueId: z.string().nullable().optional(),
+  uploaderId: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  deletedAt: z.number().nullable().optional(),
+});
+
+export const attachmentResponseSchema = z.object({
+  attachment: attachmentSchema,
+});
+

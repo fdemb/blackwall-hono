@@ -1,5 +1,6 @@
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import { Hono } from "hono";
-import { zValidator } from "../../lib/validator";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
 import { workspaceMiddleware } from "../workspaces/workspace-middleware";
@@ -13,6 +14,12 @@ import {
   addTeamMemberSchema,
   removeTeamMemberParamSchema,
   createTeamSettingsSchema,
+  profileResponseSchema,
+  workspaceResponseSchema,
+  teamListSchema,
+  teamResponseSchema,
+  teamWithMembersSchema,
+  userListSchema,
 } from "./settings.zod";
 import { workspaceService } from "../workspaces/workspace.service";
 import { HTTPException } from "hono/http-exception";
@@ -25,30 +32,56 @@ const settingsRoutes = new Hono<AppEnv>()
   /**
    * GET /profile - Get the current user's profile.
    */
-  .get("/profile", async (c) => {
-    const user = c.get("user")!;
-    const profile = await settingsService.getProfile(user.id);
+  .get(
+    "/profile",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Get profile",
+      responses: {
+        200: {
+          description: "User profile",
+          content: { "application/json": { schema: resolver(profileResponseSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const user = c.get("user")!;
+      const profile = await settingsService.getProfile(user.id);
 
-    if (!profile) {
-      return c.notFound();
-    }
+      if (!profile) {
+        return c.notFound();
+      }
 
-    return c.json({ profile });
-  })
+      return c.json({ profile });
+    })
   /**
    * PATCH /profile - Update the current user's profile name.
    */
-  .patch("/profile", zValidator("json", updateProfileNameSchema), async (c) => {
-    const user = c.get("user")!;
-    const { name } = c.req.valid("json");
+  .patch(
+    "/profile",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Update profile name",
+      responses: {
+        200: {
+          description: "User profile",
+          content: { "application/json": { schema: resolver(profileResponseSchema) } },
+        },
+      },
+    }),
+    validator("json", updateProfileNameSchema),
+    async (c) => {
+      const user = c.get("user")!;
+      const { name } = c.req.valid("json");
 
-    const profile = await settingsService.updateProfileName({
-      userId: user.id,
-      name,
-    });
+      const profile = await settingsService.updateProfileName({
+        userId: user.id,
+        name,
+      });
 
-    return c.json({ profile });
-  })
+      return c.json({ profile });
+    },
+  )
   /**
    * PATCH /profile/avatar - Update or remove the current user's avatar.
    */
@@ -101,109 +134,201 @@ const settingsRoutes = new Hono<AppEnv>()
   /**
    * POST /profile/password - Change the current user's password.
    */
-  .post("/profile/password", zValidator("json", changePasswordSchema), async (c) => {
-    const { currentPassword, newPassword, revokeOtherSessions } = c.req.valid("json");
+  .post(
+    "/profile/password",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Change password",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("json", changePasswordSchema),
+    async (c) => {
+      const { currentPassword, newPassword, revokeOtherSessions } = c.req.valid("json");
 
-    try {
-      await settingsService.changePassword({
-        headers: c.req.raw.headers,
-        currentPassword,
-        newPassword,
-        revokeOtherSessions,
-      });
+      try {
+        await settingsService.changePassword({
+          headers: c.req.raw.headers,
+          currentPassword,
+          newPassword,
+          revokeOtherSessions,
+        });
 
-      return c.json({ success: true });
-    } catch (error) {
-      throw new HTTPException(400, { message: "Failed to change password" });
-    }
-  })
+        return c.json({ success: true });
+      } catch (error) {
+        throw new HTTPException(400, { message: "Failed to change password" });
+      }
+    },
+  )
   /**
    * GET /workspace - Get the current workspace settings.
    */
-  .get("/workspace", async (c) => {
-    const workspace = c.get("workspace");
+  .get(
+    "/workspace",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Get workspace settings",
+      responses: {
+        200: {
+          description: "Workspace settings",
+          content: { "application/json": { schema: resolver(workspaceResponseSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
 
-    return c.json({ workspace });
-  })
+      return c.json({ workspace });
+    },
+  )
   /**
    * PATCH /workspace - Update the current workspace settings.
    */
-  .patch("/workspace", zValidator("json", updateWorkspaceSettingsSchema), async (c) => {
-    const user = c.get("user")!;
-    const workspace = c.get("workspace");
-    const { displayName } = c.req.valid("json");
+  .patch(
+    "/workspace",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Update workspace settings",
+      responses: {
+        200: {
+          description: "Workspace settings",
+          content: { "application/json": { schema: resolver(workspaceResponseSchema) } },
+        },
+      },
+    }),
+    validator("json", updateWorkspaceSettingsSchema),
+    async (c) => {
+      const user = c.get("user")!;
+      const workspace = c.get("workspace");
+      const { displayName } = c.req.valid("json");
 
-    if (displayName) {
-      const updatedWorkspace = await workspaceService.updateWorkspace({
-        actorId: user.id,
-        workspaceId: workspace.id,
-        displayName,
-      });
+      if (displayName) {
+        const updatedWorkspace = await workspaceService.updateWorkspace({
+          actorId: user.id,
+          workspaceId: workspace.id,
+          displayName,
+        });
 
-      return c.json({ workspace: updatedWorkspace });
-    }
+        return c.json({ workspace: updatedWorkspace });
+      }
 
-    return c.json({ workspace });
-  })
+      return c.json({ workspace });
+    },
+  )
   /**
    * GET /teams - List all teams in the workspace with member counts.
    */
-  .get("/teams", async (c) => {
-    const workspace = c.get("workspace");
-    const teamsData = await teamData.listTeamsWithCounts({ workspaceId: workspace.id });
-    return c.json({ teams: teamsData });
-  })
+  .get(
+    "/teams",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "List teams",
+      responses: {
+        200: {
+          description: "List of teams",
+          content: { "application/json": { schema: resolver(teamListSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const teamsData = await teamData.listTeamsWithCounts({ workspaceId: workspace.id });
+      return c.json({ teams: teamsData });
+    },
+  )
   /**
-   * POST /teams - Create a new team in the workspace.
-   */
-  .post("/teams", zValidator("json", createTeamSettingsSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { name, key } = c.req.valid("json");
+    * POST /teams - Create a new team in the workspace.
+    */
+  .post(
+    "/teams",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Create team",
+      responses: {
+        200: {
+          description: "Created team",
+          content: { "application/json": { schema: resolver(teamResponseSchema) } },
+        },
+      },
+    }),
+    validator("json", createTeamSettingsSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { name, key } = c.req.valid("json");
 
-    const team = await teamService.createTeam({
-      name,
-      key,
-      workspaceId: workspace.id,
-    });
+      const team = await teamService.createTeam({
+        name,
+        key,
+        workspaceId: workspace.id,
+      });
 
-    await teamService.UNCHECKED_addUserToTeam({
-      teamId: team.id,
-      userId: user.id,
-    });
+      await teamService.UNCHECKED_addUserToTeam({
+        teamId: team.id,
+        userId: user.id,
+      });
 
-    return c.json({ team });
-  })
+      return c.json({ team });
+    },
+  )
   /**
    * GET /teams/:teamKey - Get a team by its key with members.
    */
-  .get("/teams/:teamKey", zValidator("param", teamKeyParamSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const { teamKey } = c.req.valid("param");
+  .get(
+    "/teams/:teamKey",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Get team by key",
+      responses: {
+        200: {
+          description: "Team details",
+          content: { "application/json": { schema: resolver(teamWithMembersSchema) } },
+        },
+      },
+    }),
+    validator("param", teamKeyParamSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const { teamKey } = c.req.valid("param");
 
-    const team = await teamData.getTeamByKey({
-      workspaceId: workspace.id,
-      teamKey,
-    });
+      const team = await teamData.getTeamByKey({
+        workspaceId: workspace.id,
+        teamKey,
+      });
 
-    if (!team) {
-      throw new HTTPException(404, { message: "Team not found" });
-    }
+      if (!team) {
+        throw new HTTPException(404, { message: "Team not found" });
+      }
 
-    const teamMembers = await teamData.listTeamUsers({
-      workspaceId: workspace.id,
-      teamKey,
-    });
+      const teamMembers = await teamData.listTeamUsers({
+        workspaceId: workspace.id,
+        teamKey,
+      });
 
-    return c.json({ team, teamMembers });
-  })
+      return c.json({ team, teamMembers });
+    },
+  )
   /**
    * PATCH /teams/:teamKey - Update a team's settings.
    */
   .patch(
     "/teams/:teamKey",
-    zValidator("param", teamKeyParamSchema),
-    zValidator("json", updateTeamSchema),
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Update team",
+      responses: {
+        200: {
+          description: "Updated team",
+          content: { "application/json": { schema: resolver(teamResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", teamKeyParamSchema),
+    validator("json", updateTeamSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const { teamKey } = c.req.valid("param");
@@ -225,24 +350,48 @@ const settingsRoutes = new Hono<AppEnv>()
   /**
    * GET /teams/:teamKey/available-users - List workspace users not in a team.
    */
-  .get("/teams/:teamKey/available-users", zValidator("param", teamKeyParamSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const { teamKey } = c.req.valid("param");
+  .get(
+    "/teams/:teamKey/available-users",
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Get available users for team",
+      responses: {
+        200: {
+          description: "Available users",
+          content: { "application/json": { schema: resolver(userListSchema) } },
+        },
+      },
+    }),
+    validator("param", teamKeyParamSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const { teamKey } = c.req.valid("param");
 
-    const users = await teamData.listWorkspaceUsersNotInTeam({
-      workspaceId: workspace.id,
-      teamKey,
-    });
+      const users = await teamData.listWorkspaceUsersNotInTeam({
+        workspaceId: workspace.id,
+        teamKey,
+      });
 
-    return c.json({ users });
-  })
+      return c.json({ users });
+    },
+  )
   /**
    * POST /teams/:teamKey/members - Add a member to a team.
    */
   .post(
     "/teams/:teamKey/members",
-    zValidator("param", teamKeyParamSchema),
-    zValidator("json", addTeamMemberSchema),
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Add team member",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("param", teamKeyParamSchema),
+    validator("json", addTeamMemberSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -272,7 +421,17 @@ const settingsRoutes = new Hono<AppEnv>()
    */
   .delete(
     "/teams/:teamKey/members/:userId",
-    zValidator("param", removeTeamMemberParamSchema),
+    describeRoute({
+      tags: ["Settings"],
+      summary: "Remove team member",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("param", removeTeamMemberParamSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const { teamKey, userId } = c.req.valid("param");

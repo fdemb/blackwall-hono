@@ -57,3 +57,65 @@ export const createTeamSettingsSchema = z.object({
 });
 
 export type CreateTeamSettings = z.infer<typeof createTeamSettingsSchema>;
+
+export const userProfileSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  emailVerified: z.boolean(),
+  image: z.string().nullable().optional(),
+  createdAt: z.any(),
+  updatedAt: z.any(),
+});
+
+export const workspaceSettingsSchema = z.object({
+  id: z.string(),
+  displayName: z.string(),
+  slug: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  createdAt: z.any(),
+  updatedAt: z.any(),
+});
+
+export const teamSettingsSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  key: z.string(),
+  workspaceId: z.string(),
+  activePlanId: z.string().nullable().optional(),
+  createdAt: z.any(),
+  updatedAt: z.any(),
+});
+
+export const teamListSchema = z.object({
+  teams: z.array(teamSettingsSchema.extend({ _count: z.object({ members: z.number() }).optional() })),
+});
+
+export const teamMemberSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  image: z.string().nullable().optional(),
+});
+
+export const teamWithMembersSchema = z.object({
+  team: teamSettingsSchema,
+  teamMembers: z.array(teamMemberSchema),
+});
+
+export const userListSchema = z.object({
+  users: z.array(teamMemberSchema),
+});
+
+export const profileResponseSchema = z.object({
+  profile: userProfileSchema,
+});
+
+export const workspaceResponseSchema = z.object({
+  workspace: workspaceSettingsSchema,
+});
+
+export const teamResponseSchema = z.object({
+  team: teamSettingsSchema,
+});
+

@@ -1,11 +1,12 @@
 import type { JSONContent } from "@tiptap/core";
 import { Hono } from "hono";
-import { zValidator } from "../../lib/validator";
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import { commentService } from "./comment.service";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
 import { workspaceMiddleware } from "../workspaces/workspace-middleware";
-import { commentParamsSchema, createCommentSchema, deleteCommentParamsSchema } from "./comment.zod";
+import { commentParamsSchema, commentResponseSchema, createCommentSchema, deleteCommentParamsSchema } from "./comment.zod";
 
 const commentRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
@@ -15,8 +16,18 @@ const commentRoutes = new Hono<AppEnv>()
    */
   .post(
     "/:issueKey/comments",
-    zValidator("param", commentParamsSchema),
-    zValidator("json", createCommentSchema),
+    describeRoute({
+      tags: ["Comments"],
+      summary: "Create a comment",
+      responses: {
+        200: {
+          description: "Created comment",
+          content: { "application/json": { schema: resolver(commentResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", commentParamsSchema),
+    validator("json", createCommentSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -38,7 +49,17 @@ const commentRoutes = new Hono<AppEnv>()
    */
   .delete(
     "/:issueKey/comments/:commentId",
-    zValidator("param", deleteCommentParamsSchema),
+    describeRoute({
+      tags: ["Comments"],
+      summary: "Delete a comment",
+      responses: {
+        200: {
+          description: "Success message",
+          content: { "application/json": { schema: resolver(z.object({ message: z.string() })) } },
+        },
+      },
+    }),
+    validator("param", deleteCommentParamsSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;

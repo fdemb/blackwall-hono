@@ -31,3 +31,38 @@ export const workspaceMemberParamsSchema = z.object({
 });
 
 export type WorkspaceMemberParams = z.infer<typeof workspaceMemberParamsSchema>;
+
+export const workspaceSchema = z.object({
+  id: z.string(),
+  displayName: z.string(),
+  slug: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  createdAt: z.any(),
+  updatedAt: z.any(),
+});
+
+export const workspaceListSchema = z.object({
+  workspaces: z.array(workspaceSchema),
+});
+
+export const workspaceResponseSchema = z.object({
+  workspace: workspaceSchema,
+});
+
+export const workspaceMemberSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  image: z.string().nullable().optional(),
+  role: z.string().optional(),
+  joinedAt: z.any().optional(),
+});
+
+export const workspaceMemberListSchema = z.object({
+  members: z.array(workspaceMemberSchema),
+});
+
+export const workspaceMemberResponseSchema = z.object({
+  member: workspaceMemberSchema,
+});
+

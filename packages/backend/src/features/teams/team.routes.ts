@@ -1,10 +1,18 @@
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import { Hono } from "hono";
-import { zValidator } from "../../lib/validator";
 import { teamService } from "./team.service";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
 import { workspaceMiddleware } from "../workspaces/workspace-middleware";
-import { createTeamSchema, teamParamsSchema } from "./team.zod";
+import {
+  createTeamSchema,
+  teamParamsSchema,
+  teamResponseSchema,
+  teamListSchema,
+  teamWithPlanListSchema,
+  teamUserListSchema,
+} from "./team.zod";
 
 const teamRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
@@ -12,78 +20,157 @@ const teamRoutes = new Hono<AppEnv>()
   /**
    * POST /create - Create a new team in the workspace.
    */
-  .post("/create", zValidator("json", createTeamSchema), async (c) => {
-    const validated = c.req.valid("json");
-    const team = await teamService.createTeam(validated);
+  .post(
+    "/create",
+    describeRoute({
+      tags: ["Teams"],
+      summary: "Create team",
+      responses: {
+        200: {
+          description: "Created team",
+          content: { "application/json": { schema: resolver(teamResponseSchema) } },
+        },
+      },
+    }),
+    validator("json", createTeamSchema),
+    async (c) => {
+      const validated = c.req.valid("json");
+      const team = await teamService.createTeam(validated);
 
-    return c.json({ team: team });
-  })
+      return c.json({ team: team });
+    },
+  )
   /**
-   * GET / - List all teams in the workspace.
-   */
-  .get("/", async (c) => {
-    const workspace = c.get("workspace");
-    const teams = await teamService.getTeams({ workspaceId: workspace.id });
+    * GET / - List all teams in the workspace.
+    */
+  .get(
+    "/",
+    describeRoute({
+      tags: ["Teams"],
+      summary: "List teams",
+      responses: {
+        200: {
+          description: "List of teams",
+          content: { "application/json": { schema: resolver(teamListSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const teams = await teamService.getTeams({ workspaceId: workspace.id });
 
-    return c.json({ teams });
-  })
+      return c.json({ teams });
+    },
+  )
   /**
    * GET /preferred - Get the user's preferred team for the workspace.
    */
-  .get("/preferred", async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const team = await teamService.getPreferredTeam({
-      workspaceId: workspace.id,
-      userId: user.id,
-    });
+  .get(
+    "/preferred",
+    describeRoute({
+      tags: ["Teams"],
+      summary: "Get preferred team",
+      responses: {
+        200: {
+          description: "Preferred team",
+          content: { "application/json": { schema: resolver(teamResponseSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const team = await teamService.getPreferredTeam({
+        workspaceId: workspace.id,
+        userId: user.id,
+      });
 
-    return c.json({ team });
-  })
+      return c.json({ team });
+    })
   /**
-   * GET /with-active-plans - List teams the user belongs to that have active plans.
-   */
-  .get("/with-active-plans", async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const teams = await teamService.listTeamsWithActivePlans({
-      workspaceId: workspace.id,
-      userId: user.id,
-    });
+    * GET /with-active-plans - List teams the user belongs to that have active plans.
+    */
+  .get(
+    "/with-active-plans",
+    describeRoute({
+      tags: ["Teams"],
+      summary: "List teams with active plans",
+      responses: {
+        200: {
+          description: "Teams with active plans",
+          content: { "application/json": { schema: resolver(teamWithPlanListSchema) } },
+        },
+      },
+    }),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const teams = await teamService.listTeamsWithActivePlans({
+        workspaceId: workspace.id,
+        userId: user.id,
+      });
 
-    return c.json({ teams });
-  })
+      return c.json({ teams });
+    },
+  )
   /**
    * GET /:teamKey - Get a team by its key.
    */
-  .get("/:teamKey", zValidator("param", teamParamsSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { teamKey } = c.req.valid("param");
+  .get(
+    "/:teamKey",
+    describeRoute({
+      tags: ["Teams"],
+      summary: "Get team by key",
+      responses: {
+        200: {
+          description: "Team details",
+          content: { "application/json": { schema: resolver(teamResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", teamParamsSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey } = c.req.valid("param");
 
-    const team = await teamService.getTeamByKey({
-      workspaceId: workspace.id,
-      teamKey,
-      userId: user.id,
-    });
+      const team = await teamService.getTeamByKey({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+      });
 
-    return c.json({ team });
-  })
+      return c.json({ team });
+    })
   /**
-   * GET /:teamKey/users - List all users in a team.
-   */
-  .get("/:teamKey/users", zValidator("param", teamParamsSchema), async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { teamKey } = c.req.valid("param");
+    * GET /:teamKey/users - List all users in a team.
+    */
+  .get(
+    "/:teamKey/users",
+    describeRoute({
+      tags: ["Teams"],
+      summary: "List team users",
+      responses: {
+        200: {
+          description: "Team users",
+          content: { "application/json": { schema: resolver(teamUserListSchema) } },
+        },
+      },
+    }),
+    validator("param", teamParamsSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey } = c.req.valid("param");
 
-    const users = await teamService.listTeamUsers({
-      workspaceId: workspace.id,
-      teamKey,
-      userId: user.id,
-    });
+      const users = await teamService.listTeamUsers({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+      });
 
-    return c.json({ users });
-  });
+      return c.json({ users });
+    },
+  );
 
 export { teamRoutes };

@@ -1,9 +1,10 @@
-import { zValidator } from "../../lib/validator";
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import { Hono } from "hono";
 import { auth } from "./better-auth";
 import { workspaceService } from "../workspaces/workspace.service";
 import { teamService } from "../teams/team.service";
-import { signupEmailSchema } from "./auth.zod";
+import { signupEmailSchema, signupResponseSchema } from "./auth.zod";
 
 /**
  * We're wrapping better-auth signup here so we can create a workspace and team
@@ -12,7 +13,17 @@ import { signupEmailSchema } from "./auth.zod";
  */
 const authRoutes = new Hono().post(
   "/signup/email",
-  zValidator("json", signupEmailSchema),
+  describeRoute({
+    tags: ["Auth"],
+    summary: "Sign up with email",
+    responses: {
+      200: {
+        description: "User, workspace and team created",
+        content: { "application/json": { schema: resolver(signupResponseSchema) } },
+      },
+    },
+  }),
+  validator("json", signupEmailSchema),
   async (c) => {
     const { email, password, name, workspaceDisplayName, workspaceUrlSlug } = c.req.valid("json");
 

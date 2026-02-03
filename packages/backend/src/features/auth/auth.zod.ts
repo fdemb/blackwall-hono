@@ -13,3 +13,28 @@ export const signupEmailSchema = z.object({
 });
 
 export type SignupEmail = z.infer<typeof signupEmailSchema>;
+
+export const authUserSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    emailVerified: z.boolean(),
+    image: z.string().nullable().optional(),
+    createdAt: z.any(),
+    updatedAt: z.any(),
+});
+
+export const signupResponseSchema = z.object({
+    user: authUserSchema,
+    workspace: z.object({
+        id: z.string(),
+        displayName: z.string(),
+        slug: z.string(),
+    }),
+    team: z.object({
+        id: z.string(),
+        name: z.string(),
+        key: z.string(),
+    }),
+});
+
