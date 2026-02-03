@@ -1,15 +1,10 @@
 import { Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
-import { z } from "zod";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
-import { workspaceMiddleware } from "../workspaces/workspace-middleware";
+import { workspaceHeaderSchema, workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { globalSearchService } from "./global-search.service";
 import { globalSearchQuerySchema, globalSearchResponseSchema } from "./global-search.zod";
-
-const workspaceHeaderSchema = z.object({
-  "x-blackwall-workspace-slug": z.string().min(1),
-});
 
 const globalSearchRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
