@@ -1,14 +1,30 @@
 import { AuthCard } from "@/components/blocks/auth";
+import { toast } from "@/components/custom-ui/toast";
 import { useTheme } from "@/components/settings/use-theme";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { authClient } from "@/lib/auth-client";
-import { A } from "@solidjs/router";
+import { A, action, redirect, useAction } from "@solidjs/router";
 import * as z from "zod";
+
+const signinAction = action(async (email: string, password: string) => {
+  const result = await authClient.signIn.email({
+    email,
+    password,
+  });
+
+  if (result.error) {
+    toast.error(result.error.message ?? "Something went wrong");
+    return;
+  }
+
+  throw redirect("/")
+});
 
 export default function SignInPage() {
   const { setThemeToUserPreference } = useTheme();
+  const _action = useAction(signinAction)
 
   const form = useAppForm(() => ({
     defaultValues: {
@@ -21,11 +37,8 @@ export default function SignInPage() {
         password: z.string().min(8),
       }),
     },
-    onSubmit: async ({ value, formApi }) => {
-      await authClient.signIn.email({
-        email: value.email,
-        password: value.password,
-      });
+    onSubmit: async ({ value }) => {
+      _action(value.email, value.password)
     },
   }));
 
