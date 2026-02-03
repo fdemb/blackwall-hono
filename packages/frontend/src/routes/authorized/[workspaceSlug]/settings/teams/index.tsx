@@ -48,6 +48,9 @@ function TeamTable() {
     columnHelper.accessor((row) => row.team.name, {
       id: "name",
       header: "Name",
+      meta: {
+        expand: true
+      },
       cell: (info) => (
         <div class="flex items-center gap-2 font-medium">
           <TeamAvatar team={info.row.original.team} size="5" />
