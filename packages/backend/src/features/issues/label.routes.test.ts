@@ -107,7 +107,7 @@ describe("Label Routes", () => {
                 },
             );
 
-            expect(res.status).toBe(400);
+            expect(res.status as number).toBe(400);
         });
 
         it("should return 400 when name is too long", async () => {
@@ -121,7 +121,7 @@ describe("Label Routes", () => {
                 },
             );
 
-            expect(res.status).toBe(400);
+            expect(res.status as number).toBe(400);
         });
 
         it("should return 400 when label with same name exists", async () => {
@@ -137,7 +137,7 @@ describe("Label Routes", () => {
                 },
             );
 
-            expect(res.status).toBe(400);
+            expect(res.status as number).toBe(400);
         });
     });
 

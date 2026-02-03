@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
-import { workspaceHeaderSchema, workspaceMiddleware } from "../workspaces/workspace-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { globalSearchService } from "./global-search.service";
 import { globalSearchQuerySchema, globalSearchResponseSchema } from "./global-search.zod";
 
@@ -33,7 +33,6 @@ const globalSearchRoutes = new Hono<AppEnv>()
         },
       },
     }),
-    validator("header", workspaceHeaderSchema),
     validator("query", globalSearchQuerySchema),
     async (c) => {
       const workspace = c.get("workspace");

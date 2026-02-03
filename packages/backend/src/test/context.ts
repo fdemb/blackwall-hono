@@ -2,7 +2,7 @@ import { beforeEach, afterEach } from "bun:test";
 import { app } from "../index";
 import { createTestDb, cleanupTestDb, type TestDb } from "./setup";
 import { seedTestSetup } from "./fixtures";
-import { Team, User, Workspace } from "../db/schema";
+import type { Team, User, Workspace } from "../db/schema";
 import { testClient } from "hono/testing";
 
 type TestClient = ReturnType<typeof testClient<typeof app>>;

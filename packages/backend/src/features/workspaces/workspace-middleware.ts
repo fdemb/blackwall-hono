@@ -1,11 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { workspaceService } from "./workspace.service";
-import { z } from "zod";
-
-export const workspaceHeaderSchema = z.object({
-  "x-blackwall-workspace-slug": z.string().min(1),
-});
 
 export const workspaceMiddleware = createMiddleware(async (c, next) => {
   const workspaceSlug = c.req.header("x-blackwall-workspace-slug");

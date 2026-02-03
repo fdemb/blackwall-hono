@@ -21,8 +21,7 @@ describe("Global Search Routes", () => {
     it("should return 400 when query is missing", async () => {
       const { client, headers } = getCtx();
       const res = await client.search.$get(
-        // @ts-expect-error - intentionally missing q for validation test
-        { query: {} },
+        { query: {} as any },
         { headers: headers() },
       );
 
