@@ -2,12 +2,16 @@ import { Hono } from "hono";
 import { zValidator } from "../../lib/validator";
 import { issuePlanService } from "./issue-plan.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { teamData } from "../teams/team.data";
 import { issueData } from "../issues/issue.data";
 import { createIssuePlanSchema, updateIssuePlanSchema } from "./issue-plan.zod";
 import { NotFoundError } from "../../lib/errors";
 
 const issuePlanRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * GET /teams/:teamKey/plans - List all plans for a team.
    */

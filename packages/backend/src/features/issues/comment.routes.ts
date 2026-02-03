@@ -3,9 +3,13 @@ import { Hono } from "hono";
 import { zValidator } from "../../lib/validator";
 import { commentService } from "./comment.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { commentParamsSchema, createCommentSchema, deleteCommentParamsSchema } from "./comment.zod";
 
 const commentRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * POST /:issueKey/comments - Create a comment on an issue.
    */

@@ -2,9 +2,13 @@ import { Hono } from "hono";
 import { zValidator } from "../../lib/validator";
 import { teamService } from "./team.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { createTeamSchema, teamParamsSchema } from "./team.zod";
 
 const teamRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * POST /create - Create a new team in the workspace.
    */

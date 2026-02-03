@@ -4,6 +4,8 @@ import { z } from "zod";
 import { issueService } from "./issue.service";
 import { labelService } from "./label.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import {
   listIssuesQuerySchema,
   createIssueSchema,
@@ -14,6 +16,8 @@ import {
 } from "./issue.zod";
 
 const issueRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * GET / - List issues for a team with optional filters.
    */

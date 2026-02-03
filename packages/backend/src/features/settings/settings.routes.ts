@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "../../lib/validator";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { settingsService } from "./settings.service";
 import {
   updateProfileNameSchema,
@@ -18,6 +20,8 @@ import { teamData } from "../teams/team.data";
 import { teamService } from "../teams/team.service";
 
 const settingsRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * GET /profile - Get the current user's profile.
    */

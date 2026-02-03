@@ -3,9 +3,13 @@ import { zValidator } from "../../lib/validator";
 import { timeEntryService } from "./time-entry.service";
 import { issueService } from "../issues/issue.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { createTimeEntrySchema } from "./time-entry.zod";
 
 const timeEntryRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * GET /issues/:issueKey/time-entries - List all time entries for an issue.
    */

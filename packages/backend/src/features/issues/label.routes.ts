@@ -2,10 +2,14 @@ import { Hono } from "hono";
 import { zValidator } from "../../lib/validator";
 import { labelService } from "./label.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { createLabelSchema } from "./label.zod";
 import { HTTPException } from "hono/http-exception";
 
 const labelRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * GET / - List all labels in the workspace.
    */

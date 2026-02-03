@@ -1,6 +1,7 @@
 import { zValidator } from "../../lib/validator";
 import { Hono } from "hono";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
 import { workspaceService } from "./workspace.service";
 import {
   createWorkspaceSchema,
@@ -12,6 +13,7 @@ import {
 import { HTTPException } from "hono/http-exception";
 
 const workspaceRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
   /**
    * GET / - List all workspaces the user belongs to.
    */

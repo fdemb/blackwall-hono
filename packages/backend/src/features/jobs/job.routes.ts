@@ -1,6 +1,7 @@
 import { zValidator } from "../../lib/validator";
 import { Hono } from "hono";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
 import { jobService } from "./job.service";
 import {
   jobStatsQuerySchema,
@@ -11,6 +12,7 @@ import {
 } from "./job.zod";
 
 const jobRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
   /**
    * GET /stats - Get job queue statistics.
    */

@@ -1,28 +1,58 @@
-import { zValidator } from "../../lib/validator";
 import { Hono } from "hono";
+import { describeRoute, resolver, validator } from "hono-openapi";
+import { z } from "zod";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { globalSearchService } from "./global-search.service";
-import { globalSearchQuerySchema } from "./global-search.zod";
+import { globalSearchQuerySchema, globalSearchResponseSchema } from "./global-search.zod";
 
-/**
- * GET / - Search for issues and users in the workspace.
- */
-const globalSearchRoutes = new Hono<AppEnv>().get(
-  "/",
-  zValidator("query", globalSearchQuerySchema),
-  async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { q } = c.req.valid("query");
+const workspaceHeaderSchema = z.object({
+  "x-blackwall-workspace-slug": z.string().min(1),
+});
 
-    const results = await globalSearchService.search({
-      searchTerm: q,
-      workspaceId: workspace.id,
-      userId: user.id,
-    });
+const globalSearchRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
+  .get(
+    "/",
+    describeRoute({
+      tags: ["Search"],
+      summary: "Search for issues and users",
+      description: "Search for issues and users across the workspace using a search query.",
+      security: [{ cookieAuth: [] }],
+      responses: {
+        200: {
+          description: "Search results",
+          content: {
+            "application/json": {
+              schema: resolver(globalSearchResponseSchema),
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized - not logged in",
+        },
+        400: {
+          description: "Missing required header: x-blackwall-workspace-slug",
+        },
+      },
+    }),
+    validator("header", workspaceHeaderSchema),
+    validator("query", globalSearchQuerySchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { q } = c.req.valid("query");
 
-    return c.json(results);
-  },
-);
+      const results = await globalSearchService.search({
+        searchTerm: q,
+        workspaceId: workspace.id,
+        userId: user.id,
+      });
+
+      return c.json(results);
+    },
+  );
 
 export { globalSearchRoutes };

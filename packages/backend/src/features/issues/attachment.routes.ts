@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { zValidator } from "../../lib/validator";
 import { attachmentService } from "./attachment.service";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import {
   attachmentParamsSchema,
   associateAttachmentsSchema,
@@ -11,6 +13,8 @@ import {
 import { HTTPException } from "hono/http-exception";
 
 const attachmentRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
   /**
    * POST /:issueKey/attachments - Upload an attachment to an issue.
    */
@@ -127,20 +131,23 @@ const attachmentRoutes = new Hono<AppEnv>()
 /**
  * GET /attachments/:attachmentId/download - Get attachment details for downloading.
  */
-const attachmentDownloadRoutes = new Hono<AppEnv>().get(
-  "/attachments/:attachmentId/download",
-  zValidator("param", getAttachmentParamsSchema),
-  async (c) => {
-    const user = c.get("user")!;
-    const { attachmentId } = c.req.valid("param");
+const attachmentDownloadRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
+  .get(
+    "/attachments/:attachmentId/download",
+    zValidator("param", getAttachmentParamsSchema),
+    async (c) => {
+      const user = c.get("user")!;
+      const { attachmentId } = c.req.valid("param");
 
-    const attachment = await attachmentService.getAttachmentForDownload({
-      userId: user.id,
-      attachmentId,
-    });
+      const attachment = await attachmentService.getAttachmentForDownload({
+        userId: user.id,
+        attachmentId,
+      });
 
-    return c.json({ attachment });
-  },
-);
+      return c.json({ attachment });
+    },
+  );
 
 export { attachmentRoutes, attachmentDownloadRoutes };

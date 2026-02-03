@@ -1,6 +1,8 @@
 import { zValidator } from "../../lib/validator";
 import { Hono } from "hono";
 import type { AppEnv } from "../../lib/hono-env";
+import { authMiddleware } from "../auth/auth-middleware";
+import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { invitationService } from "./invitation.service";
 import { auth } from "../auth/better-auth";
 import { workspaceData } from "../workspaces/workspace.data";
@@ -13,29 +15,33 @@ import { HTTPException } from "hono/http-exception";
 
 /**
  * POST / - Create and send an invitation to join the workspace.
+ * Requires auth + workspace context.
  */
-const invitationRoutes = new Hono<AppEnv>().post(
-  "/",
-  zValidator("json", createInvitationSchema),
-  async (c) => {
-    const workspace = c.get("workspace");
-    const user = c.get("user")!;
-    const { email } = c.req.valid("json");
+const invitationRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .use("*", workspaceMiddleware)
+  .post(
+    "/",
+    zValidator("json", createInvitationSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { email } = c.req.valid("json");
 
-    const result = await invitationService.createInvitation({
-      workspaceId: workspace.id,
-      inviterId: user.id,
-      inviterName: user.name,
-      email,
-    });
+      const result = await invitationService.createInvitation({
+        workspaceId: workspace.id,
+        inviterId: user.id,
+        inviterName: user.name,
+        email,
+      });
 
-    return c.json({
-      message: "Invitation sent successfully.",
-      invitation: result.invitation,
-      invitationUrl: result.invitationUrl,
-    });
-  },
-);
+      return c.json({
+        message: "Invitation sent successfully.",
+        invitation: result.invitation,
+        invitationUrl: result.invitationUrl,
+      });
+    },
+  );
 
 const publicInvitationRoutes = new Hono<AppEnv>()
   /**
@@ -106,24 +112,27 @@ const publicInvitationRoutes = new Hono<AppEnv>()
 
 /**
  * POST /:token/accept - Accept an invitation for an existing logged-in user.
+ * Requires auth only (no workspace context).
  */
-const protectedInvitationRoutes = new Hono<AppEnv>().post(
-  "/:token/accept",
-  zValidator("param", invitationTokenParamsSchema),
-  async (c) => {
-    const user = c.get("user")!;
-    const { token } = c.req.valid("param");
+const protectedInvitationRoutes = new Hono<AppEnv>()
+  .use("*", authMiddleware)
+  .post(
+    "/:token/accept",
+    zValidator("param", invitationTokenParamsSchema),
+    async (c) => {
+      const user = c.get("user")!;
+      const { token } = c.req.valid("param");
 
-    const result = await invitationService.acceptInvitation({
-      token,
-      userId: user.id,
-    });
+      const result = await invitationService.acceptInvitation({
+        token,
+        userId: user.id,
+      });
 
-    return c.json({
-      message: "Invitation accepted successfully.",
-      workspaceSlug: result.workspaceSlug,
-    });
-  },
-);
+      return c.json({
+        message: "Invitation accepted successfully.",
+        workspaceSlug: result.workspaceSlug,
+      });
+    },
+  );
 
 export { invitationRoutes, publicInvitationRoutes, protectedInvitationRoutes };

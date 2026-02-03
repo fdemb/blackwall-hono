@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { Scalar } from "@scalar/hono-api-reference";
+import { openAPIRouteHandler } from "hono-openapi";
 import { betterAuthRoutes } from "./features/auth/better-auth.routes";
 import { env } from "./lib/zod-env";
 import { workspaceRoutes } from "./features/workspaces/workspace.routes";
@@ -21,39 +23,32 @@ import {
   publicInvitationRoutes,
   protectedInvitationRoutes,
 } from "./features/invitations/invitation.routes";
-import { authMiddleware } from "./features/auth/auth-middleware";
 import type { AppEnv } from "./lib/hono-env";
 import { authRoutes } from "./features/auth/auth.routes";
-import { workspaceMiddleware } from "./features/workspaces/workspace-middleware";
 import { errorHandler } from "./lib/error-handler";
-import { logger } from "hono/logger";
 
-const corsMiddleware = cors({
-  origin: env.APP_BASE_URL,
-  allowHeaders: ["Content-Type", "Authorization", "x-blackwall-workspace-slug"],
-  allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH"],
-  exposeHeaders: ["Content-Length"],
-  maxAge: 600,
-  credentials: true,
-});
-
-const publicApp = new Hono()
-  .use("*", corsMiddleware)
+const app = new Hono<AppEnv>()
+  .use(
+    "*",
+    cors({
+      origin: env.APP_BASE_URL,
+      allowHeaders: ["Content-Type", "Authorization", "x-blackwall-workspace-slug"],
+      allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH"],
+      exposeHeaders: ["Content-Length"],
+      maxAge: 600,
+      credentials: true,
+    }),
+  )
+  .onError(errorHandler)
+  // Public routes
   .route("/api/auth", betterAuthRoutes)
   .route("/auth", authRoutes)
-  .route("/invitations", publicInvitationRoutes);
-
-const protectedApp = new Hono<AppEnv>()
-  .use("*", corsMiddleware)
-  .use("*", authMiddleware)
+  .route("/invitations", publicInvitationRoutes)
+  // Protected routes (auth middleware inside each)
   .route("/workspaces", workspaceRoutes)
   .route("/jobs", jobRoutes)
-  .route("/invitations", protectedInvitationRoutes);
-
-const protectedPerWorkspaceApp = new Hono<AppEnv>()
-  .use("*", corsMiddleware)
-  .use("*", authMiddleware)
-  .use("*", workspaceMiddleware)
+  .route("/invitations", protectedInvitationRoutes)
+  // Protected per-workspace routes (auth + workspace middleware inside each)
   .route("/teams", teamRoutes)
   .route("/issues", issueRoutes)
   .route("/issues", commentRoutes)
@@ -66,11 +61,31 @@ const protectedPerWorkspaceApp = new Hono<AppEnv>()
   .route("/invitations", invitationRoutes)
   .route("/settings", settingsRoutes);
 
-const app = new Hono()
-  .onError(errorHandler)
-  .route("/", publicApp)
-  .route("/", protectedApp)
-  .route("/", protectedPerWorkspaceApp);
+// OpenAPI docs (public) - added after app is defined
+app.get(
+  "/api/docs/openapi",
+  openAPIRouteHandler(app, {
+    documentation: {
+      info: {
+        title: "Blackwall API",
+        version: "1.0.0",
+        description: "API documentation for the Blackwall backend",
+      },
+      servers: [{ url: "http://localhost:8000", description: "Local development" }],
+      components: {
+        securitySchemes: {
+          cookieAuth: {
+            type: "apiKey",
+            in: "cookie",
+            name: "better-auth.session_token",
+            description: "Session cookie authentication",
+          },
+        },
+      },
+    },
+  }),
+);
+app.get("/api/docs", Scalar({ url: "/api/docs/openapi" }));
 
 export type AppType = typeof app;
 export { app };
