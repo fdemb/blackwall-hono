@@ -6,6 +6,9 @@ import { createLabelSchema } from "./label.zod";
 import { HTTPException } from "hono/http-exception";
 
 const labelRoutes = new Hono<AppEnv>()
+  /**
+   * GET / - List all labels in the workspace.
+   */
   .get("/", async (c) => {
     const workspace = c.get("workspace");
     const labels = await labelService.getLabelsForWorkspace({
@@ -14,6 +17,9 @@ const labelRoutes = new Hono<AppEnv>()
 
     return c.json({ labels });
   })
+  /**
+   * GET /:labelId - Get a label by its id.
+   */
   .get("/:labelId", async (c) => {
     const workspace = c.get("workspace");
     const { labelId } = c.req.param();
@@ -29,6 +35,9 @@ const labelRoutes = new Hono<AppEnv>()
 
     return c.json({ label });
   })
+  /**
+   * POST / - Create a new label.
+   */
   .post("/", zValidator("json", createLabelSchema), async (c) => {
     const workspace = c.get("workspace");
     const { name } = c.req.valid("json");
@@ -47,6 +56,9 @@ const labelRoutes = new Hono<AppEnv>()
       throw error;
     }
   })
+  /**
+   * DELETE /:labelId - Delete a label from the workspace.
+   */
   .delete("/:labelId", async (c) => {
     const workspace = c.get("workspace");
     const { labelId } = c.req.param();

@@ -1,6 +1,11 @@
 import { teamData } from "../teams/team.data";
 import { globalSearchData } from "./global-search.data";
 
+/**
+ * Search for issues and users across the workspace.
+ * @param input search term, workspace id, and user id
+ * @returns matching issues and users
+ */
 async function search(input: {
   searchTerm: string;
   workspaceId: string;

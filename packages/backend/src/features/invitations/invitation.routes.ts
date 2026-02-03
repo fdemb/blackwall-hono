@@ -11,6 +11,9 @@ import {
 } from "./invitation.zod";
 import { HTTPException } from "hono/http-exception";
 
+/**
+ * POST / - Create and send an invitation to join the workspace.
+ */
 const invitationRoutes = new Hono<AppEnv>().post(
   "/",
   zValidator("json", createInvitationSchema),
@@ -35,6 +38,9 @@ const invitationRoutes = new Hono<AppEnv>().post(
 );
 
 const publicInvitationRoutes = new Hono<AppEnv>()
+  /**
+   * GET /:token - Get invitation details by token (public).
+   */
   .get("/:token", zValidator("param", invitationTokenParamsSchema), async (c) => {
     const { token } = c.req.valid("param");
 
@@ -54,6 +60,9 @@ const publicInvitationRoutes = new Hono<AppEnv>()
       },
     });
   })
+  /**
+   * POST /:token/register - Register a new user and accept an invitation.
+   */
   .post(
     "/:token/register",
     zValidator("param", invitationTokenParamsSchema),
@@ -95,6 +104,9 @@ const publicInvitationRoutes = new Hono<AppEnv>()
     },
   );
 
+/**
+ * POST /:token/accept - Accept an invitation for an existing logged-in user.
+ */
 const protectedInvitationRoutes = new Hono<AppEnv>().post(
   "/:token/accept",
   zValidator("param", invitationTokenParamsSchema),

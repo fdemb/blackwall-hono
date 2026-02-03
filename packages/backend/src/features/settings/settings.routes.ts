@@ -18,6 +18,9 @@ import { teamData } from "../teams/team.data";
 import { teamService } from "../teams/team.service";
 
 const settingsRoutes = new Hono<AppEnv>()
+  /**
+   * GET /profile - Get the current user's profile.
+   */
   .get("/profile", async (c) => {
     const user = c.get("user")!;
     const profile = await settingsService.getProfile(user.id);
@@ -28,6 +31,9 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ profile });
   })
+  /**
+   * PATCH /profile - Update the current user's profile name.
+   */
   .patch("/profile", zValidator("json", updateProfileNameSchema), async (c) => {
     const user = c.get("user")!;
     const { name } = c.req.valid("json");
@@ -39,6 +45,9 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ profile });
   })
+  /**
+   * PATCH /profile/avatar - Update or remove the current user's avatar.
+   */
   .patch("/profile/avatar", async (c) => {
     const user = c.get("user")!;
     const formData = await c.req.formData();
@@ -85,6 +94,9 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ profile });
   })
+  /**
+   * POST /profile/password - Change the current user's password.
+   */
   .post("/profile/password", zValidator("json", changePasswordSchema), async (c) => {
     const { currentPassword, newPassword, revokeOtherSessions } = c.req.valid("json");
 
@@ -101,11 +113,17 @@ const settingsRoutes = new Hono<AppEnv>()
       throw new HTTPException(400, { message: "Failed to change password" });
     }
   })
+  /**
+   * GET /workspace - Get the current workspace settings.
+   */
   .get("/workspace", async (c) => {
     const workspace = c.get("workspace");
 
     return c.json({ workspace });
   })
+  /**
+   * PATCH /workspace - Update the current workspace settings.
+   */
   .patch("/workspace", zValidator("json", updateWorkspaceSettingsSchema), async (c) => {
     const user = c.get("user")!;
     const workspace = c.get("workspace");
@@ -123,12 +141,17 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ workspace });
   })
-  // Team settings routes
+  /**
+   * GET /teams - List all teams in the workspace with member counts.
+   */
   .get("/teams", async (c) => {
     const workspace = c.get("workspace");
     const teamsData = await teamData.listTeamsWithCounts({ workspaceId: workspace.id });
     return c.json({ teams: teamsData });
   })
+  /**
+   * POST /teams - Create a new team in the workspace.
+   */
   .post("/teams", zValidator("json", createTeamSettingsSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -147,6 +170,9 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ team });
   })
+  /**
+   * GET /teams/:teamKey - Get a team by its key with members.
+   */
   .get("/teams/:teamKey", zValidator("param", teamKeyParamSchema), async (c) => {
     const workspace = c.get("workspace");
     const { teamKey } = c.req.valid("param");
@@ -167,6 +193,9 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ team, teamMembers });
   })
+  /**
+   * PATCH /teams/:teamKey - Update a team's settings.
+   */
   .patch(
     "/teams/:teamKey",
     zValidator("param", teamKeyParamSchema),
@@ -189,6 +218,9 @@ const settingsRoutes = new Hono<AppEnv>()
       return c.json({ team });
     },
   )
+  /**
+   * GET /teams/:teamKey/available-users - List workspace users not in a team.
+   */
   .get("/teams/:teamKey/available-users", zValidator("param", teamKeyParamSchema), async (c) => {
     const workspace = c.get("workspace");
     const { teamKey } = c.req.valid("param");
@@ -200,6 +232,9 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ users });
   })
+  /**
+   * POST /teams/:teamKey/members - Add a member to a team.
+   */
   .post(
     "/teams/:teamKey/members",
     zValidator("param", teamKeyParamSchema),
@@ -228,6 +263,9 @@ const settingsRoutes = new Hono<AppEnv>()
       return c.json({ success: true });
     },
   )
+  /**
+   * DELETE /teams/:teamKey/members/:userId - Remove a member from a team.
+   */
   .delete(
     "/teams/:teamKey/members/:userId",
     zValidator("param", removeTeamMemberParamSchema),

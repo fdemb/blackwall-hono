@@ -12,6 +12,9 @@ import {
 import { HTTPException } from "hono/http-exception";
 
 const workspaceRoutes = new Hono<AppEnv>()
+  /**
+   * GET / - List all workspaces the user belongs to.
+   */
   .get("/", async (c) => {
     const workspaces = await workspaceService.listUserWorkspaces({
       userId: c.get("user")!.id,
@@ -20,12 +23,18 @@ const workspaceRoutes = new Hono<AppEnv>()
     return c.json({ workspaces });
   })
 
+  /**
+   * POST /create - Create a new workspace.
+   */
   .post("/create", zValidator("json", createWorkspaceSchema), async (c) => {
     const workspace = await workspaceService.createWorkspace(c.req.valid("json"));
 
     return c.json({ workspace });
   })
 
+  /**
+   * GET /preferred - Get the user's preferred workspace.
+   */
   .get("/preferred", async (c) => {
     const user = c.get("user")!;
     const workspace = await workspaceService.getPreferredWorkspaceForUser({ user });
@@ -33,6 +42,9 @@ const workspaceRoutes = new Hono<AppEnv>()
     return c.json({ workspace });
   })
 
+  /**
+   * GET /:slug - Get a workspace by its slug.
+   */
   .get("/:slug", async (c) => {
     const { slug } = c.req.param();
     const user = c.get("user")!;
@@ -42,6 +54,9 @@ const workspaceRoutes = new Hono<AppEnv>()
     return c.json({ workspace: workspace });
   })
 
+  /**
+   * PATCH /:workspaceId - Update a workspace's settings.
+   */
   .patch(
     "/:workspaceId",
     zValidator("param", workspaceIdParamsSchema),
@@ -61,6 +76,9 @@ const workspaceRoutes = new Hono<AppEnv>()
     },
   )
 
+  /**
+   * GET /:slug/members - List all members of a workspace.
+   */
   .get("/:slug/members", zValidator("param", workspaceSlugParamsSchema), async (c) => {
     const user = c.get("user")!;
     const { slug } = c.req.valid("param");
@@ -74,6 +92,9 @@ const workspaceRoutes = new Hono<AppEnv>()
     return c.json({ members });
   })
 
+  /**
+   * GET /:slug/members/:userId - Get a specific member of a workspace.
+   */
   .get("/:slug/members/:userId", zValidator("param", workspaceMemberParamsSchema), async (c) => {
     const user = c.get("user")!;
     const { slug, userId } = c.req.valid("param");

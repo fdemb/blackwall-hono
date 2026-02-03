@@ -3,6 +3,13 @@ import type { JSONContent } from "@tiptap/core";
 import { issueData } from "./issue.data";
 import { commentData } from "./comment.data";
 
+/**
+ * Get an issue by its key or throw a 404 error.
+ * @param workspaceId workspace id
+ * @param issueKey issue key
+ * @returns issue data
+ * @throws HTTPException 404 if issue not found
+ */
 async function getIssueOrThrow(workspaceId: string, issueKey: string) {
   const issue = await issueData.getIssueByKey({ workspaceId, issueKey });
   if (!issue) {
@@ -11,6 +18,11 @@ async function getIssueOrThrow(workspaceId: string, issueKey: string) {
   return issue;
 }
 
+/**
+ * Create a comment on an issue.
+ * @param input workspace id, issue key, user id, and comment content
+ * @returns created comment
+ */
 export async function createComment(input: {
   workspaceId: string;
   issueKey: string;
@@ -26,6 +38,11 @@ export async function createComment(input: {
   });
 }
 
+/**
+ * Soft delete a comment from an issue.
+ * @param input workspace id, issue key, comment id, and user id
+ * @throws HTTPException 404 if comment not found
+ */
 export async function deleteComment(input: {
   workspaceId: string;
   issueKey: string;

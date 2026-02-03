@@ -3,6 +3,13 @@ import { issueData } from "./issue.data";
 import { attachmentData } from "./attachment.data";
 import { saveFile } from "../../lib/file-upload";
 
+/**
+ * Get an issue by its key or throw a 404 error.
+ * @param workspaceId workspace id
+ * @param issueKey issue key
+ * @returns issue data
+ * @throws HTTPException 404 if issue not found
+ */
 async function getIssueOrThrow(workspaceId: string, issueKey: string) {
   const issue = await issueData.getIssueByKey({ workspaceId, issueKey });
   if (!issue) {
@@ -11,6 +18,11 @@ async function getIssueOrThrow(workspaceId: string, issueKey: string) {
   return issue;
 }
 
+/**
+ * Upload a file attachment, optionally associating it with an issue.
+ * @param input workspace details, optional issue key, user id, and file
+ * @returns created attachment
+ */
 export async function uploadAttachment(input: {
   workspaceSlug: string;
   workspaceId: string;
@@ -46,6 +58,10 @@ export async function uploadAttachment(input: {
   });
 }
 
+/**
+ * Associate orphan attachments with an issue.
+ * @param input workspace id, issue key, user id, and attachment ids
+ */
 export async function associateAttachments(input: {
   workspaceId: string;
   issueKey: string;
@@ -61,6 +77,12 @@ export async function associateAttachments(input: {
   });
 }
 
+/**
+ * Get an attachment by its id for a specific issue.
+ * @param input workspace id, issue key, and attachment id
+ * @returns attachment data
+ * @throws HTTPException 404 if attachment not found
+ */
 export async function getAttachment(input: {
   workspaceId: string;
   issueKey: string;
@@ -80,6 +102,12 @@ export async function getAttachment(input: {
   return attachment;
 }
 
+/**
+ * Get an attachment for download. Validates user access.
+ * @param input user id and attachment id
+ * @returns attachment data for serving
+ * @throws HTTPException 404 if attachment not found or access denied
+ */
 export async function getAttachmentForDownload(input: { userId: string; attachmentId: string }) {
   const attachment = await attachmentData.getAttachmentForServing({
     userId: input.userId,
@@ -93,6 +121,11 @@ export async function getAttachmentForDownload(input: { userId: string; attachme
   return attachment;
 }
 
+/**
+ * Delete an attachment from an issue.
+ * @param input workspace id, issue key, attachment id, and user id
+ * @throws HTTPException 404 if attachment not found
+ */
 export async function deleteAttachment(input: {
   workspaceId: string;
   issueKey: string;

@@ -1,10 +1,21 @@
 import { settingsData } from "./settings.data";
 import { auth } from "../auth/better-auth";
 
+/**
+ * Get a user's profile by their id.
+ * @param userId user id
+ * @returns user profile data
+ */
 async function getProfile(userId: string) {
   return settingsData.getUserById(userId);
 }
 
+/**
+ * Update a user's display name.
+ * @param input user id and new name
+ * @returns updated user profile
+ * @throws Error if name is empty
+ */
 async function updateProfileName(input: { userId: string; name: string }) {
   const normalizedName = input.name.trim();
 
@@ -18,6 +29,11 @@ async function updateProfileName(input: { userId: string; name: string }) {
   });
 }
 
+/**
+ * Update a user's profile avatar.
+ * @param input user id, new image (or null to remove), and current image
+ * @returns updated user profile
+ */
 async function updateProfileAvatar(input: {
   userId: string;
   image: string | null;
@@ -29,6 +45,10 @@ async function updateProfileAvatar(input: {
   });
 }
 
+/**
+ * Change the user's password.
+ * @param input request headers, current password, new password, and optional session revocation
+ */
 async function changePassword(input: {
   headers: Headers;
   currentPassword: string;

@@ -4,6 +4,9 @@ import type { AppEnv } from "../../lib/hono-env";
 import { globalSearchService } from "./global-search.service";
 import { globalSearchQuerySchema } from "./global-search.zod";
 
+/**
+ * GET / - Search for issues and users in the workspace.
+ */
 const globalSearchRoutes = new Hono<AppEnv>().get(
   "/",
   zValidator("query", globalSearchQuerySchema),

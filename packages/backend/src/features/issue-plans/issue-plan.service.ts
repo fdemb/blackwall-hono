@@ -2,10 +2,21 @@ import { issuePlanData } from "./issue-plan.data";
 import { teamData } from "../teams/team.data";
 import { BadRequestError, NotFoundError } from "../../lib/errors";
 
+/**
+ * List all plans for a team.
+ * @param input team id
+ * @returns list of issue plans
+ */
 async function listPlans(input: { teamId: string }) {
     return issuePlanData.listPlansForTeam({ teamId: input.teamId });
 }
 
+/**
+ * Get a plan by its id.
+ * @param input plan id and team id
+ * @returns issue plan
+ * @throws NotFoundError if plan not found
+ */
 async function getPlanById(input: { planId: string; teamId: string }) {
     const plan = await issuePlanData.getPlanById(input);
     if (!plan) {
@@ -14,6 +25,11 @@ async function getPlanById(input: { planId: string; teamId: string }) {
     return plan;
 }
 
+/**
+ * Get the active plan for a team.
+ * @param input team id and active plan id
+ * @returns active plan or null
+ */
 async function getActivePlan(input: { teamId: string; activePlanId: string | null }) {
     if (!input.activePlanId) {
         return null;
@@ -21,6 +37,12 @@ async function getActivePlan(input: { teamId: string; activePlanId: string | nul
     return issuePlanData.getPlanById({ planId: input.activePlanId, teamId: input.teamId });
 }
 
+/**
+ * Create a new plan and set it as the active plan for the team.
+ * Handles moving undone issues from the previous plan.
+ * @param input plan details, team id, and strategy for undone issues
+ * @returns newly created plan
+ */
 async function createAndActivatePlan(input: {
     name: string;
     goal: string | null;
@@ -74,6 +96,13 @@ async function createAndActivatePlan(input: {
     return plan;
 }
 
+/**
+ * Update an existing plan.
+ * @param input plan id, team id, and updated fields
+ * @returns updated plan
+ * @throws NotFoundError if plan not found
+ * @throws BadRequestError if plan is already completed
+ */
 async function updatePlan(input: {
     planId: string;
     teamId: string;
@@ -104,6 +133,12 @@ async function updatePlan(input: {
     });
 }
 
+/**
+ * Mark a plan as completed and clear the active plan from the team.
+ * @param input plan id and team id
+ * @throws NotFoundError if plan not found
+ * @throws BadRequestError if plan is already completed
+ */
 async function completePlan(input: { planId: string; teamId: string }) {
     const plan = await issuePlanData.getPlanById({
         planId: input.planId,

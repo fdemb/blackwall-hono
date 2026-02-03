@@ -11,6 +11,9 @@ import {
 import { HTTPException } from "hono/http-exception";
 
 const attachmentRoutes = new Hono<AppEnv>()
+  /**
+   * POST /:issueKey/attachments - Upload an attachment to an issue.
+   */
   .post("/:issueKey/attachments", zValidator("param", attachmentParamsSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -33,6 +36,9 @@ const attachmentRoutes = new Hono<AppEnv>()
 
     return c.json({ attachment });
   })
+  /**
+   * POST /attachments - Upload an orphan attachment (not linked to any issue yet).
+   */
   .post("/attachments", async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -54,6 +60,9 @@ const attachmentRoutes = new Hono<AppEnv>()
 
     return c.json({ attachment });
   })
+  /**
+   * POST /:issueKey/attachments/associate - Associate orphan attachments with an issue.
+   */
   .post(
     "/:issueKey/attachments/associate",
     zValidator("param", attachmentParamsSchema),
@@ -74,6 +83,9 @@ const attachmentRoutes = new Hono<AppEnv>()
       return c.json({ success: true });
     },
   )
+  /**
+   * GET /:issueKey/attachments/:attachmentId - Get an attachment by its id.
+   */
   .get(
     "/:issueKey/attachments/:attachmentId",
     zValidator("param", deleteAttachmentParamsSchema),
@@ -90,6 +102,9 @@ const attachmentRoutes = new Hono<AppEnv>()
       return c.json({ attachment });
     },
   )
+  /**
+   * DELETE /:issueKey/attachments/:attachmentId - Delete an attachment from an issue.
+   */
   .delete(
     "/:issueKey/attachments/:attachmentId",
     zValidator("param", deleteAttachmentParamsSchema),
@@ -109,7 +124,9 @@ const attachmentRoutes = new Hono<AppEnv>()
     },
   );
 
-// Separate route for downloading attachments (doesn't need issueKey)
+/**
+ * GET /attachments/:attachmentId/download - Get attachment details for downloading.
+ */
 const attachmentDownloadRoutes = new Hono<AppEnv>().get(
   "/attachments/:attachmentId/download",
   zValidator("param", getAttachmentParamsSchema),

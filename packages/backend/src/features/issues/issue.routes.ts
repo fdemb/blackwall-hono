@@ -14,6 +14,9 @@ import {
 } from "./issue.zod";
 
 const issueRoutes = new Hono<AppEnv>()
+  /**
+   * GET / - List issues for a team with optional filters.
+   */
   .get("/", zValidator("query", listIssuesQuerySchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -29,6 +32,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ issues });
   })
+  /**
+   * POST / - Create a new issue.
+   */
   .post("/", zValidator("json", createIssueSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -43,6 +49,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ issue: created });
   })
+  /**
+   * GET /my - List all issues assigned to the current user.
+   */
   .get("/my", async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -54,6 +63,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ issues });
   })
+  /**
+   * GET /:issueKey - Get an issue by its key.
+   */
   .get("/:issueKey", zValidator("param", issueParamsSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -67,6 +79,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ issue });
   })
+  /**
+   * PATCH /bulk - Update multiple issues at once.
+   */
   .patch("/bulk", zValidator("json", bulkUpdateIssuesSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -81,6 +96,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ issues: updated });
   })
+  /**
+   * PATCH /:issueKey - Update an existing issue.
+   */
   .patch(
     "/:issueKey",
     zValidator("param", issueParamsSchema),
@@ -101,6 +119,9 @@ const issueRoutes = new Hono<AppEnv>()
       return c.json({ issue: updated });
     },
   )
+  /**
+   * DELETE /bulk - Soft delete multiple issues at once.
+   */
   .delete("/bulk", zValidator("json", bulkDeleteIssuesSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -114,6 +135,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ message: `${issues.length} issues deleted` });
   })
+  /**
+   * DELETE /:issueKey - Soft delete an issue.
+   */
   .delete("/:issueKey", zValidator("param", issueParamsSchema), async (c) => {
     const workspace = c.get("workspace");
     const user = c.get("user")!;
@@ -127,6 +151,9 @@ const issueRoutes = new Hono<AppEnv>()
 
     return c.json({ message: "Issue deleted" });
   })
+  /**
+   * POST /:issueKey/labels - Add a label to an issue.
+   */
   .post(
     "/:issueKey/labels",
     zValidator("param", issueParamsSchema),
@@ -153,6 +180,9 @@ const issueRoutes = new Hono<AppEnv>()
       return c.json({ success: true });
     },
   )
+  /**
+   * DELETE /:issueKey/labels/:labelId - Remove a label from an issue.
+   */
   .delete(
     "/:issueKey/labels/:labelId",
     zValidator("param", issueParamsSchema.extend({ labelId: z.string() })),

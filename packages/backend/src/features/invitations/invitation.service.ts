@@ -3,6 +3,11 @@ import { jobService } from "../jobs/job.service";
 import { workspaceData } from "../workspaces/workspace.data";
 import { invitationData } from "./invitation.data";
 
+/**
+ * Create a new invitation to join a workspace and send an email.
+ * @param input workspace id, inviter id, inviter name, and invitee email
+ * @returns the invitation and invitation URL
+ */
 async function createInvitation(input: {
   workspaceId: string;
   inviterId: string;
@@ -44,6 +49,11 @@ async function createInvitation(input: {
   };
 }
 
+/**
+ * Get an invitation by its token. Returns null if not found or expired.
+ * @param token invitation token
+ * @returns invitation data or null
+ */
 async function getInvitationByToken(token: string) {
   const invitation = await invitationData.getInvitationByToken(token);
 
@@ -58,6 +68,12 @@ async function getInvitationByToken(token: string) {
   return invitation;
 }
 
+/**
+ * Accept an invitation and add the user to the workspace.
+ * @param input invitation token and user id
+ * @returns workspace slug
+ * @throws Error if invitation not found or expired
+ */
 async function acceptInvitation(input: { token: string; userId: string }) {
   const invitation = await getInvitationByToken(input.token);
 
@@ -73,6 +89,10 @@ async function acceptInvitation(input: { token: string; userId: string }) {
   return { workspaceSlug: invitation.workspace.slug };
 }
 
+/**
+ * Delete an invitation by its id.
+ * @param invitationId invitation id
+ */
 async function deleteInvitation(invitationId: string) {
   await invitationData.deleteInvitation(invitationId);
 }

@@ -3,6 +3,12 @@ import { teamData } from "../teams/team.data";
 import { issueData, type CreateIssueInput, type UpdateIssueInput } from "./issue.data";
 import { ForbiddenError, NotFoundError } from "../../lib/errors";
 
+/**
+ * Get a team for user or throw an error if not found.
+ * @param input workspace id, team key, and user id
+ * @returns team data
+ * @throws NotFoundError if team not found or access denied
+ */
 async function getTeamForUserOrThrow(input: {
   workspaceId: string;
   teamKey: string;
@@ -17,6 +23,12 @@ async function getTeamForUserOrThrow(input: {
   return team;
 }
 
+/**
+ * Get an issue by its key. Validates user access to the team.
+ * @param input workspace id, issue key, and user id
+ * @returns issue data with relations
+ * @throws NotFoundError if issue not found or access denied
+ */
 async function getIssueByKey(input: { workspaceId: string; issueKey: string; userId: string }) {
   const issue = await issueData.getIssueByKey({
     workspaceId: input.workspaceId,
@@ -36,6 +48,11 @@ async function getIssueByKey(input: { workspaceId: string; issueKey: string; use
   return issue;
 }
 
+/**
+ * List issues for a team with optional filters.
+ * @param input workspace id, team key, user id, and optional filters
+ * @returns list of issues
+ */
 async function listIssuesForTeam(input: {
   workspaceId: string;
   teamKey: string;
@@ -65,6 +82,11 @@ async function listIssuesForTeam(input: {
   });
 }
 
+/**
+ * List all issues assigned to the current user.
+ * @param input workspace id and user id
+ * @returns list of issues assigned to the user
+ */
 async function listIssuesAssignedToUser(input: { workspaceId: string; userId: string }) {
   return issueData.listIssuesAssignedToUser({
     workspaceId: input.workspaceId,
@@ -72,6 +94,11 @@ async function listIssuesAssignedToUser(input: { workspaceId: string; userId: st
   });
 }
 
+/**
+ * Create a new issue in a team.
+ * @param input workspace id, team key, user id, and issue data
+ * @returns created issue
+ */
 async function createIssue(input: {
   workspaceId: string;
   teamKey: string;
@@ -93,6 +120,11 @@ async function createIssue(input: {
   });
 }
 
+/**
+ * Update an existing issue.
+ * @param input workspace id, issue key, user id, and updates
+ * @returns updated issue
+ */
 async function updateIssue(input: {
   workspaceId: string;
   issueKey: string;
@@ -114,6 +146,12 @@ async function updateIssue(input: {
   });
 }
 
+/**
+ * Update multiple issues at once.
+ * @param input workspace id, issue ids, user id, and updates
+ * @returns updated issues
+ * @throws ForbiddenError if some issues are not accessible to the user
+ */
 async function updateIssuesBulk(input: {
   workspaceId: string;
   issueIds: string[];
@@ -146,6 +184,10 @@ async function updateIssuesBulk(input: {
   });
 }
 
+/**
+ * Soft delete an issue by its key.
+ * @param input workspace id, issue key, and user id
+ */
 async function deleteIssue(input: { workspaceId: string; issueKey: string; userId: string }) {
   const issue = await getIssueByKey({
     workspaceId: input.workspaceId,
@@ -156,6 +198,12 @@ async function deleteIssue(input: { workspaceId: string; issueKey: string; userI
   await issueData.softDeleteIssue({ issueId: issue.id });
 }
 
+/**
+ * Soft delete multiple issues at once.
+ * @param input workspace id, issue ids, and user id
+ * @returns deleted issues
+ * @throws ForbiddenError if some issues are not accessible to the user
+ */
 async function softDeleteIssuesBulk(input: {
   workspaceId: string;
   issueIds: string[];

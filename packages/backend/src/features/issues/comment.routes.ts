@@ -6,6 +6,9 @@ import type { AppEnv } from "../../lib/hono-env";
 import { commentParamsSchema, createCommentSchema, deleteCommentParamsSchema } from "./comment.zod";
 
 const commentRoutes = new Hono<AppEnv>()
+  /**
+   * POST /:issueKey/comments - Create a comment on an issue.
+   */
   .post(
     "/:issueKey/comments",
     zValidator("param", commentParamsSchema),
@@ -26,6 +29,9 @@ const commentRoutes = new Hono<AppEnv>()
       return c.json({ comment });
     },
   )
+  /**
+   * DELETE /:issueKey/comments/:commentId - Delete a comment from an issue.
+   */
   .delete(
     "/:issueKey/comments/:commentId",
     zValidator("param", deleteCommentParamsSchema),
