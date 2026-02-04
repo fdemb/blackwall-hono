@@ -1,9 +1,10 @@
 import { useAppForm } from "@/context/form-context";
-import { useNavigate } from "@solidjs/router";
+import { action, redirect, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { Button } from "@/components/ui/button";
+import { toast } from "../custom-ui/toast";
 
 type CompletePlanFormProps = {
   workspaceSlug: string;
@@ -12,17 +13,24 @@ type CompletePlanFormProps = {
   plan: InferDbType<"issuePlan">;
 };
 
+const completePlanAction = action(
+  async (workspaceSlug: string, teamKey: string, planId: string) => {
+    await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].complete.$post({
+      param: { teamKey, planId },
+    });
+
+    toast.success("Plan completed successfully");
+    throw redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
+  },
+);
+
 export function CompletePlanForm(props: CompletePlanFormProps) {
-  const navigate = useNavigate();
+  const _action = useAction(completePlanAction);
 
   const form = useAppForm(() => ({
     defaultValues: {},
     onSubmit: async () => {
-      await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].complete.$post({
-        param: { teamKey: props.teamKey, planId: props.plan.id },
-      });
-
-      navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/create`);
+      await _action(props.workspaceSlug, props.teamKey, props.plan.id);
     },
   }));
 

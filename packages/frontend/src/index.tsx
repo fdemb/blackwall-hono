@@ -18,7 +18,7 @@ import { boardLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/
 import { issueLoader } from "./routes/authorized/[workspaceSlug]/issue/[key].data";
 import { myIssuesLoader } from "./routes/authorized/[workspaceSlug]/my-issues.data";
 import { plansLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/index.data";
-import { activePlanLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/complete.data";
+
 import { planDetailLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/index.data";
 import { membersLoader } from "./routes/authorized/[workspaceSlug]/members/index.data";
 import { memberDetailLoader } from "./routes/authorized/[workspaceSlug]/members/[userId].data";
@@ -56,7 +56,7 @@ const CreatePlanPage = lazy(
   () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/create"),
 );
 const CompletePlanPage = lazy(
-  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/complete"),
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/complete"),
 );
 const PlanDetailPage = lazy(
   () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/index"),
@@ -166,9 +166,9 @@ const AppRouter = () => (
             />
             <Route path="/plans/create" component={CreatePlanPage} />
             <Route
-              path="/plans/complete"
+              path="/plans/:planId/complete"
               component={CompletePlanPage}
-              preload={({ params }) => activePlanLoader(params.teamKey!)}
+              preload={({ params }) => planDetailLoader(params.teamKey!, params.planId!)}
             />
             <Route
               path="/plans/:planId/edit"

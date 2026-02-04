@@ -229,7 +229,7 @@ function BoardList(props: BoardListProps) {
           </DialogTrigger>
           <CreateDialogContent
             status={props.statusId}
-            teamKey={params.teamKey!}
+            teamKey={params.teamKey}
             planId={teamData().activePlanId}
           />
         </Dialog>
@@ -288,7 +288,6 @@ type BoardItemProps = {
 
 function BoardItem(props: BoardItemProps) {
   const { dragState, useDraggable, onDrop } = useBoardDnD();
-  const navigate = useNavigate();
   const params = useParams();
 
   const isDragged = () => dragState.isDragging && dragState.draggedIssueKey === props.issue.key;
@@ -397,7 +396,7 @@ function PlanSection(props: { plan: SerializedIssuePlan | null }) {
               </div>
               <div class="px-4 py-3 border-t flex flex-row gap-2">
                 <A
-                  href={`/${params.workspace!}/team/${params.teamKey!}/plans/${plan().id}`}
+                  href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${plan().id}`}
                   class={buttonVariants({
                     variant: "outline",
                     size: "xs",
@@ -407,7 +406,7 @@ function PlanSection(props: { plan: SerializedIssuePlan | null }) {
                   Details
                 </A>
                 <A
-                  href={`/${params.workspace!}/team/${params.teamKey!}/plans/${plan().id}/edit`}
+                  href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${plan().id}/edit`}
                   class={buttonVariants({
                     variant: "outline",
                     size: "xs",
@@ -417,7 +416,7 @@ function PlanSection(props: { plan: SerializedIssuePlan | null }) {
                   Edit
                 </A>
                 <A
-                  href={`/${params.workspace!}/team/${params.teamKey!}/plans/${plan().id}/complete`}
+                  href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${plan().id}/complete`}
                   class={buttonVariants({
                     variant: "outline",
                     size: "xs",

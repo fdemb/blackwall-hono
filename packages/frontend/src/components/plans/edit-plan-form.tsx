@@ -1,14 +1,16 @@
 import * as z from "zod";
 import { useAppForm } from "@/context/form-context";
-import { useNavigate } from "@solidjs/router";
+import { action, redirect, useAction, useNavigate } from "@solidjs/router";
 import { api } from "@/lib/api";
 import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { TanStackTextArea, TanStackTextField } from "@/components/ui/text-field";
-import { getLocalTimeZone, parseAbsolute } from "@internationalized/date";
+import { parseDate } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
+import type { UpdateIssuePlan } from "@blackwall/backend/src/features/issue-plans/issue-plan.zod";
+import { toast } from "../custom-ui/toast";
 
 type EditPlanFormProps = {
   workspaceSlug: string;
@@ -17,15 +19,27 @@ type EditPlanFormProps = {
   plan: InferDbType<"issuePlan">;
 };
 
+const updatePlanAction = action(
+  async (workspaceSlug: string, teamKey: string, planId: string, value: UpdateIssuePlan) => {
+    await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$patch({
+      param: { teamKey, planId },
+      json: value,
+    });
+
+    toast.success("Plan updated successfully");
+    throw redirect(`/${workspaceSlug}/team/${teamKey}/plans/${planId}`);
+  },
+);
+
 export function EditPlanForm(props: EditPlanFormProps) {
-  const navigate = useNavigate();
+  const _action = useAction(updatePlanAction);
 
   const form = useAppForm(() => ({
     defaultValues: {
       name: props.plan.name,
       goal: props.plan.goal,
-      startDate: new Date(props.plan.startDate).toISOString(),
-      endDate: new Date(props.plan.endDate).toISOString(),
+      startDate: parseDate(props.plan.startDate.split("T")[0]).toString(),
+      endDate: parseDate(props.plan.endDate.split("T")[0]).toString(),
     },
     validators: {
       onSubmit: z.object({
@@ -36,17 +50,7 @@ export function EditPlanForm(props: EditPlanFormProps) {
       }),
     },
     onSubmit: async ({ value }) => {
-      await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$patch({
-        param: { teamKey: props.teamKey, planId: props.plan.id },
-        json: {
-          name: value.name,
-          goal: value.goal,
-          startDate: value.startDate,
-          endDate: value.endDate,
-        },
-      });
-
-      navigate(`/${props.workspaceSlug}/team/${props.teamKey}/issues/board`);
+      await _action(props.workspaceSlug, props.teamKey, props.plan.id, value);
     },
   }));
 
@@ -87,7 +91,7 @@ export function EditPlanForm(props: EditPlanFormProps) {
         <div class="flex flex-col gap-2 sm:flex-row">
           <form.AppField name="startDate">
             {(field) => {
-              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
+              const calendarDate = () => parseDate(field().state.value);
 
               return (
                 <div class="flex flex-col gap-2 w-full">
@@ -103,7 +107,7 @@ export function EditPlanForm(props: EditPlanFormProps) {
 
           <form.AppField name="endDate">
             {(field) => {
-              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
+              const calendarDate = () => parseDate(field().state.value);
 
               return (
                 <div class="flex flex-col gap-2 w-full">

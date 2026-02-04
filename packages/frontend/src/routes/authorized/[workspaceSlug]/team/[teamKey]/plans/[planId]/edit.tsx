@@ -1,4 +1,4 @@
-import { createAsync, useParams, A } from "@solidjs/router";
+import { createAsync, useParams } from "@solidjs/router";
 import { Show } from "solid-js";
 import { planDetailLoader } from "./index.data";
 import { useTeamData } from "../../../[teamKey]";

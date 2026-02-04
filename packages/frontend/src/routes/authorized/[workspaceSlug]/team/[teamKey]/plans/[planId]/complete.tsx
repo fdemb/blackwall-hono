@@ -1,7 +1,7 @@
-import { createAsync, useParams, Navigate } from "@solidjs/router";
+import { createAsync, useParams } from "@solidjs/router";
 import { Show } from "solid-js";
-import { activePlanLoader } from "./complete.data";
-import { useTeamData } from "../../[teamKey]";
+import { planDetailLoader } from "./index.data";
+import { useTeamData } from "../../../[teamKey]";
 import { CompletePlanForm } from "@/components/plans/complete-plan-form";
 import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
@@ -11,11 +11,11 @@ import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 export default function CompletePlanPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const plan = createAsync(() => activePlanLoader(params.teamKey!));
+  const data = createAsync(() => planDetailLoader(params.teamKey!, params.planId!));
 
   return (
-    <Show when={plan()} fallback={null}>
-      {(activePlan) => (
+    <Show when={data()} fallback={null}>
+      {(planData) => (
         <>
           <PageHeader>
             <Breadcrumbs>
@@ -38,7 +38,7 @@ export default function CompletePlanPage() {
               workspaceSlug={params.workspaceSlug!}
               teamKey={params.teamKey!}
               team={teamData()}
-              plan={activePlan()}
+              plan={planData().plan}
             />
           </ScrollContainer>
         </>

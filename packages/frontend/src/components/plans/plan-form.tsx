@@ -1,12 +1,11 @@
 import * as z from "zod";
 import { useAppForm } from "@/context/form-context";
-import { action, redirect, useAction, useNavigate } from "@solidjs/router";
-import { add } from "date-fns";
+import { action, redirect, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { TanStackTextArea, TanStackTextField } from "@/components/ui/text-field";
-import { CalendarDate, getLocalTimeZone, parseAbsolute } from "@internationalized/date";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,7 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "../custom-ui/toast";
 
 type PlanFormProps = {
   workspaceSlug: string;
@@ -52,7 +52,9 @@ const createPlanAction = action(
       },
     });
 
-    redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
+    toast.success("Plan created successfully");
+
+    throw redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
   },
 );
 
@@ -63,8 +65,8 @@ export function PlanForm(props: PlanFormProps) {
     defaultValues: {
       name: "",
       goal: null as string | null,
-      startDate: new Date().toISOString(),
-      endDate: add(new Date(), { weeks: 2 }).toISOString(),
+      startDate: today(getLocalTimeZone()).toString(),
+      endDate: today(getLocalTimeZone()).add({ weeks: 2 }).toString(),
       onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewPlan",
     },
     validators: {
@@ -118,7 +120,7 @@ export function PlanForm(props: PlanFormProps) {
         <div class="flex flex-col gap-2 sm:flex-row">
           <form.AppField name="startDate">
             {(field) => {
-              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
+              const calendarDate = () => parseDate(field().state.value);
 
               return (
                 <div class="flex flex-col gap-2 w-full">
@@ -134,7 +136,7 @@ export function PlanForm(props: PlanFormProps) {
 
           <form.AppField name="endDate">
             {(field) => {
-              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
+              const calendarDate = () => parseDate(field().state.value);
 
               return (
                 <div class="flex flex-col gap-2 w-full">

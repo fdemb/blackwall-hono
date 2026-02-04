@@ -52,7 +52,8 @@ const issuePlanRoutes = new Hono<AppEnv>()
 
       const plans = await issuePlanService.listPlans({ teamId: team.id });
       return c.json({ plans });
-    })
+    },
+  )
   /**
    * GET /teams/:teamKey/plans/active - Get the active plan for a team.
    */
@@ -90,7 +91,8 @@ const issuePlanRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ plan });
-    })
+    },
+  )
   /**
    * GET /teams/:teamKey/plans/:planId - Get a plan by its id with associated issues.
    */
@@ -134,7 +136,8 @@ const issuePlanRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ plan, issues });
-    })
+    },
+  )
   /**
    * POST /teams/:teamKey/plans - Create a new plan and set it as active.
    */
@@ -185,7 +188,8 @@ const issuePlanRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ plan }, 201);
-    })
+    },
+  )
   /**
    * PATCH /teams/:teamKey/plans/:planId - Update an existing plan.
    */
@@ -219,17 +223,23 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
+      const startDate = new Date(body.startDate);
+      startDate.setUTCHours(0, 0, 0, 0);
+      const endDate = new Date(body.endDate);
+      endDate.setUTCHours(23, 59, 59, 999);
+
       const plan = await issuePlanService.updatePlan({
         planId,
         teamId: team.id,
         name: body.name,
         goal: body.goal,
-        startDate: body.startDate,
-        endDate: body.endDate,
+        startDate,
+        endDate,
       });
 
       return c.json({ plan });
-    })
+    },
+  )
   /**
    * POST /teams/:teamKey/plans/:planId/complete - Mark a plan as completed.
    */
@@ -267,6 +277,7 @@ const issuePlanRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ success: true });
-    });
+    },
+  );
 
 export { issuePlanRoutes };
