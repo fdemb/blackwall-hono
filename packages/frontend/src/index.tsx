@@ -91,7 +91,7 @@ const Root: ParentComponent = (props) => {
   return (
     <>
       <Toaster />
-      <KeybindProvider>{props.children}</KeybindProvider>;
+      <KeybindProvider>{props.children}</KeybindProvider>
     </>
   );
 };

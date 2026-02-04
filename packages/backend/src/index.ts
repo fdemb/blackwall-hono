@@ -22,7 +22,6 @@ import {
 import type { AppEnv } from "./lib/hono-env";
 import { authRoutes } from "./features/auth/auth.routes";
 import { errorHandler } from "./lib/error-handler";
-import { serveStatic } from "hono/bun";
 
 const app = new Hono<AppEnv>()
   .use(
@@ -55,9 +54,7 @@ const app = new Hono<AppEnv>()
   .route("/api/time-entries", timeEntryRoutes)
   .route("/api/search", globalSearchRoutes)
   .route("/api/invitations", invitationRoutes)
-  .route("/api/settings", settingsRoutes)
-  .use("/*", serveStatic({ root: "../frontend/dist" }))
-  .get("/*", serveStatic({ path: "../frontend/dist/index.html" }));
+  .route("/api/settings", settingsRoutes);
 
 app.get(
   "/api/docs/openapi",

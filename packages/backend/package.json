@@ -2,6 +2,12 @@
   "name": "@blackwall/backend",
   "type": "module",
   "module": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./db/migrate": "./src/db/migrate.ts",
+    "./features/jobs/job.service": "./src/features/jobs/job.service.ts",
+    "./jobs/register": "./src/jobs/register.ts"
+  },
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "typecheck": "bun run --bun tsc --noEmit",
