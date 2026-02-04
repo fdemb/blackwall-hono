@@ -1,4 +1,4 @@
-import type { Workspace } from "../db/schema";
+import type { Workspace } from "@blackwall/database/schema";
 import type { AuthVariables } from "../features/auth/auth-middleware";
 
 export interface AppVariables extends AuthVariables {

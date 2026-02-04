@@ -1,6 +1,6 @@
 import { eq, inArray } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
-import type { Issue, IssueStatus, NewIssue } from "../../db/schema";
+import { db, dbSchema } from "@blackwall/database";
+import type { Issue, IssueStatus, NewIssue } from "@blackwall/database/schema";
 import { getNextSequenceNumber } from "./key-sequences";
 import { buildChangeEvent, buildIssueUpdatedEvent } from "./change-events";
 

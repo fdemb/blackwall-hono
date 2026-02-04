@@ -1,6 +1,6 @@
 import { and, count, eq } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
-import type { ColorKey } from "../../db/schema";
+import { db, dbSchema } from "@blackwall/database";
+import type { ColorKey } from "@blackwall/database/schema";
 import { buildChangeEvent } from "./change-events";
 
 export async function createLabel(input: {

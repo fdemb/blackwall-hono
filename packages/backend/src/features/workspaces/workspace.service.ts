@@ -1,6 +1,6 @@
 import { workspaceData } from "./workspace.data";
 import { ForbiddenError, NotFoundError } from "../../lib/errors";
-import type { User } from "../../db/schema";
+import type { User } from "@blackwall/database/schema";
 
 /**
  * Creates a new workspace. Anyone can create a workspace. It's used when signing up.

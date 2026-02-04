@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
-import type { Issue } from "../../db/schema";
+import { db, dbSchema } from "@blackwall/database";
+import type { Issue } from "@blackwall/database/schema";
 import { buildChangeEvent } from "./change-events";
 
 export async function createOrphanAttachment(input: {

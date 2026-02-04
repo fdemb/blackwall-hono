@@ -1,4 +1,4 @@
-import type { Workspace } from "../../db/schema";
+import type { Workspace } from "@blackwall/database/schema";
 import { teamData } from "./team.data";
 import { ForbiddenError, NotFoundError } from "../../lib/errors";
 

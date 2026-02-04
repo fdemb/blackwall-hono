@@ -1,4 +1,4 @@
-import type { IssueStatus } from "../../db/schema";
+import type { IssueStatus } from "@blackwall/database/schema";
 import { teamData } from "../teams/team.data";
 import { issueData, type CreateIssueInput, type UpdateIssueInput } from "./issue.data";
 import { ForbiddenError, NotFoundError } from "../../lib/errors";

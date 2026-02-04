@@ -1,5 +1,5 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
+import { db, dbSchema } from "@blackwall/database";
 import { buildChangeEvent } from "../issues/change-events";
 
 export async function createTimeEntry(input: {

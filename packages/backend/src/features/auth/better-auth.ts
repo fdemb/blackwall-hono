@@ -1,7 +1,7 @@
 import { env } from "../../lib/zod-env";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../../db";
+import { db } from "@blackwall/database";
 
 const hashOptions = {
   algorithm: "argon2id" as const,

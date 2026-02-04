@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { JSONContent } from "@tiptap/core";
-import { db, dbSchema } from "../../db";
-import type { Issue } from "../../db/schema";
+import { db, dbSchema } from "@blackwall/database";
+import type { Issue } from "@blackwall/database/schema";
 import { buildChangeEvent } from "./change-events";
 
 export async function createComment(input: {

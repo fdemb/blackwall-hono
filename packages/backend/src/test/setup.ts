@@ -1,5 +1,5 @@
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import { client, db } from "../db";
+import { client, db } from "@blackwall/database";
 
 type SqliteTableRow = { name: string };
 

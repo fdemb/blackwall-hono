@@ -3,7 +3,7 @@ import type {
   IssueChangeEventType,
   IssueFieldChanges,
   NewIssueChangeEvent,
-} from "../../db/schema";
+} from "@blackwall/database/schema";
 
 type ChangeEventContext = {
   issueId: string;

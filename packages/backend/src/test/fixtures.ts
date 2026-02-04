@@ -1,4 +1,4 @@
-import { dbSchema } from "../db";
+import { dbSchema } from "@blackwall/database";
 import type { TestDb } from "./setup";
 
 type WorkspaceInsert = typeof dbSchema.workspace.$inferInsert;

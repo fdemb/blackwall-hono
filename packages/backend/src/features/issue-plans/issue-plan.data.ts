@@ -1,6 +1,6 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
-import type { IssueStatus } from "../../db/schema";
+import { db, dbSchema } from "@blackwall/database";
+import type { IssueStatus } from "@blackwall/database/schema";
 
 const ACTIVE_ISSUE_STATUSES = ["to_do", "in_progress"] as IssueStatus[];
 

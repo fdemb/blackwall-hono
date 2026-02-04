@@ -1,4 +1,4 @@
-import { db } from "../../db";
+import { db } from "@blackwall/database";
 
 export async function searchIssues(input: {
   searchTerm: string;

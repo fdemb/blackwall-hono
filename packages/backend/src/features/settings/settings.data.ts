@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
+import { db, dbSchema } from "@blackwall/database";
 
 export async function getUserById(userId: string) {
   const user = await db.query.user.findFirst({

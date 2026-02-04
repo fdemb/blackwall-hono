@@ -1,4 +1,4 @@
-import { db, dbSchema } from "../../db";
+import { db, dbSchema } from "@blackwall/database";
 import { and, eq } from "drizzle-orm";
 
 export async function createTeam(input: { name: string; key: string; workspaceId: string }) {

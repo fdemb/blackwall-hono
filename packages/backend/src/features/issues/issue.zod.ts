@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { issueStatusValues, issuePriorityValues } from "../../db/schema";
+import { issueStatusValues, issuePriorityValues } from "@blackwall/database/schema";
 
 export const listIssuesQuerySchema = z.object({
   teamKey: z.string(),

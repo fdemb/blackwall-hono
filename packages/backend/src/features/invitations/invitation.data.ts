@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
+import { db, dbSchema } from "@blackwall/database";
 import { add } from "date-fns";
 import { randomBytes } from "node:crypto";
 

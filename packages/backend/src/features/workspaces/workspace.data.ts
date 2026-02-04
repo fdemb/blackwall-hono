@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, dbSchema } from "../../db";
+import { db, dbSchema } from "@blackwall/database";
 
 export async function createWorkspace(input: { displayName: string; slug: string }) {
   const [workspace] = await db

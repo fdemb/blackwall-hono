@@ -1,4 +1,4 @@
-import { db, dbSchema, type DbTransaction } from "../../db";
+import { db, dbSchema, type DbTransaction } from "@blackwall/database";
 import { and, eq, sql } from "drizzle-orm";
 
 export async function ensureSequenceExists(input: {
