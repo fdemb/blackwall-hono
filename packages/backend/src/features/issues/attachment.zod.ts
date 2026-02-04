@@ -7,7 +7,7 @@ export const attachmentParamsSchema = z.object({
 export type AttachmentParams = z.infer<typeof attachmentParamsSchema>;
 
 export const attachmentUploadFormSchema = z.object({
-  file: z.instanceof(File),
+  file: z.any(),
 });
 
 export type AttachmentUploadForm = z.infer<typeof attachmentUploadFormSchema>;
@@ -47,4 +47,3 @@ export const attachmentSchema = z.object({
 export const attachmentResponseSchema = z.object({
   attachment: attachmentSchema,
 });
-
