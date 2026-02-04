@@ -10,9 +10,9 @@
   },
   "scripts": {
     "typecheck": "bun run --bun tsc --noEmit",
-    "db:generate": "bun run --bun drizzle-kit generate",
-    "db:migrate": "bun run --bun drizzle-kit migrate",
-    "db:drop": "bun run src/drop.ts"
+    "db:generate": "bun --env-file=../../.env run --bun drizzle-kit generate",
+    "db:migrate": "bun --env-file=../../.env run --bun drizzle-kit migrate",
+    "db:drop": "bun --env-file=../../.env run src/drop.ts"
   },
   "dependencies": {
     "@blackwall/shared": "workspace:*",

@@ -351,7 +351,7 @@ function PlanSection(props: { plan: SerializedIssuePlan | null }) {
           <>
             <div class="text-muted-foreground">No plan</div>
             <A
-              href={`/${params.workspace!}/team/${params.teamKey!}/plans/create`}
+              href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/create`}
               class={buttonVariants({
                 variant: "secondary",
                 size: "xxs",

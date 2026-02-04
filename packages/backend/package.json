@@ -3,7 +3,7 @@
   "type": "module",
   "module": "src/index.ts",
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun --env-file=../../.env run --hot src/index.ts",
     "typecheck": "bun run --bun tsc --noEmit",
     "lint": "bun run --bun oxlint",
     "test": "bun test",
