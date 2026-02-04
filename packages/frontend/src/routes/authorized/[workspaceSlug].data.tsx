@@ -4,7 +4,7 @@ import { query, redirect } from "@solidjs/router";
 
 export const workspaceLoader = query(async (workspaceSlug: string) => {
   setCurrentWorkspaceSlug(workspaceSlug);
-  const result = await api.workspaces[":slug"].$get({
+  const result = await api.api.workspaces[":slug"].$get({
     param: {
       slug: workspaceSlug,
     },
@@ -16,7 +16,7 @@ export const workspaceLoader = query(async (workspaceSlug: string) => {
     throw redirect("/");
   }
 
-  const teamsRes = await api.teams.$get();
+  const teamsRes = await api.api.teams.$get();
   const { teams } = await teamsRes.json();
 
   return { workspace, teams };

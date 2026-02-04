@@ -77,7 +77,7 @@ function WorkspaceNameForm(props: WorkspaceNameFormProps) {
     },
     onSubmit: async ({ value }) => {
       try {
-        await api.settings.workspace.$patch({
+        await api.api.settings.workspace.$patch({
           json: { displayName: value.name },
         });
         toast.success("Workspace name updated successfully.");
@@ -164,9 +164,7 @@ function MembersSection() {
           fallback={
             <div class="flex flex-col items-center justify-center py-8 text-center">
               <p class="text-sm text-muted-foreground">No members in this workspace yet.</p>
-              <p class="text-xs text-muted-foreground mt-1">
-                Invite members to collaborate.
-              </p>
+              <p class="text-xs text-muted-foreground mt-1">Invite members to collaborate.</p>
             </div>
           }
         >

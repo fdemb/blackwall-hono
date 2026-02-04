@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 import { query } from "@solidjs/router";
 
 export const teamSettingsLoader = query(async (teamKey: string) => {
-  const res = await api.settings.teams[":teamKey"].$get({
+  const res = await api.api.settings.teams[":teamKey"].$get({
     param: { teamKey },
   });
 
@@ -14,7 +14,7 @@ export const teamSettingsLoader = query(async (teamKey: string) => {
 }, "teamSettings");
 
 export const availableUsersLoader = query(async (teamKey: string) => {
-  const res = await api.settings.teams[":teamKey"]["available-users"].$get({
+  const res = await api.api.settings.teams[":teamKey"]["available-users"].$get({
     param: { teamKey },
   });
 

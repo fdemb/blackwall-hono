@@ -40,10 +40,12 @@ export function IssueDescription(props: { issue: SerializedIssue }) {
     }
 
     await action(
-      api.issues[":issueKey"].$patch({
-        param: { issueKey: props.issue.key },
-        json: { description: description() },
-      }).then((res) => res.json()),
+      api.api.issues[":issueKey"]
+        .$patch({
+          param: { issueKey: props.issue.key },
+          json: { description: description() },
+        })
+        .then((res) => res.json()),
     );
     setIsEditing(false);
   };

@@ -7,7 +7,7 @@ describe("Team Routes", () => {
   describe("GET /teams", () => {
     it("should return empty array when no teams exist", async () => {
       const { client, headers } = getCtx();
-      const res = await client.teams.$get(
+      const res = await client.api.teams.$get(
         {},
         {
           headers: headers(),
@@ -21,7 +21,7 @@ describe("Team Routes", () => {
 
     it("should return list of teams for workspace", async () => {
       const { client, headers } = getCtx();
-      const res = await client.teams.$get(
+      const res = await client.api.teams.$get(
         {},
         {
           headers: headers(),
@@ -35,7 +35,7 @@ describe("Team Routes", () => {
 
     it("should return multiple teams", async () => {
       const { client, headers, workspace } = getCtx();
-      await client.teams.create.$post(
+      await client.api.teams.create.$post(
         {
           json: {
             name: "Team 2",
@@ -48,7 +48,7 @@ describe("Team Routes", () => {
         },
       );
 
-      await client.teams.create.$post(
+      await client.api.teams.create.$post(
         {
           json: {
             name: "Team 3",
@@ -61,7 +61,7 @@ describe("Team Routes", () => {
         },
       );
 
-      const res = await client.teams.$get(
+      const res = await client.api.teams.$get(
         {},
         {
           headers: headers(),
@@ -77,7 +77,7 @@ describe("Team Routes", () => {
   describe("POST /teams/create", () => {
     it("should create a new team", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.teams.create.$post(
+      const res = await client.api.teams.create.$post(
         {
           json: {
             name: "New Team",
@@ -100,7 +100,7 @@ describe("Team Routes", () => {
 
     it("should return 400 when name is too short", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.teams.create.$post(
+      const res = await client.api.teams.create.$post(
         {
           json: {
             name: "A",
@@ -118,7 +118,7 @@ describe("Team Routes", () => {
 
     it("should return 400 when name is too long", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.teams.create.$post(
+      const res = await client.api.teams.create.$post(
         {
           json: {
             name: "A".repeat(31),
@@ -136,7 +136,7 @@ describe("Team Routes", () => {
 
     it("should return 400 when key is too short", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.teams.create.$post(
+      const res = await client.api.teams.create.$post(
         {
           json: {
             name: "New Team",
@@ -154,7 +154,7 @@ describe("Team Routes", () => {
 
     it("should return 400 when key is too long", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.teams.create.$post(
+      const res = await client.api.teams.create.$post(
         {
           json: {
             name: "New Team",
@@ -172,7 +172,7 @@ describe("Team Routes", () => {
 
     it("should return 400 when workspaceId is missing", async () => {
       const { client, headers } = getCtx();
-      const res = await client.teams.create.$post(
+      const res = await client.api.teams.create.$post(
         {
           // @ts-expect-error - intentionally missing workspaceId for validation test
           json: {
@@ -192,7 +192,7 @@ describe("Team Routes", () => {
   describe("GET /teams/:teamKey", () => {
     it("should return team by key", async () => {
       const { client, headers, team } = getCtx();
-      const res = await client.teams[":teamKey"].$get(
+      const res = await client.api.teams[":teamKey"].$get(
         { param: { teamKey: team.key } },
         { headers: headers() },
       );
@@ -207,7 +207,7 @@ describe("Team Routes", () => {
   describe("GET /teams/:teamKey/users", () => {
     it("should return list of team users", async () => {
       const { client, headers, team } = getCtx();
-      const res = await client.teams[":teamKey"].users.$get(
+      const res = await client.api.teams[":teamKey"].users.$get(
         { param: { teamKey: team.key } },
         { headers: headers() },
       );
@@ -221,7 +221,7 @@ describe("Team Routes", () => {
   describe("GET /teams/preferred", () => {
     it("should return preferred team for user", async () => {
       const { client, headers } = getCtx();
-      const res = await client.teams.preferred.$get({}, { headers: headers() });
+      const res = await client.api.teams.preferred.$get({}, { headers: headers() });
 
       expect(res.status).toBe(200);
       const json = await res.json();
@@ -232,7 +232,7 @@ describe("Team Routes", () => {
   describe("GET /teams/with-active-plans", () => {
     it("should return teams with active plans", async () => {
       const { client, headers } = getCtx();
-      const res = await client.teams["with-active-plans"].$get({}, { headers: headers() });
+      const res = await client.api.teams["with-active-plans"].$get({}, { headers: headers() });
 
       expect(res.status).toBe(200);
       const json = await res.json();

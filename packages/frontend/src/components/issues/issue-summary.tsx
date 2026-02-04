@@ -17,10 +17,12 @@ export function IssueSummary(props: { issue: SerializedIssue }) {
     }
 
     await action(
-      api.issues[":issueKey"].$patch({
-        param: { issueKey: props.issue.key },
-        json: { summary: summary() },
-      }).then((res) => res.json()),
+      api.api.issues[":issueKey"]
+        .$patch({
+          param: { issueKey: props.issue.key },
+          json: { summary: summary() },
+        })
+        .then((res) => res.json()),
     );
 
     setIsEditing(false);

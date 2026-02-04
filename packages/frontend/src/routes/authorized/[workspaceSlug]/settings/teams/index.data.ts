@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 import { query } from "@solidjs/router";
 
 export const teamsSettingsLoader = query(async () => {
-  const res = await api.settings.teams.$get();
+  const res = await api.api.settings.teams.$get();
 
   if (!res.ok) {
     throw new Error("Failed to fetch teams");

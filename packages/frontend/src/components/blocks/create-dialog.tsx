@@ -40,7 +40,7 @@ type CreateDialogProps = {
 };
 
 const getTeamUsers = query(async (teamKey: string) => {
-  const res = await api.teams[":teamKey"].users.$get({
+  const res = await api.api.teams[":teamKey"].users.$get({
     param: {
       teamKey,
     },
@@ -53,7 +53,7 @@ const getTeamUsers = query(async (teamKey: string) => {
 
 const createIssueAction = action(
   async (issue: CreateIssue["issue"], workspaceSlug: string, teamKey: string) => {
-    const res = await api.issues.$post({
+    const res = await api.api.issues.$post({
       json: {
         issue,
         teamKey,

@@ -24,7 +24,7 @@ export default function InvitePage() {
       }),
     },
     onSubmit: async ({ value, formApi }) => {
-      const res = await api.invitations[":token"].register.$post({
+      const res = await api.api.invitations[":token"].register.$post({
         param: { token: params.token! },
         json: value,
       });

@@ -6,5 +6,6 @@ const baseUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000";
 
 export const authClient = createAuthClient({
   baseURL: baseUrl,
+  basePath: "/api/better-auth",
   plugins: [inferAdditionalFields<typeof auth>()],
 });

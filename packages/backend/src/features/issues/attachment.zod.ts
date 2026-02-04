@@ -6,6 +6,12 @@ export const attachmentParamsSchema = z.object({
 
 export type AttachmentParams = z.infer<typeof attachmentParamsSchema>;
 
+export const attachmentUploadFormSchema = z.object({
+  file: z.instanceof(File),
+});
+
+export type AttachmentUploadForm = z.infer<typeof attachmentUploadFormSchema>;
+
 export const associateAttachmentsSchema = z.object({
   attachmentIds: z.array(z.string()),
 });

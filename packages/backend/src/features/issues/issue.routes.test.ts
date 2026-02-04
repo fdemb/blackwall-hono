@@ -13,7 +13,7 @@ describe("Issue Routes", () => {
     planId: string | null;
   }) => {
     const { client, headers, team } = getCtx();
-    return client.issues.$post(
+    return client.api.issues.$post(
       {
         json: {
           teamKey: team.key,
@@ -32,7 +32,7 @@ describe("Issue Routes", () => {
   describe("GET /issues", () => {
     it("should return empty array when no issues exist", async () => {
       const { client, headers, team } = getCtx();
-      const res = await client.issues.$get(
+      const res = await client.api.issues.$get(
         {
           query: { teamKey: team.key },
         },
@@ -67,7 +67,7 @@ describe("Issue Routes", () => {
       });
 
       const { client, headers, team } = getCtx();
-      const res = await client.issues.$get(
+      const res = await client.api.issues.$get(
         {
           query: { teamKey: team.key },
         },
@@ -105,7 +105,7 @@ describe("Issue Routes", () => {
       });
 
       const { client, headers, team } = getCtx();
-      const res = await client.issues.$get(
+      const res = await client.api.issues.$get(
         {
           query: { teamKey: team.key, statusFilters: ["to_do", "done"] },
         },
@@ -129,7 +129,7 @@ describe("Issue Routes", () => {
       });
 
       const { client, headers, team } = getCtx();
-      const res = await client.issues.$get(
+      const res = await client.api.issues.$get(
         {
           query: { teamKey: team.key },
         },
@@ -147,7 +147,7 @@ describe("Issue Routes", () => {
 
     it("should return 400 when teamKey is missing", async () => {
       const { client, headers } = getCtx();
-      const res = await client.issues.$get(
+      const res = await client.api.issues.$get(
         // @ts-expect-error - intentionally missing query.teamKey for validation test
         {},
         {
@@ -206,7 +206,7 @@ describe("Issue Routes", () => {
 
     it("should return 400 when summary is missing", async () => {
       const { client, headers, team } = getCtx();
-      const res = await client.issues.$post(
+      const res = await client.api.issues.$post(
         {
           json: {
             teamKey: team.key,
@@ -227,7 +227,7 @@ describe("Issue Routes", () => {
 
     it("should return 400 when teamKey is missing", async () => {
       const { client, headers } = getCtx();
-      const res = await client.issues.$post(
+      const res = await client.api.issues.$post(
         {
           // @ts-expect-error - intentionally missing teamKey for validation test
           json: {
@@ -248,7 +248,7 @@ describe("Issue Routes", () => {
 
     it("should return 400 when status is invalid", async () => {
       const { client, headers, team } = getCtx();
-      const res = await client.issues.$post(
+      const res = await client.api.issues.$post(
         {
           json: {
             teamKey: team.key,
@@ -280,7 +280,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].$get(
+      const res = await client.api.issues[":issueKey"].$get(
         {
           param: { issueKey: created.issue.key },
         },
@@ -305,7 +305,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].$get(
+      const res = await client.api.issues[":issueKey"].$get(
         {
           param: { issueKey: created.issue.key },
         },
@@ -333,7 +333,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].$patch(
+      const res = await client.api.issues[":issueKey"].$patch(
         {
           param: { issueKey: created.issue.key },
           json: { status: "in_progress" },
@@ -358,7 +358,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].$patch(
+      const res = await client.api.issues[":issueKey"].$patch(
         {
           param: { issueKey: created.issue.key },
           json: { summary: "Updated Summary" },
@@ -383,7 +383,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].$patch(
+      const res = await client.api.issues[":issueKey"].$patch(
         {
           param: { issueKey: created.issue.key },
           json: { priority: "high" },
@@ -408,7 +408,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers, user } = getCtx();
-      const res = await client.issues[":issueKey"].$patch(
+      const res = await client.api.issues[":issueKey"].$patch(
         {
           param: { issueKey: created.issue.key },
           json: { assignedToId: user.id },
@@ -435,7 +435,7 @@ describe("Issue Routes", () => {
       const created = await createRes.json();
 
       const { client, headers, team } = getCtx();
-      const deleteRes = await client.issues[":issueKey"].$delete(
+      const deleteRes = await client.api.issues[":issueKey"].$delete(
         {
           param: { issueKey: created.issue.key },
         },
@@ -448,7 +448,7 @@ describe("Issue Routes", () => {
       const deleteJson = await deleteRes.json();
       expect(deleteJson.message).toBe("Issue deleted");
 
-      const listRes = await client.issues.$get(
+      const listRes = await client.api.issues.$get(
         {
           query: { teamKey: team.key },
         },
@@ -461,4 +461,3 @@ describe("Issue Routes", () => {
     });
   });
 });
-

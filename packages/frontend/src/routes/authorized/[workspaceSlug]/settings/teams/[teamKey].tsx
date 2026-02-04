@@ -68,7 +68,7 @@ function NameForm(props: NameFormProps) {
     },
     onSubmit: async ({ value }) => {
       try {
-        await api.settings.teams[":teamKey"].$patch({
+        await api.api.settings.teams[":teamKey"].$patch({
           param: { teamKey: params.teamKey! },
           json: { name: value.name },
         });
@@ -136,7 +136,7 @@ function KeyForm(props: KeyFormProps) {
     },
     onSubmit: async ({ value }) => {
       try {
-        await api.settings.teams[":teamKey"].$patch({
+        await api.api.settings.teams[":teamKey"].$patch({
           param: { teamKey: params.teamKey! },
           json: { key: value.key.toUpperCase() },
         });
@@ -198,7 +198,7 @@ function MembersSection(props: MembersSectionProps) {
   const [open, setOpen] = createSignal(false);
 
   const availableUsers = createAsync(() =>
-    open() ? availableUsersLoader(params.teamKey!) : Promise.resolve([])
+    open() ? availableUsersLoader(params.teamKey!) : Promise.resolve([]),
   );
 
   const availableUsersOptions = createMemo((): PickerOption<string>[] => {
@@ -212,7 +212,7 @@ function MembersSection(props: MembersSectionProps) {
 
   const handleAddMember = async (userId: string) => {
     try {
-      await api.settings.teams[":teamKey"].members.$post({
+      await api.api.settings.teams[":teamKey"].members.$post({
         param: { teamKey: params.teamKey! },
         json: { userId },
       });
@@ -228,7 +228,7 @@ function MembersSection(props: MembersSectionProps) {
 
   const handleRemoveMember = async (userId: string) => {
     try {
-      await api.settings.teams[":teamKey"].members[":userId"].$delete({
+      await api.api.settings.teams[":teamKey"].members[":userId"].$delete({
         param: { teamKey: params.teamKey!, userId },
       });
 

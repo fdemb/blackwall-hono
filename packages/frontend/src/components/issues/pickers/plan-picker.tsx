@@ -9,7 +9,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { SerializedIssuePlan } from "@blackwall/backend/src/db/schema";
 
 const updatePlan = action(async (issueKey: string, planId: string | null) => {
-  await api.issues[`:issueKey`].$patch({
+  await api.api.issues[`:issueKey`].$patch({
     param: { issueKey },
     json: { planId },
   });
@@ -37,12 +37,12 @@ export function PlanPickerPopover(props: PlanPickerPopoverProps) {
       label: string;
       icon: () => any;
     }> = [
-        {
-          id: null,
-          label: "No plan",
-          icon: () => <LandPlotIcon class="size-4 text-muted-foreground" />,
-        },
-      ];
+      {
+        id: null,
+        label: "No plan",
+        icon: () => <LandPlotIcon class="size-4 text-muted-foreground" />,
+      },
+    ];
 
     if (props.activePlan) {
       options.push({

@@ -10,7 +10,7 @@ import { action, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 
 const updateAssignee = action(async (issueKey: string, assignedToId: string | null) => {
-  await api.issues[":issueKey"].$patch({
+  await api.api.issues[":issueKey"].$patch({
     param: { issueKey: issueKey },
     json: { assignedToId: assignedToId },
   });
@@ -19,26 +19,26 @@ const updateAssignee = action(async (issueKey: string, assignedToId: string | nu
 
 type AssigneePickerPopoverProps =
   | {
-    assignableUsers: SerializedUser[];
-    assignedToId: string | null;
-    workspaceSlug: string;
-    teamKey: string;
-    loading?: boolean;
-    small?: boolean;
-    issueKey: string;
-    controlled?: false;
-  }
+      assignableUsers: SerializedUser[];
+      assignedToId: string | null;
+      workspaceSlug: string;
+      teamKey: string;
+      loading?: boolean;
+      small?: boolean;
+      issueKey: string;
+      controlled?: false;
+    }
   | {
-    assignableUsers: SerializedUser[];
-    assignedToId: string | null;
-    workspaceSlug: string;
-    teamKey: string;
-    loading?: boolean;
-    small?: boolean;
-    issueKey?: never;
-    handleChange?: (id: string | null) => void;
-    controlled: true;
-  };
+      assignableUsers: SerializedUser[];
+      assignedToId: string | null;
+      workspaceSlug: string;
+      teamKey: string;
+      loading?: boolean;
+      small?: boolean;
+      issueKey?: never;
+      handleChange?: (id: string | null) => void;
+      controlled: true;
+    };
 
 export function AssigneePickerPopover(props: AssigneePickerPopoverProps) {
   const [open, setOpen] = createSignal(false);

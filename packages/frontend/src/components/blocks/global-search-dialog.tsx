@@ -19,7 +19,7 @@ const globalSearchLoader = query(async (searchTerm: string, workspaceSlug: strin
     return { issues: [], users: [] };
   }
 
-  const res = await api.search.$get({
+  const res = await api.api.search.$get({
     query: { q: searchTerm },
   });
 

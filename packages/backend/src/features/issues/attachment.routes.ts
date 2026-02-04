@@ -7,12 +7,12 @@ import { authMiddleware } from "../auth/auth-middleware";
 import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import {
   attachmentParamsSchema,
+  attachmentUploadFormSchema,
   associateAttachmentsSchema,
   deleteAttachmentParamsSchema,
   getAttachmentParamsSchema,
   attachmentResponseSchema,
 } from "./attachment.zod";
-import { HTTPException } from "hono/http-exception";
 
 const attachmentRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
@@ -33,17 +33,12 @@ const attachmentRoutes = new Hono<AppEnv>()
       },
     }),
     validator("param", attachmentParamsSchema),
+    validator("form", attachmentUploadFormSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
       const { issueKey } = c.req.valid("param");
-
-      const formData = await c.req.formData();
-      const file = formData.get("file");
-
-      if (!(file instanceof File)) {
-        throw new HTTPException(400, { message: "Expected file" });
-      }
+      const { file } = c.req.valid("form");
 
       const attachment = await attachmentService.uploadAttachment({
         workspaceSlug: workspace.slug,
@@ -70,16 +65,11 @@ const attachmentRoutes = new Hono<AppEnv>()
         },
       },
     }),
+    validator("form", attachmentUploadFormSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-
-      const formData = await c.req.formData();
-      const file = formData.get("file");
-
-      if (!(file instanceof File)) {
-        throw new HTTPException(400, { message: "Expected file" });
-      }
+      const { file } = c.req.valid("form");
 
       const attachment = await attachmentService.uploadAttachment({
         workspaceSlug: workspace.slug,

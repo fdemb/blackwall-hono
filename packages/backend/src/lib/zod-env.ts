@@ -1,9 +1,5 @@
 import * as z from "zod";
 
-if (typeof window !== "undefined") {
-  throw new Error("This file should not be imported in the browser");
-}
-
 export const envSchema = z.object({
   APP_BASE_URL: z.url(),
   APP_SECRET: z.string(),

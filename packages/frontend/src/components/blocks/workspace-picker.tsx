@@ -9,9 +9,7 @@ import { api } from "@/lib/api";
 import { createResource } from "solid-js";
 
 const workspacesQuery = query(async () => {
-  const res = await api.workspaces.$get();
-
-
+  const res = await api.api.workspaces.$get();
 
   const data = await res.json();
 

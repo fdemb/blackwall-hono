@@ -11,11 +11,11 @@ import { action, useAction, revalidate } from "@solidjs/router";
 import type { Label } from "@blackwall/backend/src/db/schema";
 
 const createAndAddLabel = action(async (name: string, issueKey: string) => {
-  const createRes = await api.labels.$post({
+  const createRes = await api.api.labels.$post({
     json: { name },
   });
   const { label } = await createRes.json();
-  await api.issues[`:issueKey`].labels.$post({
+  await api.api.issues[`:issueKey`].labels.$post({
     param: { issueKey },
     json: { labelId: label.id },
   });
@@ -23,7 +23,7 @@ const createAndAddLabel = action(async (name: string, issueKey: string) => {
 });
 
 const addLabel = action(async (labelId: string, issueKey: string) => {
-  await api.issues[`:issueKey`].labels.$post({
+  await api.api.issues[`:issueKey`].labels.$post({
     param: { issueKey },
     json: { labelId },
   });
@@ -31,7 +31,7 @@ const addLabel = action(async (labelId: string, issueKey: string) => {
 });
 
 const removeLabel = action(async (labelId: string, issueKey: string) => {
-  await api.issues[`:issueKey`].labels[`:labelId`].$delete({
+  await api.api.issues[`:issueKey`].labels[`:labelId`].$delete({
     param: { issueKey, labelId },
   });
   await revalidate("issue");
@@ -50,7 +50,7 @@ export function IssueLabelsPicker(props: { labels: Label[]; issueKey: string }) 
   const [allLabels] = createResource(
     () => addOpen() === true,
     async () => {
-      const res = await api.labels.$get();
+      const res = await api.api.labels.$get();
       const { labels } = await res.json();
       return labels.map(
         (label) =>

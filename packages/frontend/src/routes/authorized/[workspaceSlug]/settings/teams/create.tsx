@@ -28,7 +28,7 @@ export default function CreateTeamPage() {
       }),
     },
     onSubmit: async ({ value }) => {
-      await api.settings.teams.$post({
+      await api.api.settings.teams.$post({
         json: {
           name: value.name,
           key: value.key.toUpperCase(),

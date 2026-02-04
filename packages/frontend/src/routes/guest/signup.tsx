@@ -19,7 +19,7 @@ type SignupFormData = {
 type SignUpFormApi = ReturnType<typeof useSignupForm>;
 
 const signupAction = action(async (value: SignupFormData) => {
-  const res = await api.auth.signup.email.$post({
+  const res = await api.api.auth.signup.email.$post({
     json: value,
   });
 

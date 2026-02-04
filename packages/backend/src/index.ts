@@ -8,10 +8,7 @@ import { workspaceRoutes } from "./features/workspaces/workspace.routes";
 import { teamRoutes } from "./features/teams/team.routes";
 import { issueRoutes } from "./features/issues/issue.routes";
 import { commentRoutes } from "./features/issues/comment.routes";
-import {
-  attachmentRoutes,
-  attachmentDownloadRoutes,
-} from "./features/issues/attachment.routes";
+import { attachmentRoutes, attachmentDownloadRoutes } from "./features/issues/attachment.routes";
 import { labelRoutes } from "./features/issues/label.routes";
 import { issuePlanRoutes } from "./features/issue-plans/issue-plan.routes";
 import { timeEntryRoutes } from "./features/time-entries/time-entry.routes";
@@ -25,6 +22,7 @@ import {
 import type { AppEnv } from "./lib/hono-env";
 import { authRoutes } from "./features/auth/auth.routes";
 import { errorHandler } from "./lib/error-handler";
+import { serveStatic } from "hono/bun";
 
 const app = new Hono<AppEnv>()
   .use(
@@ -40,26 +38,27 @@ const app = new Hono<AppEnv>()
   )
   .onError(errorHandler)
   // Public routes
-  .route("/api/auth", betterAuthRoutes)
-  .route("/auth", authRoutes)
-  .route("/invitations", publicInvitationRoutes)
+  .route("/api/better-auth", betterAuthRoutes)
+  .route("/api/auth", authRoutes)
+  .route("/api/invitations", publicInvitationRoutes)
   // Protected routes (auth middleware inside each)
-  .route("/workspaces", workspaceRoutes)
-  .route("/invitations", protectedInvitationRoutes)
+  .route("/api/workspaces", workspaceRoutes)
+  .route("/api/invitations", protectedInvitationRoutes)
   // Protected per-workspace routes (auth + workspace middleware inside each)
-  .route("/teams", teamRoutes)
-  .route("/issues", issueRoutes)
-  .route("/issues", commentRoutes)
-  .route("/issues", attachmentRoutes)
-  .route("/issues", attachmentDownloadRoutes)
-  .route("/labels", labelRoutes)
-  .route("/issue-plans", issuePlanRoutes)
-  .route("/time-entries", timeEntryRoutes)
-  .route("/search", globalSearchRoutes)
-  .route("/invitations", invitationRoutes)
-  .route("/settings", settingsRoutes);
+  .route("/api/teams", teamRoutes)
+  .route("/api/issues", issueRoutes)
+  .route("/api/issues", commentRoutes)
+  .route("/api/issues", attachmentRoutes)
+  .route("/api/issues", attachmentDownloadRoutes)
+  .route("/api/labels", labelRoutes)
+  .route("/api/issue-plans", issuePlanRoutes)
+  .route("/api/time-entries", timeEntryRoutes)
+  .route("/api/search", globalSearchRoutes)
+  .route("/api/invitations", invitationRoutes)
+  .route("/api/settings", settingsRoutes)
+  .use("/*", serveStatic({ root: "../frontend/dist" }))
+  .get("/*", serveStatic({ path: "../frontend/dist/index.html" }));
 
-// OpenAPI docs (public) - added after app is defined
 app.get(
   "/api/docs/openapi",
   openAPIRouteHandler(app, {

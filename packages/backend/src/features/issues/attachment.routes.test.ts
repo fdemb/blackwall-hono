@@ -1,7 +1,6 @@
 import { describe, it, expect, afterEach } from "bun:test";
 import { rmSync } from "node:fs";
 import { useTestContext } from "../../test/context";
-import { app } from "../../index";
 import { env } from "../../lib/zod-env";
 
 describe("Attachment Routes", () => {
@@ -18,7 +17,7 @@ describe("Attachment Routes", () => {
 
   const createIssue = async () => {
     const { client, headers, team } = getCtx();
-    const res = await client.issues.$post(
+    const res = await client.api.issues.$post(
       {
         json: {
           teamKey: team.key,
@@ -44,36 +43,37 @@ describe("Attachment Routes", () => {
     return new File([content], name, { type });
   };
 
-  const uploadAttachment = async (issueKey: string, file?: File) => {
+  const createFormHeaders = () => {
     const { sessionCookie, workspace } = getCtx();
-    const formData = new FormData();
-    formData.append("file", file ?? createTestFile());
+    return {
+      Cookie: sessionCookie,
+      "x-blackwall-workspace-slug": workspace.slug,
+    };
+  };
 
-    const req = new Request(`http://localhost/issues/${issueKey}/attachments`, {
-      method: "POST",
-      headers: {
-        Cookie: sessionCookie,
-        "x-blackwall-workspace-slug": workspace.slug,
+  const uploadAttachment = async (issueKey: string, file?: File) => {
+    const { client } = getCtx();
+    return client.api.issues[":issueKey"].attachments.$post(
+      {
+        param: { issueKey },
+        form: { file: file ?? createTestFile() },
       },
-      body: formData,
-    });
-    return app.request(req);
+      {
+        headers: createFormHeaders(),
+      },
+    );
   };
 
   const uploadOrphanAttachment = async (file?: File) => {
-    const { sessionCookie, workspace } = getCtx();
-    const formData = new FormData();
-    formData.append("file", file ?? createTestFile());
-
-    const req = new Request("http://localhost/issues/attachments", {
-      method: "POST",
-      headers: {
-        Cookie: sessionCookie,
-        "x-blackwall-workspace-slug": workspace.slug,
+    const { client } = getCtx();
+    return client.api.issues.attachments.$post(
+      {
+        form: { file: file ?? createTestFile() },
       },
-      body: formData,
-    });
-    return app.request(req);
+      {
+        headers: createFormHeaders(),
+      },
+    );
   };
 
   describe("POST /issues/:issueKey/attachments", () => {
@@ -118,7 +118,7 @@ describe("Attachment Routes", () => {
 
       // Associate with issue
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].attachments.associate.$post(
+      const res = await client.api.issues[":issueKey"].attachments.associate.$post(
         {
           param: { issueKey: issue.key },
           json: { attachmentIds: [orphanJson.attachment.id] },
@@ -135,7 +135,7 @@ describe("Attachment Routes", () => {
 
     it("should return 404 for non-existent issue", async () => {
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].attachments.associate.$post(
+      const res = await client.api.issues[":issueKey"].attachments.associate.$post(
         {
           param: { issueKey: "NONEXISTENT-999" },
           json: { attachmentIds: ["00000000-0000-0000-0000-000000000000"] },
@@ -156,7 +156,7 @@ describe("Attachment Routes", () => {
       const uploadJson = (await uploadRes.json()) as { attachment: { id: string } };
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].attachments[":attachmentId"].$get(
+      const res = await client.api.issues[":issueKey"].attachments[":attachmentId"].$get(
         {
           param: { issueKey: issue.key, attachmentId: uploadJson.attachment.id },
         },
@@ -174,7 +174,7 @@ describe("Attachment Routes", () => {
       const issue = await createIssue();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].attachments[":attachmentId"].$get(
+      const res = await client.api.issues[":issueKey"].attachments[":attachmentId"].$get(
         {
           param: { issueKey: issue.key, attachmentId: "00000000-0000-0000-0000-000000000000" },
         },
@@ -194,7 +194,7 @@ describe("Attachment Routes", () => {
       const uploadJson = (await uploadRes.json()) as { attachment: { id: string } };
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].attachments[":attachmentId"].$delete(
+      const res = await client.api.issues[":issueKey"].attachments[":attachmentId"].$delete(
         {
           param: { issueKey: issue.key, attachmentId: uploadJson.attachment.id },
         },
@@ -212,7 +212,7 @@ describe("Attachment Routes", () => {
       const issue = await createIssue();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].attachments[":attachmentId"].$delete(
+      const res = await client.api.issues[":issueKey"].attachments[":attachmentId"].$delete(
         {
           param: { issueKey: issue.key, attachmentId: "00000000-0000-0000-0000-000000000000" },
         },
@@ -232,7 +232,7 @@ describe("Attachment Routes", () => {
       const uploadJson = (await uploadRes.json()) as { attachment: { id: string } };
 
       const { client, headers } = getCtx();
-      const res = await client.issues.attachments[":attachmentId"].download.$get(
+      const res = await client.api.issues.attachments[":attachmentId"].download.$get(
         {
           param: { attachmentId: uploadJson.attachment.id },
         },
@@ -248,7 +248,7 @@ describe("Attachment Routes", () => {
 
     it("should return 404 for non-existent attachment", async () => {
       const { client, headers } = getCtx();
-      const res = await client.issues.attachments[":attachmentId"].download.$get(
+      const res = await client.api.issues.attachments[":attachmentId"].download.$get(
         {
           param: { attachmentId: "00000000-0000-0000-0000-000000000000" },
         },

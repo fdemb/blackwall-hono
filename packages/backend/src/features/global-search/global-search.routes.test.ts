@@ -7,7 +7,7 @@ describe("Global Search Routes", () => {
   describe("GET /search", () => {
     it("should return empty results for no matches", async () => {
       const { client, headers } = getCtx();
-      const res = await client.search.$get(
+      const res = await client.api.search.$get(
         { query: { q: "nonexistentterm12345" } },
         { headers: headers() },
       );
@@ -20,10 +20,7 @@ describe("Global Search Routes", () => {
 
     it("should return 400 when query is missing", async () => {
       const { client, headers } = getCtx();
-      const res = await client.search.$get(
-        { query: {} as any },
-        { headers: headers() },
-      );
+      const res = await client.api.search.$get({ query: {} as any }, { headers: headers() });
 
       expect(res.status).toBe(400);
     });
@@ -31,7 +28,7 @@ describe("Global Search Routes", () => {
     it("should find users by name", async () => {
       const { client, headers, user } = getCtx();
       const searchTerm = user.name.substring(0, 4);
-      const res = await client.search.$get(
+      const res = await client.api.search.$get(
         { query: { q: searchTerm } },
         { headers: headers() },
       );

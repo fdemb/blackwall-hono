@@ -7,7 +7,7 @@ describe("Workspace Routes", () => {
   describe("GET /workspaces", () => {
     it("should return empty array when no workspaces exist", async () => {
       const { client, headersWithoutWorkspace, workspace } = getCtx();
-      const res = await client.workspaces.$get(
+      const res = await client.api.workspaces.$get(
         {},
         {
           headers: headersWithoutWorkspace(),
@@ -22,7 +22,7 @@ describe("Workspace Routes", () => {
 
     it("should return list of workspaces for user", async () => {
       const { client, headersWithoutWorkspace } = getCtx();
-      const res = await client.workspaces.$get(
+      const res = await client.api.workspaces.$get(
         {},
         {
           headers: headersWithoutWorkspace(),
@@ -36,7 +36,7 @@ describe("Workspace Routes", () => {
 
     it("should return only workspaces the user is a member of", async () => {
       const { client, headersWithoutWorkspace } = getCtx();
-      await client.auth.signup.email.$post(
+      await client.api.auth.signup.email.$post(
         {
           json: {
             email: "extra1@example.com",
@@ -50,7 +50,7 @@ describe("Workspace Routes", () => {
           headers: headersWithoutWorkspace(),
         },
       );
-      await client.auth.signup.email.$post(
+      await client.api.auth.signup.email.$post(
         {
           json: {
             email: "extra2@example.com",
@@ -65,7 +65,7 @@ describe("Workspace Routes", () => {
         },
       );
 
-      const res = await client.workspaces.$get(
+      const res = await client.api.workspaces.$get(
         {},
         {
           headers: headersWithoutWorkspace(),
@@ -81,7 +81,7 @@ describe("Workspace Routes", () => {
   describe("POST /workspaces", () => {
     it("should create a new workspace", async () => {
       const { client, headersWithoutWorkspace } = getCtx();
-      const res = await client.workspaces.create.$post(
+      const res = await client.api.workspaces.create.$post(
         {
           json: {
             displayName: "New Workspace",
@@ -102,7 +102,7 @@ describe("Workspace Routes", () => {
 
     it("should return 400 when displayName is missing", async () => {
       const { client, headersWithoutWorkspace } = getCtx();
-      const res = await client.workspaces.create.$post(
+      const res = await client.api.workspaces.create.$post(
         {
           // @ts-expect-error - intentionally missing displayName for validation test
           json: {
@@ -119,7 +119,7 @@ describe("Workspace Routes", () => {
 
     it("should return 400 when slug is missing", async () => {
       const { client, headersWithoutWorkspace } = getCtx();
-      const res = await client.workspaces.create.$post(
+      const res = await client.api.workspaces.create.$post(
         {
           // @ts-expect-error - intentionally missing slug for validation test
           json: {
@@ -138,7 +138,7 @@ describe("Workspace Routes", () => {
   describe("PATCH /workspaces/:workspaceId", () => {
     it("should update workspace display name", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.workspaces[":workspaceId"].$patch(
+      const res = await client.api.workspaces[":workspaceId"].$patch(
         {
           param: { workspaceId: workspace.id },
           json: { displayName: "Updated Name" },
@@ -153,7 +153,7 @@ describe("Workspace Routes", () => {
 
     it("should return 400 when displayName is too short", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.workspaces[":workspaceId"].$patch(
+      const res = await client.api.workspaces[":workspaceId"].$patch(
         {
           param: { workspaceId: workspace.id },
           json: { displayName: "A" },
@@ -168,7 +168,7 @@ describe("Workspace Routes", () => {
   describe("GET /workspaces/:slug/members", () => {
     it("should return list of workspace members", async () => {
       const { client, headers, workspace, user } = getCtx();
-      const res = await client.workspaces[":slug"].members.$get(
+      const res = await client.api.workspaces[":slug"].members.$get(
         { param: { slug: workspace.slug } },
         { headers: headers() },
       );
@@ -182,7 +182,7 @@ describe("Workspace Routes", () => {
 
     it("should not return list of workspace members for a workspace that the user is not a member of", async () => {
       const { client, headers } = getCtx();
-      await client.auth.signup.email.$post(
+      await client.api.auth.signup.email.$post(
         {
           json: {
             email: "extra1@example.com",
@@ -197,7 +197,7 @@ describe("Workspace Routes", () => {
         },
       );
 
-      const res = await client.workspaces[":slug"].members.$get(
+      const res = await client.api.workspaces[":slug"].members.$get(
         { param: { slug: "other-workspace" } },
         { headers: headers() },
       );
@@ -209,7 +209,7 @@ describe("Workspace Routes", () => {
   describe("GET /workspaces/:slug/members/:userId", () => {
     it("should return a specific workspace member", async () => {
       const { client, headers, workspace, user } = getCtx();
-      const res = await client.workspaces[":slug"].members[":userId"].$get(
+      const res = await client.api.workspaces[":slug"].members[":userId"].$get(
         { param: { slug: workspace.slug, userId: user.id } },
         { headers: headers() },
       );
@@ -222,7 +222,7 @@ describe("Workspace Routes", () => {
 
     it("should return 404 for non-existent member", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.workspaces[":slug"].members[":userId"].$get(
+      const res = await client.api.workspaces[":slug"].members[":userId"].$get(
         { param: { slug: workspace.slug, userId: "non-existent-user-id" } },
         { headers: headers() },
       );
@@ -233,7 +233,7 @@ describe("Workspace Routes", () => {
     it("should return 403 when user is not a member of the workspace", async () => {
       const { client, headersWithoutWorkspace } = getCtx();
 
-      await client.auth.signup.email.$post({
+      await client.api.auth.signup.email.$post({
         json: {
           email: "extra1@example.com",
           password: "password123",
@@ -243,7 +243,7 @@ describe("Workspace Routes", () => {
         },
       });
 
-      const memberRes = await client.workspaces[":slug"].members.$get(
+      const memberRes = await client.api.workspaces[":slug"].members.$get(
         { param: { slug: "other-workspace" } },
         { headers: headersWithoutWorkspace() },
       );

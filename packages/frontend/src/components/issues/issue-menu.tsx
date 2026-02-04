@@ -34,7 +34,7 @@ export function IssueMenu(props: IssueMenuProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal(false);
 
   const handleDelete = async () => {
-    await api.issues[":issueKey"].$delete({
+    await api.api.issues[":issueKey"].$delete({
       param: { issueKey: props.issue.key },
     });
 

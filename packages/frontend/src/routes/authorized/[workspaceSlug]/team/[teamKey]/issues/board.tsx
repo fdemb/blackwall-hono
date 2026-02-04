@@ -41,7 +41,7 @@ type IssueForBoard = InferDbType<
 >;
 
 const moveIssue = action(async (issueKey: string, status: IssueStatus, order: number) => {
-  await api.issues[":issueKey"].$patch({
+  await api.api.issues[":issueKey"].$patch({
     param: { issueKey },
     json: { status, order },
   });

@@ -6,7 +6,7 @@ describe("Comment Routes", () => {
 
   const createIssue = async () => {
     const { client, headers, team } = getCtx();
-    const res = await client.issues.$post(
+    const res = await client.api.issues.$post(
       {
         json: {
           teamKey: team.key,
@@ -27,9 +27,12 @@ describe("Comment Routes", () => {
     return json.issue;
   };
 
-  const createComment = async (issueKey: string, content: object = { type: "doc", content: [] }) => {
+  const createComment = async (
+    issueKey: string,
+    content: object = { type: "doc", content: [] },
+  ) => {
     const { client, headers } = getCtx();
-    const res = await client.issues[":issueKey"].comments.$post(
+    const res = await client.api.issues[":issueKey"].comments.$post(
       {
         param: { issueKey },
         json: { content },
@@ -44,7 +47,10 @@ describe("Comment Routes", () => {
   describe("POST /issues/:issueKey/comments", () => {
     it("should create a comment on an issue", async () => {
       const issue = await createIssue();
-      const res = await createComment(issue.key, { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Hello" }] }] });
+      const res = await createComment(issue.key, {
+        type: "doc",
+        content: [{ type: "paragraph", content: [{ type: "text", text: "Hello" }] }],
+      });
 
       expect(res.status).toBe(200);
       const json = await res.json();
@@ -66,7 +72,7 @@ describe("Comment Routes", () => {
       const createJson = (await createRes.json()) as { comment: { id: string } };
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].comments[":commentId"].$delete(
+      const res = await client.api.issues[":issueKey"].comments[":commentId"].$delete(
         {
           param: { issueKey: issue.key, commentId: createJson.comment.id },
         },
@@ -84,7 +90,7 @@ describe("Comment Routes", () => {
       const issue = await createIssue();
 
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].comments[":commentId"].$delete(
+      const res = await client.api.issues[":issueKey"].comments[":commentId"].$delete(
         {
           param: { issueKey: issue.key, commentId: "00000000-0000-0000-0000-000000000000" },
         },
@@ -98,7 +104,7 @@ describe("Comment Routes", () => {
 
     it("should return 404 for non-existent issue", async () => {
       const { client, headers } = getCtx();
-      const res = await client.issues[":issueKey"].comments[":commentId"].$delete(
+      const res = await client.api.issues[":issueKey"].comments[":commentId"].$delete(
         {
           param: { issueKey: "NONEXISTENT-999", commentId: "00000000-0000-0000-0000-000000000000" },
         },

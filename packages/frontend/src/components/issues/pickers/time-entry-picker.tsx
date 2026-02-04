@@ -37,15 +37,18 @@ import TrashIcon from "lucide-solid/icons/trash-2";
 import { createSignal, For, onMount, Show } from "solid-js";
 import type { InferDbType } from "@blackwall/backend/src/db/types";
 
-type TimeEntryWithUser = InferDbType<"timeEntry", {
-  user: {
-    columns: {
-      id: true;
-      name: true;
-      image: true;
-    }
-  };
-}>
+type TimeEntryWithUser = InferDbType<
+  "timeEntry",
+  {
+    user: {
+      columns: {
+        id: true;
+        name: true;
+        image: true;
+      };
+    };
+  }
+>;
 
 function formatDuration(minutes: number): string {
   const hours = Math.floor(minutes / 60);
@@ -85,7 +88,7 @@ function parseDurationInput(input: string): number | null {
 }
 
 const totalTimeLoader = query(async (issueKey: string) => {
-  const res = await api["time-entries"].issues[`:issueKey`]["time-entries"].total.$get({
+  const res = await api.api["time-entries"].issues[`:issueKey`]["time-entries"].total.$get({
     param: { issueKey },
   });
 
@@ -94,7 +97,7 @@ const totalTimeLoader = query(async (issueKey: string) => {
 }, "timeEntryTotal");
 
 const timeEntriesLoader = query(async (issueKey: string) => {
-  const res = await api["time-entries"].issues[`:issueKey`]["time-entries"].$get({
+  const res = await api.api["time-entries"].issues[`:issueKey`]["time-entries"].$get({
     param: { issueKey },
   });
 
@@ -103,7 +106,7 @@ const timeEntriesLoader = query(async (issueKey: string) => {
 }, "timeEntriesList");
 
 const logTimeEntry = action(async (issueKey: string, duration: number, description?: string) => {
-  await api["time-entries"].issues[`:issueKey`]["time-entries"].$post({
+  await api.api["time-entries"].issues[`:issueKey`]["time-entries"].$post({
     param: { issueKey },
     json: { duration, description },
   });
@@ -113,7 +116,7 @@ const logTimeEntry = action(async (issueKey: string, duration: number, descripti
 });
 
 const deleteTimeEntry = action(async (issueKey: string, timeEntryId: string) => {
-  await api["time-entries"].issues[`:issueKey`]["time-entries"][`:timeEntryId`].$delete({
+  await api.api["time-entries"].issues[`:issueKey`]["time-entries"][`:timeEntryId`].$delete({
     param: { issueKey, timeEntryId },
   });
   await revalidate("timeEntryTotal");
@@ -197,11 +200,7 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
           </div>
 
           <DialogFooter>
-            <Button
-              size="sm"
-              disabled={!parsedDuration() || isSubmitting()}
-              onClick={handleSubmit}
-            >
+            <Button size="sm" disabled={!parsedDuration() || isSubmitting()} onClick={handleSubmit}>
               <PlusIcon class="size-4" />
               Log Time
             </Button>

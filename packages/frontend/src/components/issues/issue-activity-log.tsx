@@ -240,7 +240,7 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
       }),
     },
     onSubmit: async (data) => {
-      await api.issues[":issueKey"].comments.$post({
+      await api.api.issues[":issueKey"].comments.$post({
         param: { issueKey: props.issue.key },
         json: { content: data.value.content },
       });
@@ -294,9 +294,11 @@ export function CommentMenu(props: CommentMenuProps) {
 
   const handleDelete = async () => {
     await action(
-      api.issues[":issueKey"].comments[":commentId"].$delete({
-        param: { issueKey: props.issueKey, commentId: props.comment.id },
-      }).then((res) => res.json()),
+      api.api.issues[":issueKey"].comments[":commentId"]
+        .$delete({
+          param: { issueKey: props.issueKey, commentId: props.comment.id },
+        })
+        .then((res) => res.json()),
     );
 
     await revalidate("issue");

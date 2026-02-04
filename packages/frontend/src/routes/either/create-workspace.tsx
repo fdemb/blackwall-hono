@@ -15,11 +15,9 @@ export default function CreateWorkspacePage() {
       slug: "",
     } satisfies CreateWorkspace,
     onSubmit: async ({ value }) => {
-      const res = await api.workspaces.create.$post({
+      const res = await api.api.workspaces.create.$post({
         json: value,
       });
-
-
 
       const { workspace } = await res.json();
       navigate(`/${workspace.slug}`);

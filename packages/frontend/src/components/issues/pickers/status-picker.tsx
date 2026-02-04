@@ -8,7 +8,7 @@ import { IssueStatusBadge } from "../issue-badges";
 import type { JSX } from "solid-js";
 
 const updateStatus = action(async (issueKey: string, status: IssueStatus) => {
-  await api.issues[":issueKey"].$patch({
+  await api.api.issues[":issueKey"].$patch({
     param: { issueKey },
     json: { status },
   });

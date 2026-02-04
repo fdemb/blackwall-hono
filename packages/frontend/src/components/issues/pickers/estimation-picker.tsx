@@ -8,7 +8,7 @@ import { createSignal, For } from "solid-js";
 const ESTIMATION_OPTIONS = [1, 2, 3, 5, 8, 13] as const;
 
 const updateEstimation = action(async (issueKey: string, points: number | null) => {
-  await api.issues[`:issueKey`].$patch({
+  await api.api.issues[`:issueKey`].$patch({
     param: { issueKey },
     json: { estimationPoints: points },
   });

@@ -97,7 +97,7 @@ function DisplayNameForm(props: DisplayNameFormProps) {
     },
     onSubmit: async ({ value }) => {
       try {
-        await api.settings.profile.$patch({
+        await api.api.settings.profile.$patch({
           json: { name: value.name },
         });
         toast.success("Name updated successfully.");
@@ -171,11 +171,14 @@ function AvatarUpload() {
     formData.append("file", file);
 
     try {
-      await fetch(`${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/settings/profile/avatar`, {
-        method: "PATCH",
-        body: formData,
-        credentials: "include",
-      });
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/settings/profile/avatar`,
+        {
+          method: "PATCH",
+          body: formData,
+          credentials: "include",
+        },
+      );
       toast.success("Avatar updated.");
       window.location.reload();
     } catch (error) {
@@ -192,11 +195,14 @@ function AvatarUpload() {
     formData.append("intent", "remove");
 
     try {
-      await fetch(`${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/settings/profile/avatar`, {
-        method: "PATCH",
-        body: formData,
-        credentials: "include",
-      });
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/settings/profile/avatar`,
+        {
+          method: "PATCH",
+          body: formData,
+          credentials: "include",
+        },
+      );
       toast.success("Avatar removed.");
       window.location.reload();
     } catch (error) {
@@ -272,7 +278,7 @@ function PasswordChangeDialog() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await api.settings.profile.password.$post({
+        await api.api.settings.profile.password.$post({
           json: {
             currentPassword: value.currentPassword,
             newPassword: value.newPassword,

@@ -26,11 +26,9 @@ export function InviteDialogContent() {
       }),
     },
     onSubmit: async ({ value }) => {
-      const res = await api.invitations.$post({
+      const res = await api.api.invitations.$post({
         json: { email: value.email },
       });
-
-
 
       ctx.close();
     },

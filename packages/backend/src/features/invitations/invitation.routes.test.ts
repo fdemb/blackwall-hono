@@ -7,7 +7,7 @@ describe("Invitation Routes", () => {
   describe("POST /invitations", () => {
     it("should create an invitation", async () => {
       const { client, headers } = getCtx();
-      const res = await client.invitations.$post(
+      const res = await client.api.invitations.$post(
         {
           json: {
             email: "newuser@example.com",
@@ -27,7 +27,7 @@ describe("Invitation Routes", () => {
 
     it("should return 400 for invalid email", async () => {
       const { client, headers } = getCtx();
-      const res = await client.invitations.$post(
+      const res = await client.api.invitations.$post(
         {
           json: {
             email: "not-an-email",
@@ -44,14 +44,14 @@ describe("Invitation Routes", () => {
     it("should return invitation details", async () => {
       const { client, headers, workspace } = getCtx();
 
-      const createRes = await client.invitations.$post(
+      const createRes = await client.api.invitations.$post(
         { json: { email: "invitee@example.com" } },
         { headers: headers() },
       );
       const createJson = await createRes.json();
       const token = createJson.invitation.token;
 
-      const res = await client.invitations[":token"].$get(
+      const res = await client.api.invitations[":token"].$get(
         { param: { token } },
         { headers: {} },
       );
@@ -67,7 +67,7 @@ describe("Invitation Routes", () => {
 
     it("should return 404 for invalid token", async () => {
       const { client } = getCtx();
-      const res = await client.invitations[":token"].$get(
+      const res = await client.api.invitations[":token"].$get(
         { param: { token: "invalid-token" } },
         { headers: {} },
       );
@@ -80,14 +80,14 @@ describe("Invitation Routes", () => {
     it("should accept invitation for authenticated user", async () => {
       const { client, headers, headersWithoutWorkspace } = getCtx();
 
-      const createRes = await client.invitations.$post(
+      const createRes = await client.api.invitations.$post(
         { json: { email: "accepter@example.com" } },
         { headers: headers() },
       );
       const createJson = await createRes.json();
       const token = createJson.invitation.token;
 
-      const signupRes = await client.auth.signup.email.$post(
+      const signupRes = await client.api.auth.signup.email.$post(
         {
           json: {
             email: "accepter@example.com",
@@ -101,7 +101,7 @@ describe("Invitation Routes", () => {
       );
       const signupCookie = signupRes.headers.get("set-cookie") ?? "";
 
-      const res = await client.invitations[":token"].accept.$post(
+      const res = await client.api.invitations[":token"].accept.$post(
         { param: { token } },
         {
           headers: {
@@ -122,14 +122,14 @@ describe("Invitation Routes", () => {
     it("should register new user and accept invitation", async () => {
       const { client, headers } = getCtx();
 
-      const createRes = await client.invitations.$post(
+      const createRes = await client.api.invitations.$post(
         { json: { email: "newregistrant@example.com" } },
         { headers: headers() },
       );
       const createJson = await createRes.json();
       const token = createJson.invitation.token;
 
-      const res = await client.invitations[":token"].register.$post(
+      const res = await client.api.invitations[":token"].register.$post(
         {
           param: { token },
           json: {
@@ -149,7 +149,7 @@ describe("Invitation Routes", () => {
 
     it("should return 404 for invalid token", async () => {
       const { client } = getCtx();
-      const res = await client.invitations[":token"].register.$post(
+      const res = await client.api.invitations[":token"].register.$post(
         {
           param: { token: "invalid-token" },
           json: {
@@ -166,14 +166,14 @@ describe("Invitation Routes", () => {
     it("should return 400 for invalid name", async () => {
       const { client, headers } = getCtx();
 
-      const createRes = await client.invitations.$post(
+      const createRes = await client.api.invitations.$post(
         { json: { email: "shortname@example.com" } },
         { headers: headers() },
       );
       const createJson = await createRes.json();
       const token = createJson.invitation.token;
 
-      const res = await client.invitations[":token"].register.$post(
+      const res = await client.api.invitations[":token"].register.$post(
         {
           param: { token },
           json: {

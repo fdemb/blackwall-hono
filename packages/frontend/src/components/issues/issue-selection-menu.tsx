@@ -1,5 +1,10 @@
 import type { IssueForDataTable } from "./issue-datatable";
-import type { IssuePlan, IssuePriority, IssueStatus, SerializedIssuePlan } from "@blackwall/backend/src/db/schema";
+import type {
+  IssuePlan,
+  IssuePriority,
+  IssueStatus,
+  SerializedIssuePlan,
+} from "@blackwall/backend/src/db/schema";
 import type { User } from "better-auth";
 import { Button } from "../ui/button";
 import {
@@ -31,7 +36,10 @@ import { PickerPopover } from "../custom-ui/picker-popover";
 import { issueMappings, mappingToOptionArray } from "@/lib/mappings";
 import { UserAvatar } from "@/components/custom-ui/avatar";
 import { action, useAction } from "@solidjs/router";
-import type { BulkDeleteIssues, BulkUpdateIssues } from "@blackwall/backend/src/features/issues/issue.zod";
+import type {
+  BulkDeleteIssues,
+  BulkUpdateIssues,
+} from "@blackwall/backend/src/features/issues/issue.zod";
 import { api } from "@/lib/api";
 import { toast } from "../custom-ui/toast";
 
@@ -42,49 +50,44 @@ type IssueSelectionMenuProps = {
   assignableUsers?: User[];
 };
 
-
 const updateIssuesBulkAction = action(async (input: BulkUpdateIssues) => {
-  const res = await api.issues.bulk.$patch({
+  const res = await api.api.issues.bulk.$patch({
     json: input,
   });
 
   const json = await res.json();
-
-
 
   toast.success("Issues updated successfully");
   return json.issues;
-})
+});
 
 const deleteIssuesBulkAction = action(async (input: BulkDeleteIssues) => {
-  const res = await api.issues.bulk.$delete({
+  const res = await api.api.issues.bulk.$delete({
     json: input,
   });
 
   const json = await res.json();
 
-
-
   toast.success("Issues deleted successfully");
-})
+});
 
 export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal(false);
-  const _updateAction = useAction(updateIssuesBulkAction)
-  const _deleteAction = useAction(deleteIssuesBulkAction)
+  const _updateAction = useAction(updateIssuesBulkAction);
+  const _deleteAction = useAction(deleteIssuesBulkAction);
 
   const handleUpdate = async (updates: BulkUpdateIssues["updates"]) => {
     await _updateAction({
       issueIds: props.selectedIssues.map((issue) => issue.id),
       updates,
-    })
+    });
     props.onClearSelection();
-  }
+  };
 
   const handleDelete = async () => {
     await _deleteAction({
       issueIds: props.selectedIssues.map((issue) => issue.id),
-    })
+    });
     setDeleteDialogOpen(false);
     props.onClearSelection();
   };
@@ -144,7 +147,11 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
         </Popover>
 
         <Show when={props.activePlan}>
-          <Button variant="outline" size="xs" onClick={() => handleUpdate({ planId: props.activePlan!.id })}>
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => handleUpdate({ planId: props.activePlan!.id })}
+          >
             <LandPlotIcon class="size-4" />
             Add to {props.activePlan!.name}
           </Button>

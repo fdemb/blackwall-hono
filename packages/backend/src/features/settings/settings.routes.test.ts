@@ -7,7 +7,7 @@ describe("Settings Routes", () => {
   describe("GET /settings/profile", () => {
     it("should return the current user profile", async () => {
       const { client, headers, user } = getCtx();
-      const res = await client.settings.profile.$get({}, { headers: headers() });
+      const res = await client.api.settings.profile.$get({}, { headers: headers() });
 
       expect(res.status).toBe(200);
       const json = (await res.json()) as { profile: { id: string; email: string } };
@@ -20,7 +20,7 @@ describe("Settings Routes", () => {
   describe("PATCH /settings/profile", () => {
     it("should update the user name", async () => {
       const { client, headers } = getCtx();
-      const res = await client.settings.profile.$patch(
+      const res = await client.api.settings.profile.$patch(
         { json: { name: "Updated Name" } },
         { headers: headers() },
       );
@@ -32,7 +32,7 @@ describe("Settings Routes", () => {
 
     it("should return 400 when name is too short", async () => {
       const { client, headers } = getCtx();
-      const res = await client.settings.profile.$patch(
+      const res = await client.api.settings.profile.$patch(
         { json: { name: "A" } },
         { headers: headers() },
       );
@@ -41,12 +41,10 @@ describe("Settings Routes", () => {
     });
   });
 
-
-
   describe("GET /settings/workspace", () => {
     it("should return the current workspace", async () => {
       const { client, headers, workspace } = getCtx();
-      const res = await client.settings.workspace.$get({}, { headers: headers() });
+      const res = await client.api.settings.workspace.$get({}, { headers: headers() });
 
       expect(res.status).toBe(200);
       const json = await res.json();
@@ -58,7 +56,7 @@ describe("Settings Routes", () => {
   describe("PATCH /settings/workspace", () => {
     it("should update workspace display name", async () => {
       const { client, headers } = getCtx();
-      const res = await client.settings.workspace.$patch(
+      const res = await client.api.settings.workspace.$patch(
         { json: { displayName: "Updated Workspace" } },
         { headers: headers() },
       );
@@ -70,7 +68,7 @@ describe("Settings Routes", () => {
 
     it("should return 400 when displayName is too short", async () => {
       const { client, headers } = getCtx();
-      const res = await client.settings.workspace.$patch(
+      const res = await client.api.settings.workspace.$patch(
         { json: { displayName: "A" } },
         { headers: headers() },
       );
