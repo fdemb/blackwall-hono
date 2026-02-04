@@ -6,7 +6,7 @@ import { Popover } from "@kobalte/core/popover";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import { createMemo, createSignal } from "solid-js";
-import type { SerializedIssuePlan } from "@blackwall/backend/src/db/schema";
+import type { SerializedIssuePlan } from "@blackwall/database/schema";
 
 const updatePlan = action(async (issueKey: string, planId: string | null) => {
   await api.api.issues[`:issueKey`].$patch({

@@ -14,7 +14,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import type { IssueStatus, SerializedIssuePlan } from "@blackwall/backend/src/db/schema";
+import type { IssueStatus, SerializedIssuePlan } from "@blackwall/database/schema";
 import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/dnd";
 import { issueMappings } from "@/lib/mappings";
 import { api } from "@/lib/api";
@@ -27,7 +27,7 @@ import { createMemo, For, Index, Show, type Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { boardLoader } from "./board.data";
 import { useTeamData } from "../../[teamKey]";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { InferDbType } from "@blackwall/database/types";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

@@ -19,8 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppForm } from "@/context/form-context";
-import type { IssueChangeEventType, SerializedUser } from "@blackwall/backend/src/db/schema";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { IssueChangeEventType, SerializedUser } from "@blackwall/database/schema";
+import type { InferDbType } from "@blackwall/database/types";
 import { action } from "@/lib/form.utils";
 import { api } from "@/lib/api";
 import { issueMappings } from "@/lib/mappings";

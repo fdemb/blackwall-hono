@@ -7,7 +7,7 @@ import { formatDateShort } from "@/lib/dates";
 import { createColumnHelper } from "@tanstack/solid-table";
 import { A, createAsync, useParams } from "@solidjs/router";
 import { teamsSettingsLoader } from "./index.data";
-import type { SerializedTeam } from "@blackwall/backend/src/db/schema";
+import type { SerializedTeam } from "@blackwall/database/schema";
 
 type TeamWithCounts = {
   team: SerializedTeam;

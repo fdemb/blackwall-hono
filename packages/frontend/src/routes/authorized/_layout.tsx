@@ -1,14 +1,17 @@
-import type { ParentComponent } from "solid-js";
+import { type ParentComponent, Show } from "solid-js";
 import { getSession } from "./_layout.data";
 import { createAsync } from "@solidjs/router";
 import { SessionContext } from "@/context/session-context";
 
 const AuthorizedLayout: ParentComponent = (props) => {
   const session = createAsync(() => getSession());
-  const sessionAccessor = () => session()!;
 
   return (
-    <SessionContext.Provider value={sessionAccessor}>{props.children}</SessionContext.Provider>
+    <Show when={session()}>
+      {(session) => (
+        <SessionContext.Provider value={session}>{props.children}</SessionContext.Provider>
+      )}
+    </Show>
   );
 };
 

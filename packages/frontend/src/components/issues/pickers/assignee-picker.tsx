@@ -1,7 +1,7 @@
 import { UserAvatar } from "@/components/custom-ui/avatar";
 import { PickerPopover } from "@/components/custom-ui/picker-popover";
 import { Button } from "@/components/ui/button";
-import type { SerializedUser } from "@blackwall/backend/src/db/schema";
+import type { SerializedUser } from "@blackwall/database/schema";
 import { cn } from "@/lib/utils";
 import { Popover } from "@kobalte/core/popover";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";

@@ -1,4 +1,4 @@
-import type { ColorKey, IssuePriority, IssueStatus } from "@blackwall/backend/src/db/schema";
+import type { ColorKey, IssuePriority, IssueStatus } from "@blackwall/database/schema";
 import { Badge } from "@/components/custom-ui/badge";
 import { FastLink } from "@/components/custom-ui/fast-link";
 import { createRowSelection } from "@/components/datatable/row-selection-feature";

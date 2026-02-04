@@ -6,7 +6,7 @@ import {
   useContext,
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import type { IssueStatus } from "@blackwall/backend/src/db/schema";
+import type { IssueStatus } from "@blackwall/database/schema";
 import { DragGesture } from "@use-gesture/vanilla";
 
 export type DragState = {

@@ -1,6 +1,6 @@
 import { TiptapEditor } from "@/components/tiptap/tiptap-editor";
 import { useWorkspaceData } from "@/context/workspace-context";
-import type { SerializedIssue } from "@blackwall/backend/src/db/schema";
+import type { SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
 import { action } from "@/lib/form.utils";
 import type { JSONContent } from "@tiptap/core";

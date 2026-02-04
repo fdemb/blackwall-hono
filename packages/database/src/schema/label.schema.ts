@@ -1,6 +1,7 @@
 // Labels are strings that can be attached to issues within a given workspace.
 import { randomUUIDv7 } from "bun";
 import { index, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import type { JSONParsed } from "hono/utils/types";
 import { lifecycleTimestamps } from "../utils";
 import { colorKey } from "./color.enum.schema";
 import { issue } from "./issue.schema";
@@ -46,3 +47,4 @@ export type Label = typeof label.$inferSelect;
 export type NewLabel = typeof label.$inferInsert;
 export type LabelOnIssue = typeof labelOnIssue.$inferSelect;
 export type NewLabelOnIssue = typeof labelOnIssue.$inferInsert;
+export type SerializedLabel = JSONParsed<Label>;

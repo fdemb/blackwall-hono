@@ -1,4 +1,4 @@
-import type { IssuePriority, IssueStatus } from "@blackwall/backend/src/db/schema";
+import type { IssuePriority, IssueStatus } from "@blackwall/database/schema";
 import { Badge } from "@/components/custom-ui/badge";
 import { Dot } from "@/components/custom-ui/dot";
 import { issueMappings } from "@/lib/mappings";

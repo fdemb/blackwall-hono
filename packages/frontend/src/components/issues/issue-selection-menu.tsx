@@ -4,7 +4,7 @@ import type {
   IssuePriority,
   IssueStatus,
   SerializedIssuePlan,
-} from "@blackwall/backend/src/db/schema";
+} from "@blackwall/database/schema";
 import type { User } from "better-auth";
 import { Button } from "../ui/button";
 import {

@@ -1,6 +1,6 @@
 import { FastLink } from "@/components/custom-ui/fast-link";
 import { Index, Show } from "solid-js";
-import type { SerializedUser, SerializedWorkspace } from "@blackwall/backend/src/db/schema";
+import type { SerializedUser, SerializedWorkspace } from "@blackwall/database/schema";
 import { UserAvatar } from "../custom-ui/avatar";
 import { useSessionData } from "@/context/session-context";
 import { Button } from "../ui/button";

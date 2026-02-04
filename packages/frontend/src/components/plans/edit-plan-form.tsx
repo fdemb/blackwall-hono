@@ -2,10 +2,10 @@ import * as z from "zod";
 import { useAppForm } from "@/context/form-context";
 import { useNavigate } from "@solidjs/router";
 import { api } from "@/lib/api";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { TanStackTextArea, TanStackTextField } from "@/components/ui/text-field";
-import { CalendarDate, getLocalTimeZone } from "@internationalized/date";
+import { getLocalTimeZone, parseAbsolute } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
@@ -24,15 +24,15 @@ export function EditPlanForm(props: EditPlanFormProps) {
     defaultValues: {
       name: props.plan.name,
       goal: props.plan.goal,
-      startDate: new Date(props.plan.startDate),
-      endDate: new Date(props.plan.endDate),
+      startDate: new Date(props.plan.startDate).toISOString(),
+      endDate: new Date(props.plan.endDate).toISOString(),
     },
     validators: {
       onSubmit: z.object({
         name: z.string().min(1, "Name is required"),
         goal: z.string().nullable(),
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.iso.date(),
+        endDate: z.iso.date(),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -87,19 +87,14 @@ export function EditPlanForm(props: EditPlanFormProps) {
         <div class="flex flex-col gap-2 sm:flex-row">
           <form.AppField name="startDate">
             {(field) => {
-              const calendarDate = () =>
-                new CalendarDate(
-                  field().state.value.getFullYear(),
-                  field().state.value.getMonth() + 1,
-                  field().state.value.getDate(),
-                );
+              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
 
               return (
                 <div class="flex flex-col gap-2 w-full">
                   <Label for={field().name}>Start date</Label>
                   <DatePicker
                     selected={calendarDate()}
-                    onSelect={(date) => field().handleChange(date.toDate(getLocalTimeZone()))}
+                    onSelect={(date) => field().handleChange(date.toString())}
                   />
                 </div>
               );
@@ -108,19 +103,14 @@ export function EditPlanForm(props: EditPlanFormProps) {
 
           <form.AppField name="endDate">
             {(field) => {
-              const calendarDate = () =>
-                new CalendarDate(
-                  field().state.value.getFullYear(),
-                  field().state.value.getMonth() + 1,
-                  field().state.value.getDate(),
-                );
+              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
 
               return (
                 <div class="flex flex-col gap-2 w-full">
                   <Label for={field().name}>End date</Label>
                   <DatePicker
                     selected={calendarDate()}
-                    onSelect={(date) => field().handleChange(date.toDate(getLocalTimeZone()))}
+                    onSelect={(date) => field().handleChange(date.toString())}
                   />
                 </div>
               );

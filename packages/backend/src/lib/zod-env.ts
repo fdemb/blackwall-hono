@@ -4,8 +4,6 @@ export const envSchema = z.object({
   APP_BASE_URL: z.url(),
   APP_SECRET: z.string(),
 
-  DATABASE_URL: z.string(),
-
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 

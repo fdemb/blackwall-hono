@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 const envSchema = z.object({
-  DATABASE_URL: z.string(),
+  DATABASE_URL: z.string().default("blackwall_data/database.sqlite"),
 });
 
 const env_internal = envSchema.safeParse(process.env);

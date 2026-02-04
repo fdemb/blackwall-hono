@@ -1,5 +1,6 @@
 import { randomUUIDv7 } from "bun";
 import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import type { JSONParsed } from "hono/utils/types";
 import { user } from "./auth.schema";
 
 export const workspace = sqliteTable(
@@ -61,3 +62,4 @@ export const workspaceInvitation = sqliteTable(
 export type Workspace = typeof workspace.$inferSelect;
 export type NewWorkspace = typeof workspace.$inferInsert;
 export type WorkspaceInvitation = typeof workspaceInvitation.$inferSelect;
+export type SerializedWorkspace = JSONParsed<Workspace>;

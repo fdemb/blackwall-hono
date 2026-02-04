@@ -1,4 +1,4 @@
-import type { Issue } from "@blackwall/backend/src/db/schema";
+import type { Issue } from "@blackwall/database/schema";
 import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheck from "lucide-solid/icons/circle-check";
 import CircleDotDashed from "lucide-solid/icons/circle-dot-dashed";

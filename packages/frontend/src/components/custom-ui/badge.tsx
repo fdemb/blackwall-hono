@@ -1,4 +1,4 @@
-import type { ColorKey } from "@blackwall/backend/src/db/schema";
+import type { ColorKey } from "@blackwall/database/schema";
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { splitProps, type ComponentProps } from "solid-js";

@@ -1,6 +1,6 @@
 import { jobService } from "@blackwall/queue";
 // Register all job handlers
-import "@blackwall/backend/jobs/register";
+import "@blackwall/backend/src/jobs/register";
 
 interface WorkerOptions {
   queue?: string;

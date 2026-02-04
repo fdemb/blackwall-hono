@@ -1,6 +1,6 @@
 import { AssigneePickerPopover, StatusPickerPopover } from "@/components/issues/pickers";
 import { useAppForm } from "@/context/form-context";
-import type { IssueStatus, SerializedTeam } from "@blackwall/backend/src/db/schema";
+import type { IssueStatus, SerializedTeam } from "@blackwall/database/schema";
 import { useDialogContext } from "@kobalte/core/dialog";
 import { Popover } from "@kobalte/core/popover";
 import type { JSONContent } from "@tiptap/core";

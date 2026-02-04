@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/empty";
 import { buttonVariants } from "@/components/ui/button";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
-import type { SerializedIssuePlan } from "@blackwall/backend/src/db/schema";
+import type { SerializedIssuePlan } from "@blackwall/database/schema";
 import { createColumnHelper, type ColumnDef } from "@tanstack/solid-table";
 import { formatDateShort } from "@/lib/dates";
 import { createDataTable } from "@/components/datatable/create-datatable";

@@ -1,4 +1,4 @@
-import type { SerializedIssue } from "@blackwall/backend/src/db/schema";
+import type { SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
 import { action } from "@/lib/form.utils";
 import CheckIcon from "lucide-solid/icons/check";

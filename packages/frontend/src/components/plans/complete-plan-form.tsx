@@ -1,7 +1,7 @@
 import { useAppForm } from "@/context/form-context";
 import { useNavigate } from "@solidjs/router";
 import { api } from "@/lib/api";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { Button } from "@/components/ui/button";
 

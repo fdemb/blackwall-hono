@@ -3,10 +3,10 @@ import { useAppForm } from "@/context/form-context";
 import { action, redirect, useAction, useNavigate } from "@solidjs/router";
 import { add } from "date-fns";
 import { api } from "@/lib/api";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { TanStackTextArea, TanStackTextField } from "@/components/ui/text-field";
-import { CalendarDate, getLocalTimeZone, parseDate } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, parseAbsolute } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
@@ -118,7 +118,7 @@ export function PlanForm(props: PlanFormProps) {
         <div class="flex flex-col gap-2 sm:flex-row">
           <form.AppField name="startDate">
             {(field) => {
-              const calendarDate = () => parseDate(field().state.value);
+              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
 
               return (
                 <div class="flex flex-col gap-2 w-full">
@@ -134,7 +134,7 @@ export function PlanForm(props: PlanFormProps) {
 
           <form.AppField name="endDate">
             {(field) => {
-              const calendarDate = () => parseDate(field().state.value);
+              const calendarDate = () => parseAbsolute(field().state.value, getLocalTimeZone());
 
               return (
                 <div class="flex flex-col gap-2 w-full">

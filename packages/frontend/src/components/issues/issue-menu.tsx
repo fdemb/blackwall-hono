@@ -1,4 +1,4 @@
-import type { Issue, SerializedIssue } from "@blackwall/backend/src/db/schema";
+import type { Issue, SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
 import { useNavigate } from "@solidjs/router";
 import EllipsisIcon from "lucide-solid/icons/ellipsis";

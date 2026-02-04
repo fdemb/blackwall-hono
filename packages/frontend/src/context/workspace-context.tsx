@@ -1,4 +1,4 @@
-import type { SerializedTeam, SerializedWorkspace } from "@blackwall/backend/src/db/schema";
+import type { SerializedTeam, SerializedWorkspace } from "@blackwall/database/schema";
 import { createContext, useContext, type Accessor } from "solid-js";
 
 export type WorkspaceDataContextType = {

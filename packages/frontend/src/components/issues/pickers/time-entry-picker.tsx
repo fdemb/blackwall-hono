@@ -35,7 +35,7 @@ import EllipsisIcon from "lucide-solid/icons/ellipsis";
 import PlusIcon from "lucide-solid/icons/plus";
 import TrashIcon from "lucide-solid/icons/trash-2";
 import { createSignal, For, onMount, Show } from "solid-js";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { InferDbType } from "@blackwall/database/types";
 
 type TimeEntryWithUser = InferDbType<
   "timeEntry",

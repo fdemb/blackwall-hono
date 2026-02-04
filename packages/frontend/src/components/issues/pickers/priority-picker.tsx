@@ -1,5 +1,5 @@
 import { PickerPopover } from "@/components/custom-ui/picker-popover";
-import type { IssuePriority } from "@blackwall/backend/src/db/schema";
+import type { IssuePriority } from "@blackwall/database/schema";
 import { issueMappings, mappingToOptionArray } from "@/lib/mappings";
 import { Popover } from "@kobalte/core/popover";
 import { IssuePriorityBadge } from "../issue-badges";

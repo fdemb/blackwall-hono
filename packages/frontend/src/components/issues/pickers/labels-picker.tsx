@@ -8,7 +8,7 @@ import { Popover } from "@kobalte/core/popover";
 import PlusIcon from "lucide-solid/icons/plus";
 import { createResource, createSignal, Index } from "solid-js";
 import { action, useAction, revalidate } from "@solidjs/router";
-import type { Label } from "@blackwall/backend/src/db/schema";
+import type { Label } from "@blackwall/database/schema";
 
 const createAndAddLabel = action(async (name: string, issueKey: string) => {
   const createRes = await api.api.labels.$post({

@@ -9,6 +9,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import type { JSONParsed } from "hono/utils/types";
 import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
 import { issuePlan } from "./issue-plan.schema";
@@ -209,6 +210,16 @@ export type IssueComment = typeof issueComment.$inferSelect;
 export type NewIssueComment = typeof issueComment.$inferInsert;
 export type IssueAttachment = typeof issueAttachment.$inferSelect;
 export type NewIssueAttachment = typeof issueAttachment.$inferInsert;
+
+// Serialized types for API responses
+export type SerializedIssue = JSONParsed<typeof issue.$inferSelect>;
+export type NewSerializedIssue = JSONParsed<typeof issue.$inferInsert>;
+export type SerializedIssueChangeEvent = JSONParsed<typeof issueChangeEvent.$inferSelect>;
+export type NewSerializedIssueChangeEvent = JSONParsed<typeof issueChangeEvent.$inferInsert>;
+export type SerializedIssueComment = JSONParsed<typeof issueComment.$inferSelect>;
+export type NewSerializedIssueComment = JSONParsed<typeof issueComment.$inferInsert>;
+export type SerializedIssueAttachment = JSONParsed<typeof issueAttachment.$inferSelect>;
+export type NewSerializedIssueAttachment = JSONParsed<typeof issueAttachment.$inferInsert>;
 
 // Schemas
 export const issueSelectSchema = createSelectSchema(issue);

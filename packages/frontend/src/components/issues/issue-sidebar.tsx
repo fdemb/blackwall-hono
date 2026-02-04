@@ -1,6 +1,6 @@
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
-import type { IssuePlan, Label, SerializedIssuePlan, SerializedLabel, SerializedUser } from "@blackwall/backend/src/db/schema";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { IssuePlan, Label, SerializedIssuePlan, SerializedLabel, SerializedUser } from "@blackwall/database/schema";
+import type { InferDbType } from "@blackwall/database/types";
 import type { JSX } from "solid-js";
 import {
   AssigneePickerPopover,

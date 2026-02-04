@@ -4,7 +4,7 @@ import { DataTableHeaderless } from "@/components/datatable/datatable";
 import type { RowSelectionResult } from "@/components/datatable/row-selection-feature";
 import { createSelectionColumn } from "@/components/datatable/selection-column";
 import { StatusPickerPopover } from "@/components/issues/pickers/status-picker";
-import type { InferDbType } from "@blackwall/backend/src/db/types";
+import type { InferDbType } from "@blackwall/database/types";
 import { formatDateShort } from "@/lib/dates";
 import { issueMappings } from "@/lib/mappings";
 import { createColumnHelper, type ColumnDef } from "@tanstack/solid-table";
