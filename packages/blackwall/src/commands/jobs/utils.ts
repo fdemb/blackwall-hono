@@ -1,4 +1,4 @@
-import type { Job } from "../../db/schema/job.schema";
+import type { Job } from "@blackwall/queue";
 
 function parseJsonArg(value: string, label: string) {
   try {
@@ -19,27 +19,16 @@ function formatJob(job: Job) {
   return job;
 }
 
-function printUsage(usage: string) {
-  console.log(usage.trim());
-}
-
 function printJson(value: unknown) {
   console.log(JSON.stringify(value, null, 2));
 }
 
-function exitWithError(message: string, usage?: string) {
-  console.error(message);
-  if (usage) {
-    console.error("");
-    console.error(usage.trim());
+function parseNumber(value: string, label: string) {
+  const parsed = Number(value);
+  if (Number.isNaN(parsed)) {
+    throw new Error(`Invalid number for ${label}: ${value}`);
   }
-  process.exit(1);
+  return parsed;
 }
 
-export {
-  parseJsonArg,
-  formatJob,
-  printUsage,
-  printJson,
-  exitWithError,
-};
+export { parseJsonArg, formatJob, printJson, parseNumber };

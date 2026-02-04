@@ -1,4 +1,4 @@
-import { migrateDatabase } from "@blackwall/backend/db/migrate";
+import { migrateDatabase } from "@blackwall/database/migrate";
 
 interface MigrateOptions {
   migrationsDir: string;

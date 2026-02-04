@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { jobStatusValues } from "../../db/schema/job.schema";
+import { jobStatusValues } from "@blackwall/queue";
 
 export const jobStatsQuerySchema = z.object({
     queue: z.string().optional(),

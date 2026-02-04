@@ -1,7 +1,7 @@
-import { env } from "../lib/zod-env";
+import { dbEnv } from "./env";
 import { Database } from "bun:sqlite";
 
-const client = new Database(env.DATABASE_URL);
+const client = new Database(dbEnv.DATABASE_URL);
 
 async function dropAll() {
   const tables = client

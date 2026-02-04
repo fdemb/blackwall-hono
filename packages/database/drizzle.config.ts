@@ -1,11 +1,11 @@
-import { env } from "./src/lib/zod-env";
+import { dbEnv } from "./src/env";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./src/db/schema",
-  out: "./src/db/migrations",
+  schema: "./src/schema",
+  out: "./src/migrations",
   dialect: "sqlite",
-  dbCredentials: { url: env.DATABASE_URL },
+  dbCredentials: { url: dbEnv.DATABASE_URL },
   casing: "snake_case",
   verbose: true,
   strict: true,

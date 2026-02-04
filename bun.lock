@@ -12,7 +12,9 @@
     "packages/backend": {
       "name": "@blackwall/backend",
       "dependencies": {
+        "@blackwall/database": "workspace:*",
         "@blackwall/email": "workspace:*",
+        "@blackwall/queue": "workspace:*",
         "@blackwall/shared": "workspace:*",
         "@hono/standard-validator": "^0.2.2",
         "@hono/zod-validator": "^0.7.6",
@@ -23,32 +25,48 @@
         "@tiptap/starter-kit": "^3.18.0",
         "@tiptap/static-renderer": "^3.18.0",
         "better-auth": "^1.4.17",
-        "commander": "^14.0.2",
         "date-fns": "^4.1.0",
         "drizzle-orm": "^1.0.0-beta.12-a5629fb",
         "drizzle-zod": "^1.0.0-beta.12-a5629fb",
         "hono": "^4.11.5",
         "hono-openapi": "^1.2.0",
-        "nanoid": "^5.1.6",
         "nodemailer": "^6.9.16",
         "zod": "^4.3.6",
       },
       "devDependencies": {
-        "@libsql/client": "^0.17.0",
         "@types/bun": "latest",
         "@types/nodemailer": "^6.4.17",
-        "drizzle-kit": "^1.0.0-beta.12-a5629fb",
       },
     },
     "packages/blackwall": {
       "name": "blackwall",
       "dependencies": {
         "@blackwall/backend": "workspace:*",
+        "@blackwall/database": "workspace:*",
+        "@blackwall/queue": "workspace:*",
         "commander": "^14.0.2",
         "hono": "^4.11.5",
       },
       "devDependencies": {
         "@types/bun": "latest",
+      },
+    },
+    "packages/database": {
+      "name": "@blackwall/database",
+      "dependencies": {
+        "@blackwall/shared": "workspace:*",
+        "drizzle-orm": "^1.0.0-beta.12-a5629fb",
+        "drizzle-zod": "^1.0.0-beta.12-a5629fb",
+        "nanoid": "^5.1.6",
+        "zod": "^4.3.6",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "drizzle-kit": "^1.0.0-beta.12-a5629fb",
+      },
+      "peerDependencies": {
+        "@tiptap/core": "^3.18.0",
+        "better-auth": "^1.4.17",
       },
     },
     "packages/email": {
@@ -112,6 +130,16 @@
         "typescript": "^5.7.2",
         "vite": "^7.3.0",
         "vite-plugin-solid": "^2.11.10",
+      },
+    },
+    "packages/queue": {
+      "name": "@blackwall/queue",
+      "dependencies": {
+        "@blackwall/database": "workspace:*",
+        "drizzle-orm": "^1.0.0-beta.12-a5629fb",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
       },
     },
     "packages/shared": {
@@ -214,7 +242,11 @@
 
     "@blackwall/backend": ["@blackwall/backend@workspace:packages/backend"],
 
+    "@blackwall/database": ["@blackwall/database@workspace:packages/database"],
+
     "@blackwall/email": ["@blackwall/email@workspace:packages/email"],
+
+    "@blackwall/queue": ["@blackwall/queue@workspace:packages/queue"],
 
     "@blackwall/shared": ["@blackwall/shared@workspace:packages/shared"],
 
@@ -772,7 +804,7 @@
 
     "defu": ["defu@6.1.4", "", {}, "sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg=="],
 
-    "detect-libc": ["detect-libc@2.0.2", "", {}, "sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw=="],
+    "detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
 
     "dom-serializer": ["dom-serializer@2.0.0", "", { "dependencies": { "domelementtype": "^2.3.0", "domhandler": "^5.0.2", "entities": "^4.2.0" } }, "sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg=="],
 
@@ -1194,7 +1226,7 @@
 
     "jsonwebtoken/semver": ["semver@7.7.3", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q=="],
 
-    "lightningcss/detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
+    "libsql/detect-libc": ["detect-libc@2.0.2", "", {}, "sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw=="],
 
     "mssql/commander": ["commander@11.1.0", "", {}, "sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ=="],
 

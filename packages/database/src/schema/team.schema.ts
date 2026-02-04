@@ -4,7 +4,6 @@ import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
 import { issuePlan } from "./issue-plan.schema";
 import { workspace } from "./workspace.schema";
-import type { JSONParsed } from "hono/utils/types";
 
 // Team table
 export const team = sqliteTable(
@@ -49,4 +48,3 @@ export const userTeam = sqliteTable(
 // Types
 export type Team = typeof team.$inferSelect;
 export type NewTeam = typeof team.$inferInsert;
-export type SerializedTeam = JSONParsed<Team>;

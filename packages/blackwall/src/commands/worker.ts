@@ -1,4 +1,4 @@
-import { jobService } from "@blackwall/backend/features/jobs/job.service";
+import { jobService } from "@blackwall/queue";
 // Register all job handlers
 import "@blackwall/backend/jobs/register";
 

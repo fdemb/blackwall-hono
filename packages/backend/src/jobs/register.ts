@@ -1,8 +1,8 @@
 import { InviteEmail, NewCommentEmail, renderEmail } from "@blackwall/email";
+import { jobService } from "@blackwall/queue";
 import { renderToHTMLString } from "@tiptap/static-renderer";
 import StarterKit from "@tiptap/starter-kit";
 import { sendEmail } from "../lib/emails";
-import { jobService } from "../features/jobs/job.service";
 import { commentData } from "../features/issues/comment.data";
 import { userData } from "../features/users/user.data";
 import { env } from "../lib/zod-env";

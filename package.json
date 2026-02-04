@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --filter=* dev",
-    "build:cli": "bun run --filter @blackwall/cli build"
+    "build:cli": "bun run --filter blackwall build"
   },
   "patchedDependencies": {
     "tinykeys@3.0.0": "patches/tinykeys@3.0.0.patch"

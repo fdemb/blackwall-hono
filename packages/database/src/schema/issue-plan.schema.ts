@@ -3,7 +3,6 @@ import { index, integer, sqliteTable, text, type AnySQLiteColumn } from "drizzle
 import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
 import { team } from "./team.schema";
-import type { JSONParsed } from "hono/utils/types";
 
 export const issuePlan = sqliteTable(
   "issue_plan",
@@ -40,4 +39,3 @@ export const issuePlan = sqliteTable(
 
 export type IssuePlan = typeof issuePlan.$inferSelect;
 export type NewIssuePlan = typeof issuePlan.$inferInsert;
-export type SerializedIssuePlan = JSONParsed<IssuePlan>

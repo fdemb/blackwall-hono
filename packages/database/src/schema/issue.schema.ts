@@ -14,7 +14,6 @@ import { user } from "./auth.schema";
 import { issuePlan } from "./issue-plan.schema";
 import { team } from "./team.schema";
 import { workspace } from "./workspace.schema";
-import type { JSONParsed } from "hono/utils/types";
 
 // Issue status and priority types
 export const issueStatusValues = ["backlog", "to_do", "in_progress", "done"] as const;
@@ -210,14 +209,6 @@ export type IssueComment = typeof issueComment.$inferSelect;
 export type NewIssueComment = typeof issueComment.$inferInsert;
 export type IssueAttachment = typeof issueAttachment.$inferSelect;
 export type NewIssueAttachment = typeof issueAttachment.$inferInsert;
-export type SerializedIssue = JSONParsed<typeof issue.$inferSelect>;
-export type NewSerializedIssue = JSONParsed<typeof issue.$inferInsert>;
-export type SerializedIssueChangeEvent = JSONParsed<typeof issueChangeEvent.$inferSelect>;
-export type NewSerializedIssueChangeEvent = JSONParsed<typeof issueChangeEvent.$inferInsert>;
-export type SerializedIssueComment = JSONParsed<typeof issueComment.$inferSelect>;
-export type NewSerializedIssueComment = JSONParsed<typeof issueComment.$inferInsert>;
-export type SerializedIssueAttachment = JSONParsed<typeof issueAttachment.$inferSelect>;
-export type NewSerializedIssueAttachment = JSONParsed<typeof issueAttachment.$inferInsert>;
 
 // Schemas
 export const issueSelectSchema = createSelectSchema(issue);

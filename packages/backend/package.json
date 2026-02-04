@@ -4,8 +4,6 @@
   "module": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./db/migrate": "./src/db/migrate.ts",
-    "./features/jobs/job.service": "./src/features/jobs/job.service.ts",
     "./jobs/register": "./src/jobs/register.ts"
   },
   "scripts": {
@@ -13,21 +11,12 @@
     "typecheck": "bun run --bun tsc --noEmit",
     "lint": "bun run --bun oxlint",
     "test": "bun test",
-    "test:watch": "bun test --watch",
-    "db:generate": "bun run --bun drizzle-kit generate",
-    "db:migrate": "bun run --bun drizzle-kit migrate",
-    "db:drop": "bun run src/db/drop.ts",
-    "jobs:add": "bun run src/cli/jobs/add.ts",
-    "jobs:stats": "bun run src/cli/jobs/stats.ts",
-    "jobs:list": "bun run src/cli/jobs/list.ts",
-    "jobs:get": "bun run src/cli/jobs/get.ts",
-    "jobs:process": "bun run src/cli/jobs/process.ts",
-    "jobs:work": "bun run src/cli/jobs/work.ts",
-    "jobs:recover-stale": "bun run src/cli/jobs/recover-stale.ts",
-    "jobs:cleanup": "bun run src/cli/jobs/cleanup.ts"
+    "test:watch": "bun test --watch"
   },
   "dependencies": {
+    "@blackwall/database": "workspace:*",
     "@blackwall/email": "workspace:*",
+    "@blackwall/queue": "workspace:*",
     "@blackwall/shared": "workspace:*",
     "@hono/standard-validator": "^0.2.2",
     "@hono/zod-validator": "^0.7.6",
@@ -38,20 +27,16 @@
     "@tiptap/starter-kit": "^3.18.0",
     "@tiptap/static-renderer": "^3.18.0",
     "better-auth": "^1.4.17",
-    "commander": "^14.0.2",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^1.0.0-beta.12-a5629fb",
     "drizzle-zod": "^1.0.0-beta.12-a5629fb",
     "hono": "^4.11.5",
     "hono-openapi": "^1.2.0",
-    "nanoid": "^5.1.6",
     "nodemailer": "^6.9.16",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@libsql/client": "^0.17.0",
     "@types/bun": "latest",
-    "@types/nodemailer": "^6.4.17",
-    "drizzle-kit": "^1.0.0-beta.12-a5629fb"
+    "@types/nodemailer": "^6.4.17"
   }
 }

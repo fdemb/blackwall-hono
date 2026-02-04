@@ -1,18 +1,17 @@
 {
-  "name": "blackwall",
+  "name": "@blackwall/queue",
   "type": "module",
   "module": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./service": "./src/job.service.ts"
+  },
   "scripts": {
-    "dev": "bun run src/index.ts serve",
-    "build": "bun run scripts/build.ts",
     "typecheck": "bun run --bun tsc --noEmit"
   },
   "dependencies": {
-    "@blackwall/backend": "workspace:*",
     "@blackwall/database": "workspace:*",
-    "@blackwall/queue": "workspace:*",
-    "commander": "^14.0.2",
-    "hono": "^4.11.5"
+    "drizzle-orm": "^1.0.0-beta.12-a5629fb"
   },
   "devDependencies": {
     "@types/bun": "latest"

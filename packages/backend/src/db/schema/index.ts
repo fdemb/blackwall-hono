@@ -1,9 +1,2 @@
-export * from "./auth.schema";
-export * from "./color.enum.schema";
-export * from "./issue-plan.schema";
-export * from "./issue.schema";
-export * from "./job.schema";
-export * from "./label.schema";
-export * from "./team.schema";
-export * from "./time-entry.schema";
-export * from "./workspace.schema";
+// Re-export from @blackwall/database/schema for backward compatibility
+export * from "@blackwall/database/schema";

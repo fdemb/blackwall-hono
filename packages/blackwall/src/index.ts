@@ -2,6 +2,8 @@ import { Command } from "commander";
 import { serve } from "./commands/serve";
 import { migrate } from "./commands/migrate";
 import { worker } from "./commands/worker";
+import { add, stats, list, get, processJob, recoverStale, cleanup } from "./commands/jobs";
+import { jobStatusValues } from "@blackwall/queue";
 
 const program = new Command();
 
@@ -32,5 +34,57 @@ program
   .option("--cleanup-interval-ms <ms>", "How often to cleanup completed/failed jobs")
   .option("--lock-duration-ms <ms>", "How long to lock a claimed job")
   .action(worker);
+
+// Jobs subcommands
+const jobs = program.command("jobs").description("Manage job queue");
+
+jobs
+  .command("add")
+  .description("Add a job to the queue")
+  .requiredOption("--type <type>", "Job type")
+  .requiredOption("--payload <json>", "Job payload as JSON")
+  .option("--queue <queue>", "Queue name")
+  .option("--delay-ms <ms>", "Delay in milliseconds")
+  .option("--max-attempts <n>", "Max retry attempts")
+  .action(add);
+
+jobs
+  .command("stats")
+  .description("Get job queue statistics")
+  .option("--queue <queue>", "Queue name")
+  .action(stats);
+
+jobs
+  .command("list")
+  .description("List jobs in the queue")
+  .option("--queue <queue>", "Queue name")
+  .option("--status <status>", `Job status (${jobStatusValues.join(", ")})`)
+  .option("--limit <n>", "Limit number of jobs")
+  .action(list);
+
+jobs
+  .command("get")
+  .description("Get a job by id")
+  .requiredOption("--id <jobId>", "Job id")
+  .action(get);
+
+jobs
+  .command("process")
+  .description("Claim and process the next job in a queue")
+  .requiredOption("--queue <queue>", "Queue name")
+  .option("--lock-duration-ms <ms>", "Lock duration in milliseconds")
+  .action(processJob);
+
+jobs
+  .command("recover-stale")
+  .description("Recover stale jobs")
+  .action(recoverStale);
+
+jobs
+  .command("cleanup")
+  .description("Cleanup old completed and failed jobs")
+  .option("--completed-older-than-ms <ms>", "Delete completed jobs older than the provided milliseconds")
+  .option("--failed-older-than-ms <ms>", "Delete failed jobs older than the provided milliseconds")
+  .action(cleanup);
 
 program.parse();

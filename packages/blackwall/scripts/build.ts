@@ -27,7 +27,7 @@ async function build() {
 
   // Copy migrations
   console.log("Copying migrations...");
-  cpSync(join(PACKAGES_DIR, "backend/src/db/migrations"), join(DIST_DIR, "migrations"), {
+  cpSync(join(PACKAGES_DIR, "database/src/migrations"), join(DIST_DIR, "migrations"), {
     recursive: true,
   });
 

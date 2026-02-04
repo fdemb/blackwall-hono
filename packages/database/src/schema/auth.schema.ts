@@ -3,7 +3,6 @@ import { randomUUIDv7 } from "bun";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { team } from "./team.schema";
 import { workspace } from "./workspace.schema";
-import type { JSONParsed } from "hono/utils/types";
 
 export const user = sqliteTable(
   "user",
@@ -108,4 +107,3 @@ export type NewVerification = typeof verification.$inferInsert;
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type BetterAuthUser = BetterAuthUserType;
-export type SerializedUser = JSONParsed<User>
