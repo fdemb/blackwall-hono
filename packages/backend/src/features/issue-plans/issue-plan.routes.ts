@@ -282,8 +282,7 @@ const issuePlanRoutes = new Hono<AppEnv>()
 
       return c.json({ success: true });
     },
-  );
-
+  )
   /**
    * DELETE /teams/:teamKey/plans/:planId - Delete a non-active plan.
    */
