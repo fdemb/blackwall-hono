@@ -1,5 +1,5 @@
-import { createAsync, useParams, A } from "@solidjs/router";
-import { Show, createMemo } from "solid-js";
+import { action, createAsync, redirect, useAction, useParams, A } from "@solidjs/router";
+import { Show, createMemo, createSignal } from "solid-js";
 import { planDetailLoader } from "./index.data";
 import { useTeamData } from "../../../[teamKey]";
 import { PageHeader } from "@/components/blocks/page-header";
@@ -17,9 +17,32 @@ import { createRowSelection } from "@/components/datatable/row-selection-feature
 import { IssueDataTable, type IssueForDataTable } from "@/components/issues/issue-datatable";
 import { IssueSelectionMenu } from "@/components/issues/issue-selection-menu";
 import { formatDateShort } from "@/lib/dates";
-import { buttonVariants } from "@/components/ui/button";
+import { api } from "@/lib/api";
+import { buttonVariants, Button } from "@/components/ui/button";
 import CalendarIcon from "lucide-solid/icons/calendar";
 import TargetIcon from "lucide-solid/icons/target";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/components/custom-ui/toast";
+import { PlanStatusBadge } from "@/components/plans/plan-status-badge";
+
+const archivePlanAction = action(async (workspaceSlug: string, teamKey: string, planId: string) => {
+  await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$delete({
+    param: { teamKey, planId },
+  });
+
+  toast.success("Plan archived");
+  throw redirect(`/${workspaceSlug}/team/${teamKey}/plans`);
+});
 
 function calculateEstimationStats(issues: IssueForDataTable[]) {
   let totalPoints = 0;
@@ -49,8 +72,12 @@ export default function PlanDetailPage() {
   const params = useParams();
   const teamData = useTeamData();
   const data = createAsync(() => planDetailLoader(params.teamKey!, params.planId!));
+  const archiveAction = useAction(archivePlanAction);
+  const [archiveDialogOpen, setArchiveDialogOpen] = createSignal(false);
 
   const plan = () => data()?.plan;
+  const isActivePlan = () => teamData().activePlanId === plan()!.id;
+  const isCompleted = () => Boolean(plan()!.finishedAt);
   const issues = () => (data()?.issues ?? []) as IssueForDataTable[];
   const stats = () => calculateEstimationStats(issues());
   const rowSelection = createRowSelection();
@@ -92,13 +119,37 @@ export default function PlanDetailPage() {
         <div class="flex flex-col flex-1 min-h-0">
           <div class="px-6 py-4 border-b flex flex-col gap-3">
             <div class="flex items-center justify-between">
-              <h1 class="text-lg font-semibold">{plan()!.name}</h1>
-              <A
-                class={buttonVariants({ variant: "outline", size: "sm" })}
-                href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${params.planId}/edit`}
-              >
-                Edit
-              </A>
+              <div class="flex items-center gap-3">
+                <h1 class="text-lg font-semibold">{plan()!.name}</h1>
+                <PlanStatusBadge plan={plan()!} activePlanId={teamData().activePlanId} />
+              </div>
+              <div class="flex items-center gap-2">
+                <Show when={!isCompleted()}>
+                  <A
+                    class={buttonVariants({ variant: "outline", size: "sm" })}
+                    href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${params.planId}/edit`}
+                  >
+                    Edit
+                  </A>
+                </Show>
+                <Show when={isActivePlan() && !isCompleted()}>
+                  <A
+                    class={buttonVariants({ variant: "default", size: "sm" })}
+                    href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${params.planId}/complete`}
+                  >
+                    Complete plan
+                  </A>
+                </Show>
+                <Show when={!isActivePlan()}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setArchiveDialogOpen(true)}
+                  >
+                    Archive
+                  </Button>
+                </Show>
+              </div>
             </div>
 
             <div class="flex flex-row items-center gap-6 text-sm text-muted-foreground">
@@ -151,6 +202,28 @@ export default function PlanDetailPage() {
             />
           </Show>
         </div>
+
+        <AlertDialog open={archiveDialogOpen()} onOpenChange={setArchiveDialogOpen}>
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogMedia class="bg-destructive/50" />
+              <AlertDialogTitle>Archive this plan?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This removes the plan and unassigns any issues still attached to it.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                size="xs"
+                variant="destructive"
+                action={() => archiveAction(params.workspaceSlug!, params.teamKey!, plan()!.id)}
+              >
+                Archive plan
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </>
     </Show>
   );
