@@ -169,28 +169,27 @@ function PlanTable(props: PlanTableProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}`);
-                }}
+                onSelect={() =>
+                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}`)
+                }
               >
                 View
               </DropdownMenuItem>
               <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/edit`);
-                }}
+                onSelect={() =>
+                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/edit`)
+                }
                 disabled={isCompleted}
               >
                 Edit
               </DropdownMenuItem>
               <Show when={isActive && !isCompleted}>
                 <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/complete`);
-                  }}
+                  onSelect={() =>
+                    navigate(
+                      `/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/complete`,
+                    )
+                  }
                 >
                   Complete plan
                 </DropdownMenuItem>
@@ -199,8 +198,7 @@ function PlanTable(props: PlanTableProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"
-                  onSelect={(e) => {
-                    e.preventDefault();
+                  onSelect={() => {
                     setSelectedPlan(plan);
                     setArchiveDialogOpen(true);
                   }}

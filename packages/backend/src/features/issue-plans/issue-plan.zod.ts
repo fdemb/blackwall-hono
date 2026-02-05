@@ -1,33 +1,31 @@
 import { z } from "zod";
 
-const planDateRangeSchema = z
-  .object({
-    startDate: z.iso.date(),
-    endDate: z.iso.date(),
-  })
-  .refine((data) => data.endDate >= data.startDate, {
+const planBaseSchema = z.object({
+  name: z.string().min(1).max(100),
+  goal: z.string().max(500).nullable(),
+  startDate: z.iso.date(),
+  endDate: z.iso.date(),
+});
+
+const withValidDateRange = <TSchema extends z.ZodType<{ startDate: string; endDate: string }>>(
+  schema: TSchema,
+) =>
+  schema.refine((data) => data.endDate >= data.startDate, {
     message: "End date must be on or after start date",
     path: ["endDate"],
   });
 
-const planBaseSchema = z
-  .object({
-    name: z.string().min(1).max(100),
-    goal: z.string().max(500).nullable(),
-    startDate: z.iso.date(),
-    endDate: z.iso.date(),
-  })
-  .and(planDateRangeSchema);
-
-export const createIssuePlanSchema = planBaseSchema.extend({
-  onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
-});
+export const createIssuePlanSchema = withValidDateRange(
+  planBaseSchema.extend({
+    onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
+  }),
+);
 
 export type CreateIssuePlan = z.infer<typeof createIssuePlanSchema>;
 
 import { issueSchema } from "../issues/issue.zod";
 
-export const updateIssuePlanSchema = planBaseSchema;
+export const updateIssuePlanSchema = withValidDateRange(planBaseSchema);
 
 export type UpdateIssuePlan = z.infer<typeof updateIssuePlanSchema>;
 
