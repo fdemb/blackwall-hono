@@ -70,13 +70,18 @@ export function PlanForm(props: PlanFormProps) {
       onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewPlan",
     },
     validators: {
-      onSubmit: z.object({
-        name: z.string().min(1, "Name is required"),
-        goal: z.string().nullable(),
-        startDate: z.iso.date(),
-        endDate: z.iso.date(),
-        onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
-      }),
+      onSubmit: z
+        .object({
+          name: z.string().min(1, "Name is required"),
+          goal: z.string().nullable(),
+          startDate: z.iso.date(),
+          endDate: z.iso.date(),
+          onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
+        })
+        .refine((data) => data.endDate >= data.startDate, {
+          message: "End date must be on or after start date",
+          path: ["endDate"],
+        }),
     },
     onSubmit: async ({ value }) => {
       await _action(props.workspaceSlug, props.teamKey, value);
