@@ -139,7 +139,11 @@ async function updatePlan(input: {
  * @throws NotFoundError if plan not found
  * @throws BadRequestError if plan is already completed
  */
-async function completePlan(input: { planId: string; teamId: string }) {
+async function completePlan(input: {
+    planId: string;
+    teamId: string;
+    onUndoneIssues: "moveToBacklog" | "moveToNewPlan";
+}) {
     const plan = await issuePlanData.getPlanById({
         planId: input.planId,
         teamId: input.teamId,
@@ -153,8 +157,57 @@ async function completePlan(input: { planId: string; teamId: string }) {
         throw new BadRequestError("Plan already completed");
     }
 
+    if (plan.endDate.getTime() > Date.now()) {
+        throw new BadRequestError("Cannot complete plan before its end date");
+    }
+
+    if (input.onUndoneIssues === "moveToBacklog") {
+        await issuePlanData.moveActiveIssuesToBacklog({
+            teamId: input.teamId,
+            planId: input.planId,
+        });
+    } else {
+        await issuePlanData.moveActiveIssuesToUnplanned({
+            teamId: input.teamId,
+            planId: input.planId,
+        });
+    }
+
     await issuePlanData.completePlan({ planId: input.planId });
     await issuePlanData.setActivePlanOnTeam({ teamId: input.teamId, planId: null });
+}
+
+/**
+ * Delete a non-active plan and detach its issues.
+ * @param input plan id, team id, and active plan id
+ * @throws NotFoundError if plan not found
+ * @throws BadRequestError if plan is active
+ */
+async function deletePlan(input: {
+    planId: string;
+    teamId: string;
+    activePlanId: string | null;
+}) {
+    const plan = await issuePlanData.getPlanById({
+        planId: input.planId,
+        teamId: input.teamId,
+    });
+
+    if (!plan) {
+        throw new NotFoundError("Issue plan not found");
+    }
+
+    if (input.activePlanId === input.planId) {
+        throw new BadRequestError("Cannot delete active plan");
+    }
+
+    await issuePlanData.moveActiveIssuesToBacklog({
+        teamId: input.teamId,
+        planId: input.planId,
+    });
+
+    await issuePlanData.clearPlanFromIssues({ planId: input.planId });
+    await issuePlanData.deletePlan({ planId: input.planId });
 }
 
 export const issuePlanService = {
@@ -164,4 +217,5 @@ export const issuePlanService = {
     createAndActivatePlan,
     updatePlan,
     completePlan,
+    deletePlan,
 };

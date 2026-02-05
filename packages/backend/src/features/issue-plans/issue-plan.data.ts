@@ -122,6 +122,34 @@ export async function moveActiveIssuesToPlan(input: {
         .where(whereConditions);
 }
 
+export async function moveActiveIssuesToUnplanned(input: { teamId: string; planId?: string }) {
+    const whereConditions = input.planId
+        ? and(
+            eq(dbSchema.issue.planId, input.planId),
+            inArray(dbSchema.issue.status, ACTIVE_ISSUE_STATUSES),
+        )
+        : and(
+            eq(dbSchema.issue.teamId, input.teamId),
+            inArray(dbSchema.issue.status, ACTIVE_ISSUE_STATUSES),
+        );
+
+    await db
+        .update(dbSchema.issue)
+        .set({ planId: null })
+        .where(whereConditions);
+}
+
+export async function clearPlanFromIssues(input: { planId: string }) {
+    await db
+        .update(dbSchema.issue)
+        .set({ planId: null })
+        .where(eq(dbSchema.issue.planId, input.planId));
+}
+
+export async function deletePlan(input: { planId: string }) {
+    await db.delete(dbSchema.issuePlan).where(eq(dbSchema.issuePlan.id, input.planId));
+}
+
 export const issuePlanData = {
     listPlansForTeam,
     getPlanById,
@@ -131,4 +159,7 @@ export const issuePlanData = {
     setActivePlanOnTeam,
     moveActiveIssuesToBacklog,
     moveActiveIssuesToPlan,
+    moveActiveIssuesToUnplanned,
+    clearPlanFromIssues,
+    deletePlan,
 };
