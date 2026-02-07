@@ -82,10 +82,11 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
 
       <PickerDialog
         options={options()}
-        loading={false} // createAsync doesn't expose isLoading the same way
+        loading={false}
         manualFiltering
         search={searchTerm()}
         onSearchChange={setSearchTermDebounced}
+        emptyText={searchTerm().length > 0 ? "No results" : "Search for an issue or user"}
         closeOnSelect
         renderOption={(option) => (
           <div class="flex flex-row items-center gap-2">

@@ -35,6 +35,7 @@ import { UserMenu } from "./user-menu";
 // import { WorkspacePicker } from "./workspace-picker";
 import { A } from "@solidjs/router";
 import { WorkspacePicker } from "./workspace-picker";
+import { GlobalSearchDialog } from "./global-search-dialog";
 
 type LinkNavItem = {
   title: string;
@@ -154,7 +155,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
         <div class="flex flex-row gap-2">
           <CreateDialog global />
 
-          {/*<GlobalSearchDialog workspaceSlug={workspaceData().workspace.slug} />*/}
+          <GlobalSearchDialog workspaceSlug={workspaceData().workspace.slug} />
         </div>
       </SidebarHeader>
 
