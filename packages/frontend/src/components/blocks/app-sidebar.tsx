@@ -107,9 +107,9 @@ function createNavItems(): () => NavGroup[] {
             icon: KanbanIcon,
           },
           {
-            title: "Plans",
+            title: "Sprints",
             type: "link",
-            href: `/${workspaceData().workspace.slug}/team/${team.key}/plans`,
+            href: `/${workspaceData().workspace.slug}/team/${team.key}/sprints`,
             icon: LandPlotIcon,
           },
         ],

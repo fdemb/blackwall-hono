@@ -17,9 +17,9 @@ import { activeIssuesLoader } from "./routes/authorized/[workspaceSlug]/team/[te
 import { boardLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/board.data";
 import { issueLoader } from "./routes/authorized/[workspaceSlug]/issue/[key].data";
 import { myIssuesLoader } from "./routes/authorized/[workspaceSlug]/my-issues.data";
-import { plansLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/index.data";
+import { sprintsLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/index.data";
 
-import { planDetailLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/index.data";
+import { sprintDetailLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/[sprintId]/index.data";
 import { membersLoader } from "./routes/authorized/[workspaceSlug]/members/index.data";
 import { memberDetailLoader } from "./routes/authorized/[workspaceSlug]/members/[userId].data";
 import { workspaceMembersLoader } from "./routes/authorized/[workspaceSlug]/settings/workspace.data";
@@ -49,20 +49,20 @@ const SignupPage = lazy(() => import("./routes/guest/signup"));
 const TeamLayout = lazy(() => import("./routes/authorized/[workspaceSlug]/team/[teamKey]"));
 const CreateWorkspacePage = lazy(() => import("./routes/either/create-workspace"));
 const InvitePage = lazy(() => import("./routes/either/invite/[token]"));
-const PlansPage = lazy(
-  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/index"),
+const SprintsPage = lazy(
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/index"),
 );
-const CreatePlanPage = lazy(
-  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/create"),
+const CreateSprintPage = lazy(
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/create"),
 );
-const CompletePlanPage = lazy(
-  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/complete"),
+const CompleteSprintPage = lazy(
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/[sprintId]/complete"),
 );
-const PlanDetailPage = lazy(
-  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/index"),
+const SprintDetailPage = lazy(
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/[sprintId]/index"),
 );
-const EditPlanPage = lazy(
-  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/plans/[planId]/edit"),
+const EditSprintPage = lazy(
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/[sprintId]/edit"),
 );
 const MembersPage = lazy(() => import("./routes/authorized/[workspaceSlug]/members/index"));
 const MemberDetailPage = lazy(() => import("./routes/authorized/[workspaceSlug]/members/[userId]"));
@@ -160,25 +160,25 @@ const AppRouter = () => (
               preload={({ params }) => boardLoader(params.teamKey!)}
             />
             <Route
-              path="/plans"
-              component={PlansPage}
-              preload={({ params }) => plansLoader(params.teamKey!)}
+              path="/sprints"
+              component={SprintsPage}
+              preload={({ params }) => sprintsLoader(params.teamKey!)}
             />
-            <Route path="/plans/create" component={CreatePlanPage} />
+            <Route path="/sprints/create" component={CreateSprintPage} />
             <Route
-              path="/plans/:planId/complete"
-              component={CompletePlanPage}
-              preload={({ params }) => planDetailLoader(params.teamKey!, params.planId!)}
-            />
-            <Route
-              path="/plans/:planId/edit"
-              component={EditPlanPage}
-              preload={({ params }) => planDetailLoader(params.teamKey!, params.planId!)}
+              path="/sprints/:sprintId/complete"
+              component={CompleteSprintPage}
+              preload={({ params }) => sprintDetailLoader(params.teamKey!, params.sprintId!)}
             />
             <Route
-              path="/plans/:planId"
-              component={PlanDetailPage}
-              preload={({ params }) => planDetailLoader(params.teamKey!, params.planId!)}
+              path="/sprints/:sprintId/edit"
+              component={EditSprintPage}
+              preload={({ params }) => sprintDetailLoader(params.teamKey!, params.sprintId!)}
+            />
+            <Route
+              path="/sprints/:sprintId"
+              component={SprintDetailPage}
+              preload={({ params }) => sprintDetailLoader(params.teamKey!, params.sprintId!)}
             />
           </Route>
           <Route

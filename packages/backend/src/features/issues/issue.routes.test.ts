@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { useTestContext } from "../../test/context";
-import { createIssuePlan } from "../../test/fixtures";
+import { createIssueSprint } from "../../test/fixtures";
 
 describe("Issue Routes", () => {
   const getCtx = useTestContext();
@@ -10,7 +10,7 @@ describe("Issue Routes", () => {
     description?: object;
     status: "backlog" | "to_do" | "in_progress" | "done";
     assignedToId: string | null;
-    planId: string | null;
+    sprintId: string | null;
   }) => {
     const { client, headers, team } = getCtx();
     return client.api.issues.$post(
@@ -51,19 +51,19 @@ describe("Issue Routes", () => {
         summary: "Test Issue 1",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       await createIssue({
         summary: "Test Issue 2",
         status: "in_progress",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       await createIssue({
         summary: "Test Issue 3",
         status: "done",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
 
       const { client, headers, team } = getCtx();
@@ -89,19 +89,19 @@ describe("Issue Routes", () => {
         summary: "Test Issue 1",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       await createIssue({
         summary: "Test Issue 2",
         status: "in_progress",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       await createIssue({
         summary: "Test Issue 3",
         status: "done",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
 
       const { client, headers, team } = getCtx();
@@ -120,12 +120,12 @@ describe("Issue Routes", () => {
       expect(json.issues.map((i: any) => i.status)).toEqual(["to_do", "done"]);
     });
 
-    it("should include assignedTo, labels, and issuePlan relations", async () => {
+    it("should include assignedTo, labels, and issueSprint relations", async () => {
       await createIssue({
         summary: "Test Issue 1",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
 
       const { client, headers, team } = getCtx();
@@ -142,7 +142,7 @@ describe("Issue Routes", () => {
       const json = await res.json();
       expect(json.issues[0]).toHaveProperty("assignedTo");
       expect(json.issues[0]).toHaveProperty("labels");
-      expect(json.issues[0]).toHaveProperty("issuePlan");
+      expect(json.issues[0]).toHaveProperty("issueSprint");
     });
 
     it("should return 400 when teamKey is missing", async () => {
@@ -165,7 +165,7 @@ describe("Issue Routes", () => {
         summary: "New Test Issue",
         status: "backlog",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
 
       expect(res.status).toBe(200);
@@ -181,7 +181,7 @@ describe("Issue Routes", () => {
         summary: "Assigned Issue",
         status: "to_do",
         assignedToId: user.id,
-        planId: null,
+        sprintId: null,
       });
 
       expect(res.status).toBe(200);
@@ -189,19 +189,19 @@ describe("Issue Routes", () => {
       expect(json.issue.assignedToId).toBe(user.id);
     });
 
-    it("should create issue with plan", async () => {
+    it("should create issue with sprint", async () => {
       const { testDb, team, user } = getCtx();
-      const plan = await createIssuePlan(testDb, { teamId: team.id, createdById: user.id });
+      const sprint = await createIssueSprint(testDb, { teamId: team.id, createdById: user.id });
       const res = await createIssue({
-        summary: "Planned Issue",
+        summary: "Sprinted Issue",
         status: "to_do",
         assignedToId: null,
-        planId: plan.id,
+        sprintId: sprint.id,
       });
 
       expect(res.status).toBe(200);
       const json = await res.json();
-      expect(json.issue.planId).toBe(plan.id);
+      expect(json.issue.sprintId).toBe(sprint.id);
     });
 
     it("should return 400 when summary is missing", async () => {
@@ -275,7 +275,7 @@ describe("Issue Routes", () => {
         summary: "Test Issue",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 
@@ -300,7 +300,7 @@ describe("Issue Routes", () => {
         summary: "Test Issue",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 
@@ -328,7 +328,7 @@ describe("Issue Routes", () => {
         summary: "Test Issue",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 
@@ -353,7 +353,7 @@ describe("Issue Routes", () => {
         summary: "Original Summary",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 
@@ -378,7 +378,7 @@ describe("Issue Routes", () => {
         summary: "Test Issue",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 
@@ -403,7 +403,7 @@ describe("Issue Routes", () => {
         summary: "Test Issue",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 
@@ -430,7 +430,7 @@ describe("Issue Routes", () => {
         summary: "Test Issue",
         status: "to_do",
         assignedToId: null,
-        planId: null,
+        sprintId: null,
       });
       const created = await createRes.json();
 

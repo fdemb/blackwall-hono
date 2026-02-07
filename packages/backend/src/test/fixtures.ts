@@ -4,10 +4,12 @@ import type { TestDb } from "./setup";
 type WorkspaceInsert = typeof dbSchema.workspace.$inferInsert;
 type UserInsert = typeof dbSchema.user.$inferInsert;
 type TeamInsert = typeof dbSchema.team.$inferInsert;
-type IssuePlanInsert = typeof dbSchema.issuePlan.$inferInsert;
+type IssueSprintInsert = typeof dbSchema.issueSprint.$inferInsert;
 type IssueInsert = typeof dbSchema.issue.$inferInsert;
 type WorkspaceUserInsert = typeof dbSchema.workspaceUser.$inferInsert;
 type UserTeamInsert = typeof dbSchema.userTeam.$inferInsert;
+
+let issueSequence = 1;
 
 export function buildWorkspace(overrides: Partial<WorkspaceInsert> = {}): WorkspaceInsert {
   return {
@@ -36,14 +38,14 @@ export function buildTeam(overrides: Partial<TeamInsert> = {}): TeamInsert {
     key: "TST",
     workspaceId: overrides.workspaceId ?? "",
     avatar: null,
-    activePlanId: null,
+    activeSprintId: null,
     ...overrides,
   };
 }
 
-export function buildIssuePlan(overrides: Partial<IssuePlanInsert> = {}): IssuePlanInsert {
+export function buildIssueSprint(overrides: Partial<IssueSprintInsert> = {}): IssueSprintInsert {
   return {
-    name: "Test Plan",
+    name: "Test Sprint",
     goal: "Test goal",
     startDate: new Date("2024-01-01"),
     endDate: new Date("2024-12-31"),
@@ -66,7 +68,7 @@ export function buildIssue(overrides: Partial<IssueInsert> = {}): IssueInsert {
     teamId: overrides.teamId ?? "",
     createdById: overrides.createdById ?? "",
     assignedToId: null,
-    planId: null,
+    sprintId: null,
     ...overrides,
   };
 }
@@ -92,17 +94,24 @@ export async function createTeam(testDb: TestDb, overrides: Partial<TeamInsert> 
   return team;
 }
 
-export async function createIssuePlan(testDb: TestDb, overrides: Partial<IssuePlanInsert> = {}) {
-  const [plan] = await testDb.db
-    .insert(dbSchema.issuePlan)
-    .values(buildIssuePlan(overrides))
+export async function createIssueSprint(testDb: TestDb, overrides: Partial<IssueSprintInsert> = {}) {
+  const [sprint] = await testDb.db
+    .insert(dbSchema.issueSprint)
+    .values(buildIssueSprint(overrides))
     .returning();
 
-  return plan;
+  return sprint;
 }
 
 export async function createIssue(testDb: TestDb, overrides: Partial<IssueInsert> = {}) {
-  const [issue] = await testDb.db.insert(dbSchema.issue).values(buildIssue(overrides)).returning();
+  const nextIssueNumber = issueSequence++;
+  const keyNumber = overrides.keyNumber ?? nextIssueNumber;
+  const key = overrides.key ?? `TST-${keyNumber}`;
+
+  const [issue] = await testDb.db
+    .insert(dbSchema.issue)
+    .values(buildIssue({ ...overrides, keyNumber, key }))
+    .returning();
 
   return issue;
 }

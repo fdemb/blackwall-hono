@@ -1,37 +1,37 @@
 import { Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
-import { issuePlanService } from "./issue-plan.service";
+import { issueSprintService } from "./issue-sprint.service";
 import type { AppEnv } from "../../lib/hono-env";
 import { authMiddleware } from "../auth/auth-middleware";
 import { workspaceMiddleware } from "../workspaces/workspace-middleware";
 import { teamData } from "../teams/team.data";
 import { issueData } from "../issues/issue.data";
 import {
-  createIssuePlanSchema,
-  completeIssuePlanSchema,
-  updateIssuePlanSchema,
-  issuePlanListSchema,
-  issuePlanResponseSchema,
-  issuePlanWithIssuesSchema,
-} from "./issue-plan.zod";
+  createIssueSprintSchema,
+  completeIssueSprintSchema,
+  updateIssueSprintSchema,
+  issueSprintListSchema,
+  issueSprintResponseSchema,
+  issueSprintWithIssuesSchema,
+} from "./issue-sprint.zod";
 import { NotFoundError } from "../../lib/errors";
 
-const issuePlanRoutes = new Hono<AppEnv>()
+const issueSprintRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
   .use("*", workspaceMiddleware)
   /**
-   * GET /teams/:teamKey/plans - List all plans for a team.
+   * GET /teams/:teamKey/sprints - List all sprints for a team.
    */
   .get(
-    "/teams/:teamKey/plans",
+    "/teams/:teamKey/sprints",
     describeRoute({
-      tags: ["Plans"],
-      summary: "List all plans for a team",
+      tags: ["Sprints"],
+      summary: "List all sprints for a team",
       responses: {
         200: {
-          description: "List of plans",
-          content: { "application/json": { schema: resolver(issuePlanListSchema) } },
+          description: "List of sprints",
+          content: { "application/json": { schema: resolver(issueSprintListSchema) } },
         },
       },
     }),
@@ -51,22 +51,22 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      const plans = await issuePlanService.listPlans({ teamId: team.id });
-      return c.json({ plans });
+      const sprints = await issueSprintService.listSprints({ teamId: team.id });
+      return c.json({ sprints });
     },
   )
   /**
-   * GET /teams/:teamKey/plans/active - Get the active plan for a team.
+   * GET /teams/:teamKey/sprints/active - Get the active sprint for a team.
    */
   .get(
-    "/teams/:teamKey/plans/active",
+    "/teams/:teamKey/sprints/active",
     describeRoute({
-      tags: ["Plans"],
-      summary: "Get active plan for a team",
+      tags: ["Sprints"],
+      summary: "Get active sprint for a team",
       responses: {
         200: {
-          description: "Active plan",
-          content: { "application/json": { schema: resolver(issuePlanResponseSchema) } },
+          description: "Active sprint",
+          content: { "application/json": { schema: resolver(issueSprintResponseSchema) } },
         },
       },
     }),
@@ -86,34 +86,34 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      const plan = await issuePlanService.getActivePlan({
+      const sprint = await issueSprintService.getActiveSprint({
         teamId: team.id,
-        activePlanId: team.activePlanId,
+        activeSprintId: team.activeSprintId,
       });
 
-      return c.json({ plan });
+      return c.json({ sprint });
     },
   )
   /**
-   * GET /teams/:teamKey/plans/:planId - Get a plan by its id with associated issues.
+   * GET /teams/:teamKey/sprints/:sprintId - Get a sprint by its id with associated issues.
    */
   .get(
-    "/teams/:teamKey/plans/:planId",
+    "/teams/:teamKey/sprints/:sprintId",
     describeRoute({
-      tags: ["Plans"],
-      summary: "Get a plan by id",
+      tags: ["Sprints"],
+      summary: "Get a sprint by id",
       responses: {
         200: {
-          description: "Plan details with issues",
-          content: { "application/json": { schema: resolver(issuePlanWithIssuesSchema) } },
+          description: "Sprint details with issues",
+          content: { "application/json": { schema: resolver(issueSprintWithIssuesSchema) } },
         },
       },
     }),
-    validator("param", z.object({ teamKey: z.string(), planId: z.string() })),
+    validator("param", z.object({ teamKey: z.string(), sprintId: z.string() })),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const { teamKey, planId } = c.req.valid("param");
+      const { teamKey, sprintId } = c.req.valid("param");
 
       const team = await teamData.getTeamForUser({
         workspaceId: workspace.id,
@@ -125,37 +125,37 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      const plan = await issuePlanService.getPlanById({
-        planId,
+      const sprint = await issueSprintService.getSprintById({
+        sprintId,
         teamId: team.id,
       });
 
-      const issues = await issueData.listIssuesInPlan({
+      const issues = await issueData.listIssuesInSprint({
         workspaceId: workspace.id,
         teamId: team.id,
-        planId,
+        sprintId,
       });
 
-      return c.json({ plan, issues });
+      return c.json({ sprint, issues });
     },
   )
   /**
-   * POST /teams/:teamKey/plans - Create a new plan and set it as active.
+   * POST /teams/:teamKey/sprints - Create a new sprint and set it as active.
    */
   .post(
-    "/teams/:teamKey/plans",
+    "/teams/:teamKey/sprints",
     describeRoute({
-      tags: ["Plans"],
-      summary: "Create a new plan",
+      tags: ["Sprints"],
+      summary: "Create a new sprint",
       responses: {
         201: {
-          description: "Created plan",
-          content: { "application/json": { schema: resolver(issuePlanResponseSchema) } },
+          description: "Created sprint",
+          content: { "application/json": { schema: resolver(issueSprintResponseSchema) } },
         },
       },
     }),
     validator("param", z.object({ teamKey: z.string() })),
-    validator("json", createIssuePlanSchema),
+    validator("json", createIssueSprintSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -177,41 +177,41 @@ const issuePlanRoutes = new Hono<AppEnv>()
       const endDate = new Date(body.endDate);
       endDate.setUTCHours(23, 59, 59, 999);
 
-      const plan = await issuePlanService.createAndActivatePlan({
+      const sprint = await issueSprintService.createAndActivateSprint({
         name: body.name,
         goal: body.goal,
         startDate,
         endDate,
         createdById: user.id,
         teamId: team.id,
-        activePlanId: team.activePlanId,
+        activeSprintId: team.activeSprintId,
         onUndoneIssues: body.onUndoneIssues,
       });
 
-      return c.json({ plan }, 201);
+      return c.json({ sprint }, 201);
     },
   )
   /**
-   * PATCH /teams/:teamKey/plans/:planId - Update an existing plan.
+   * PATCH /teams/:teamKey/sprints/:sprintId - Update an existing sprint.
    */
   .patch(
-    "/teams/:teamKey/plans/:planId",
+    "/teams/:teamKey/sprints/:sprintId",
     describeRoute({
-      tags: ["Plans"],
-      summary: "Update a plan",
+      tags: ["Sprints"],
+      summary: "Update a sprint",
       responses: {
         200: {
-          description: "Updated plan",
-          content: { "application/json": { schema: resolver(issuePlanResponseSchema) } },
+          description: "Updated sprint",
+          content: { "application/json": { schema: resolver(issueSprintResponseSchema) } },
         },
       },
     }),
-    validator("param", z.object({ teamKey: z.string(), planId: z.string() })),
-    validator("json", updateIssuePlanSchema),
+    validator("param", z.object({ teamKey: z.string(), sprintId: z.string() })),
+    validator("json", updateIssueSprintSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const { teamKey, planId } = c.req.valid("param");
+      const { teamKey, sprintId } = c.req.valid("param");
       const body = c.req.valid("json");
 
       const team = await teamData.getTeamForUser({
@@ -229,8 +229,8 @@ const issuePlanRoutes = new Hono<AppEnv>()
       const endDate = new Date(body.endDate);
       endDate.setUTCHours(23, 59, 59, 999);
 
-      const plan = await issuePlanService.updatePlan({
-        planId,
+      const sprint = await issueSprintService.updateSprint({
+        sprintId,
         teamId: team.id,
         name: body.name,
         goal: body.goal,
@@ -238,17 +238,17 @@ const issuePlanRoutes = new Hono<AppEnv>()
         endDate,
       });
 
-      return c.json({ plan });
+      return c.json({ sprint });
     },
   )
   /**
-   * POST /teams/:teamKey/plans/:planId/complete - Mark a plan as completed.
+   * POST /teams/:teamKey/sprints/:sprintId/complete - Mark a sprint as completed.
    */
   .post(
-    "/teams/:teamKey/plans/:planId/complete",
+    "/teams/:teamKey/sprints/:sprintId/complete",
     describeRoute({
-      tags: ["Plans"],
-      summary: "Complete a plan",
+      tags: ["Sprints"],
+      summary: "Complete a sprint",
       responses: {
         200: {
           description: "Success",
@@ -256,12 +256,12 @@ const issuePlanRoutes = new Hono<AppEnv>()
         },
       },
     }),
-    validator("param", z.object({ teamKey: z.string(), planId: z.string() })),
-    validator("json", completeIssuePlanSchema),
+    validator("param", z.object({ teamKey: z.string(), sprintId: z.string() })),
+    validator("json", completeIssueSprintSchema),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const { teamKey, planId } = c.req.valid("param");
+      const { teamKey, sprintId } = c.req.valid("param");
       const body = c.req.valid("json");
 
       const team = await teamData.getTeamForUser({
@@ -274,8 +274,8 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      await issuePlanService.completePlan({
-        planId,
+      await issueSprintService.completeSprint({
+        sprintId,
         teamId: team.id,
         onUndoneIssues: body.onUndoneIssues,
       });
@@ -284,13 +284,13 @@ const issuePlanRoutes = new Hono<AppEnv>()
     },
   )
   /**
-   * DELETE /teams/:teamKey/plans/:planId - Delete a non-active plan.
+   * DELETE /teams/:teamKey/sprints/:sprintId - Delete a non-active sprint.
    */
   .delete(
-    "/teams/:teamKey/plans/:planId",
+    "/teams/:teamKey/sprints/:sprintId",
     describeRoute({
-      tags: ["Plans"],
-      summary: "Delete a plan",
+      tags: ["Sprints"],
+      summary: "Delete a sprint",
       responses: {
         200: {
           description: "Success",
@@ -298,11 +298,11 @@ const issuePlanRoutes = new Hono<AppEnv>()
         },
       },
     }),
-    validator("param", z.object({ teamKey: z.string(), planId: z.string() })),
+    validator("param", z.object({ teamKey: z.string(), sprintId: z.string() })),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const { teamKey, planId } = c.req.valid("param");
+      const { teamKey, sprintId } = c.req.valid("param");
 
       const team = await teamData.getTeamForUser({
         workspaceId: workspace.id,
@@ -314,14 +314,14 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      await issuePlanService.deletePlan({
-        planId,
+      await issueSprintService.deleteSprint({
+        sprintId,
         teamId: team.id,
-        activePlanId: team.activePlanId,
+        activeSprintId: team.activeSprintId,
       });
 
       return c.json({ success: true });
     },
   );
 
-export { issuePlanRoutes };
+export { issueSprintRoutes };

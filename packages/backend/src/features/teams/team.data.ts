@@ -61,7 +61,7 @@ export async function getTeamForUser(input: {
       users: { id: input.userId },
     },
     with: {
-      activePlan: true,
+      activeSprint: true,
     },
   });
 
@@ -113,7 +113,7 @@ export async function listUserTeams(input: { workspaceId: string; userId: string
       users: { id: input.userId },
     },
     with: {
-      activePlan: true,
+      activeSprint: true,
     },
   });
 }
@@ -137,7 +137,7 @@ export async function listTeamsWithCounts(input: { workspaceId: string }) {
       avatar: team.avatar,
       createdAt: team.createdAt,
       workspaceId: team.workspaceId,
-      activePlanId: team.activePlanId,
+      activeSprintId: team.activeSprintId,
     },
     usersCount: team.users?.length ?? 0,
     issuesCount: team.issues?.length ?? 0,

@@ -1,5 +1,5 @@
 import type { IssueForDataTable } from "./issue-datatable";
-import type { IssuePriority, IssueStatus, SerializedIssuePlan } from "@blackwall/database/schema";
+import type { IssuePriority, IssueStatus, SerializedIssueSprint } from "@blackwall/database/schema";
 import type { User } from "better-auth";
 import { Button } from "../ui/button";
 import {
@@ -41,7 +41,7 @@ import { toast } from "../custom-ui/toast";
 type IssueSelectionMenuProps = {
   selectedIssues: IssueForDataTable[];
   onClearSelection: () => void;
-  activePlan?: SerializedIssuePlan | null;
+  activeSprint?: SerializedIssueSprint | null;
   assignableUsers?: User[];
 };
 
@@ -87,9 +87,9 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
     props.onClearSelection();
   };
 
-  const displayAddToActivePlan = () =>
-    !!props.activePlan &&
-    !props.selectedIssues.every((issue) => issue.planId === props.activePlan?.id);
+  const displayAddToActiveSprint = () =>
+    !!props.activeSprint &&
+    !props.selectedIssues.every((issue) => issue.sprintId === props.activeSprint?.id);
 
   const assignableUsersOptions = () => {
     if (!props.assignableUsers?.length) return [];
@@ -145,14 +145,14 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           />
         </Popover>
 
-        <Show when={displayAddToActivePlan()}>
+        <Show when={displayAddToActiveSprint()}>
           <Button
             variant="outline"
             size="xs"
-            onClick={() => handleUpdate({ planId: props.activePlan!.id })}
+            onClick={() => handleUpdate({ sprintId: props.activeSprint!.id })}
           >
             <LandPlotIcon class="size-4" />
-            Add to {props.activePlan!.name}
+            Add to {props.activeSprint!.name}
           </Button>
         </Show>
 

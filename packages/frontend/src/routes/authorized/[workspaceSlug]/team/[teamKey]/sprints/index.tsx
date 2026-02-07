@@ -8,7 +8,7 @@ import {
   A,
 } from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
-import { plansLoader } from "./index.data";
+import { sprintsLoader } from "./index.data";
 import { useTeamData } from "../../[teamKey]";
 import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
@@ -23,14 +23,14 @@ import {
 } from "@/components/ui/empty";
 import { buttonVariants } from "@/components/ui/button";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
-import type { SerializedIssuePlan } from "@blackwall/database/schema";
+import type { SerializedIssueSprint } from "@blackwall/database/schema";
 import { createColumnHelper, type ColumnDef } from "@tanstack/solid-table";
 import { formatDateShort } from "@/lib/dates";
 import { createDataTable } from "@/components/datatable/create-datatable";
 import { DataTable } from "@/components/datatable/datatable";
 import { api } from "@/lib/api";
 import { toast } from "@/components/custom-ui/toast";
-import { PlanStatusBadge } from "@/components/plans/plan-status-badge";
+import { SprintStatusBadge } from "@/components/sprints/sprint-status-badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,19 +52,19 @@ import {
 import MoreHorizontalIcon from "lucide-solid/icons/more-horizontal";
 import { Button } from "@/components/ui/button";
 
-const archivePlanAction = action(async (workspaceSlug: string, teamKey: string, planId: string) => {
-  await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$delete({
-    param: { teamKey, planId },
+const archiveSprintAction = action(async (workspaceSlug: string, teamKey: string, sprintId: string) => {
+  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$delete({
+    param: { teamKey, sprintId },
   });
 
-  toast.success("Plan archived");
-  throw redirect(`/${workspaceSlug}/team/${teamKey}/plans`);
+  toast.success("Sprint archived");
+  throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
 });
 
-export default function PlansPage() {
+export default function SprintsPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const plans = createAsync(() => plansLoader(params.teamKey!));
+  const sprints = createAsync(() => sprintsLoader(params.teamKey!));
 
   return (
     <>
@@ -76,16 +76,16 @@ export default function PlansPage() {
               {teamData().name}
             </div>
           </BreadcrumbsItem>
-          <BreadcrumbsItem>Plans</BreadcrumbsItem>
+          <BreadcrumbsItem>Sprints</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
       <Show
-        when={plans() && plans()!.length > 0}
-        fallback={<PlanEmpty workspaceSlug={params.workspaceSlug!} teamKey={params.teamKey!} />}
+        when={sprints() && sprints()!.length > 0}
+        fallback={<SprintEmpty workspaceSlug={params.workspaceSlug!} teamKey={params.teamKey!} />}
       >
-        <PlanTable
-          plans={plans()!}
+        <SprintTable
+          sprints={sprints()!}
           workspaceSlug={params.workspaceSlug!}
           teamKey={params.teamKey!}
         />
@@ -94,43 +94,43 @@ export default function PlansPage() {
   );
 }
 
-function PlanEmpty(props: { workspaceSlug: string; teamKey: string }) {
+function SprintEmpty(props: { workspaceSlug: string; teamKey: string }) {
   return (
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <LandPlotIcon />
         </EmptyMedia>
-        <EmptyTitle>No plans yet</EmptyTitle>
+        <EmptyTitle>No sprints yet</EmptyTitle>
         <EmptyDescription>
-          Plans help you organize and track work over time. Create your first plan to get started.
+          Sprints help you organize and track work over time. Create your first sprint to get started.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <A
-          href={`/${props.workspaceSlug}/team/${props.teamKey}/plans/create`}
+          href={`/${props.workspaceSlug}/team/${props.teamKey}/sprints/create`}
           class={buttonVariants()}
         >
-          Create plan
+          Create sprint
         </A>
       </EmptyContent>
     </Empty>
   );
 }
 
-type PlanTableProps = {
-  plans: SerializedIssuePlan[];
+type SprintTableProps = {
+  sprints: SerializedIssueSprint[];
   workspaceSlug: string;
   teamKey: string;
 };
 
-function PlanTable(props: PlanTableProps) {
-  const columnHelper = createColumnHelper<SerializedIssuePlan>();
+function SprintTable(props: SprintTableProps) {
+  const columnHelper = createColumnHelper<SerializedIssueSprint>();
   const teamData = useTeamData();
   const navigate = useNavigate();
-  const archiveAction = useAction(archivePlanAction);
+  const archiveAction = useAction(archiveSprintAction);
   const [archiveDialogOpen, setArchiveDialogOpen] = createSignal(false);
-  const [selectedPlan, setSelectedPlan] = createSignal<SerializedIssuePlan | null>(null);
+  const [selectedSprint, setSelectedSprint] = createSignal<SerializedIssueSprint | null>(null);
 
   const columns = [
     columnHelper.accessor("name", {
@@ -146,24 +146,24 @@ function PlanTable(props: PlanTableProps) {
       id: "status",
       header: "Status",
       cell: (info) => (
-        <PlanStatusBadge plan={info.row.original} activePlanId={teamData().activePlanId} />
+        <SprintStatusBadge sprint={info.row.original} activeSprintId={teamData().activeSprintId} />
       ),
     }),
     columnHelper.accessor("startDate", {
       header: "Start date",
       cell: (info) => formatDateShort(new Date(info.getValue())),
-    }) as ColumnDef<SerializedIssuePlan, string>,
+    }) as ColumnDef<SerializedIssueSprint, string>,
     columnHelper.accessor("endDate", {
       header: "End date",
       cell: (info) => formatDateShort(new Date(info.getValue())),
-    }) as ColumnDef<SerializedIssuePlan, string>,
+    }) as ColumnDef<SerializedIssueSprint, string>,
     columnHelper.display({
       id: "actions",
       header: "Actions",
       cell: (info) => {
-        const plan = info.row.original;
-        const isActive = teamData().activePlanId === plan.id;
-        const isCompleted = Boolean(plan.finishedAt);
+        const sprint = info.row.original;
+        const isActive = teamData().activeSprintId === sprint.id;
+        const isCompleted = Boolean(sprint.finishedAt);
 
         return (
           <DropdownMenu>
@@ -178,14 +178,14 @@ function PlanTable(props: PlanTableProps) {
             <DropdownMenuContent>
               <DropdownMenuItem
                 onSelect={() =>
-                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}`)
+                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}`)
                 }
               >
                 View
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() =>
-                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/edit`)
+                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}/edit`)
                 }
                 disabled={isCompleted}
               >
@@ -195,11 +195,11 @@ function PlanTable(props: PlanTableProps) {
                 <DropdownMenuItem
                   onSelect={() =>
                     navigate(
-                      `/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/complete`,
+                      `/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}/complete`,
                     )
                   }
                 >
-                  Complete plan
+                  Complete sprint
                 </DropdownMenuItem>
               </Show>
               <Show when={!isActive}>
@@ -207,7 +207,7 @@ function PlanTable(props: PlanTableProps) {
                 <DropdownMenuItem
                   variant="destructive"
                   onSelect={() => {
-                    setSelectedPlan(plan);
+                    setSelectedSprint(sprint);
                     setArchiveDialogOpen(true);
                   }}
                 >
@@ -223,10 +223,10 @@ function PlanTable(props: PlanTableProps) {
 
   const datatableProps = createDataTable({
     columns,
-    data: () => props.plans,
+    data: () => props.sprints,
     getLinkProps(row) {
       return {
-        href: `/${props.workspaceSlug}/team/${props.teamKey}/plans/${row.original.id}`,
+        href: `/${props.workspaceSlug}/team/${props.teamKey}/sprints/${row.original.id}`,
       };
     },
   });
@@ -238,9 +238,9 @@ function PlanTable(props: PlanTableProps) {
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
             <AlertDialogMedia class="bg-destructive/50" />
-            <AlertDialogTitle>Archive this plan?</AlertDialogTitle>
+            <AlertDialogTitle>Archive this sprint?</AlertDialogTitle>
             <AlertDialogDescription>
-              This removes the plan and unassigns any issues still attached to it.
+              This removes the sprint and unassigns any issues still attached to it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -249,12 +249,12 @@ function PlanTable(props: PlanTableProps) {
               size="xs"
               variant="destructive"
               action={() =>
-                selectedPlan()
-                  ? archiveAction(props.workspaceSlug, props.teamKey, selectedPlan()!.id)
+                selectedSprint()
+                  ? archiveAction(props.workspaceSlug, props.teamKey, selectedSprint()!.id)
                   : Promise.resolve()
               }
             >
-              Archive plan
+              Archive sprint
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

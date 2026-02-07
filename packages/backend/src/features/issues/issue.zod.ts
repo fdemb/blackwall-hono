@@ -7,7 +7,7 @@ export const listIssuesQuerySchema = z.object({
     .union([z.array(z.enum(issueStatusValues)), z.enum(issueStatusValues)])
     .transform((val) => (Array.isArray(val) ? val : [val]))
     .optional(),
-  onlyOnActivePlan: z.coerce.boolean().optional(),
+  onlyOnActiveSprint: z.coerce.boolean().optional(),
 });
 
 export type ListIssuesQuery = z.infer<typeof listIssuesQuerySchema>;
@@ -19,7 +19,7 @@ export const createIssueSchema = z.object({
     description: z.any(),
     status: z.enum(issueStatusValues).optional().default("backlog"),
     assignedToId: z.string().nullable().optional(),
-    planId: z.string().nullable().optional(),
+    sprintId: z.string().nullable().optional(),
   }),
 });
 
@@ -37,7 +37,7 @@ export const updateIssueSchema = z.object({
   status: z.enum(issueStatusValues).optional(),
   priority: z.enum(issuePriorityValues).optional(),
   assignedToId: z.string().nullable().optional(),
-  planId: z.string().nullable().optional(),
+  sprintId: z.string().nullable().optional(),
   estimationPoints: z.number().int().positive().nullable().optional(),
   order: z.number().optional(),
 });
@@ -50,7 +50,7 @@ export const bulkUpdateIssuesSchema = z.object({
     status: z.enum(issueStatusValues).optional(),
     priority: z.enum(issuePriorityValues).optional(),
     assignedToId: z.string().nullable().optional(),
-    planId: z.string().nullable().optional(),
+    sprintId: z.string().nullable().optional(),
     estimationPoints: z.number().int().positive().nullable().optional(),
   }),
 });
@@ -74,7 +74,7 @@ export const issueSchema = z.object({
   teamId: z.string(),
   createdById: z.string(),
   assignedToId: z.string().nullable().optional(),
-  planId: z.string().nullable().optional(),
+  sprintId: z.string().nullable().optional(),
   estimationPoints: z.number().nullable().optional(),
   order: z.number(),
   createdAt: z.string().optional(),

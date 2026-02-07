@@ -21,7 +21,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "../custom-ui/toast";
 
-type PlanFormProps = {
+type SprintFormProps = {
   workspaceSlug: string;
   teamKey: string;
   team: InferDbType<"team">;
@@ -29,7 +29,7 @@ type PlanFormProps = {
   buttonText: string;
 };
 
-const createPlanAction = action(
+const createSprintAction = action(
   async (
     workspaceSlug: string,
     teamKey: string,
@@ -38,10 +38,10 @@ const createPlanAction = action(
       goal: string | null;
       startDate: string;
       endDate: string;
-      onUndoneIssues: "moveToBacklog" | "moveToNewPlan";
+      onUndoneIssues: "moveToBacklog" | "moveToNewSprint";
     },
   ) => {
-    await api.api["issue-plans"].teams[":teamKey"].plans.$post({
+    await api.api["issue-sprints"].teams[":teamKey"].sprints.$post({
       param: { teamKey },
       json: {
         name: value.name,
@@ -52,14 +52,14 @@ const createPlanAction = action(
       },
     });
 
-    toast.success("Plan created successfully");
+    toast.success("Sprint created successfully");
 
     throw redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
   },
 );
 
-export function PlanForm(props: PlanFormProps) {
-  const _action = useAction(createPlanAction);
+export function SprintForm(props: SprintFormProps) {
+  const _action = useAction(createSprintAction);
 
   const form = useAppForm(() => ({
     defaultValues: {
@@ -67,7 +67,7 @@ export function PlanForm(props: PlanFormProps) {
       goal: null as string | null,
       startDate: today(getLocalTimeZone()).toString(),
       endDate: today(getLocalTimeZone()).add({ weeks: 2 }).toString(),
-      onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewPlan",
+      onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewSprint",
     },
     validators: {
       onSubmit: z
@@ -76,7 +76,7 @@ export function PlanForm(props: PlanFormProps) {
           goal: z.string().nullable(),
           startDate: z.iso.date(),
           endDate: z.iso.date(),
-          onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
+          onUndoneIssues: z.enum(["moveToBacklog", "moveToNewSprint"]),
         })
         .refine((data) => data.endDate >= data.startDate, {
           message: "End date must be on or after start date",
@@ -177,16 +177,16 @@ export function PlanForm(props: PlanFormProps) {
                     />
                   </Field>
                 </FieldLabel>
-                <FieldLabel for="moveToNewPlan">
+                <FieldLabel for="moveToNewSprint">
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldTitle>Move to new plan</FieldTitle>
-                      <FieldDescription>Move undone issues to a new plan.</FieldDescription>
+                      <FieldTitle>Move to new sprint</FieldTitle>
+                      <FieldDescription>Move undone issues to a new sprint.</FieldDescription>
                     </FieldContent>
                     <RadioGroupItem
-                      value="moveToNewPlan"
-                      id="moveToNewPlan"
-                      aria-label="Move to new plan"
+                      value="moveToNewSprint"
+                      id="moveToNewSprint"
+                      aria-label="Move to new sprint"
                     />
                   </Field>
                 </FieldLabel>

@@ -10,7 +10,7 @@ import { issueRoutes } from "./features/issues/issue.routes";
 import { commentRoutes } from "./features/issues/comment.routes";
 import { attachmentRoutes, attachmentDownloadRoutes } from "./features/issues/attachment.routes";
 import { labelRoutes } from "./features/issues/label.routes";
-import { issuePlanRoutes } from "./features/issue-plans/issue-plan.routes";
+import { issueSprintRoutes } from "./features/issue-sprints/issue-sprint.routes";
 import { timeEntryRoutes } from "./features/time-entries/time-entry.routes";
 import { globalSearchRoutes } from "./features/global-search/global-search.routes";
 import { settingsRoutes } from "./features/settings/settings.routes";
@@ -50,7 +50,7 @@ const app = new Hono<AppEnv>()
   .route("/api/issues", attachmentRoutes)
   .route("/api/issues", attachmentDownloadRoutes)
   .route("/api/labels", labelRoutes)
-  .route("/api/issue-plans", issuePlanRoutes)
+  .route("/api/issue-sprints", issueSprintRoutes)
   .route("/api/time-entries", timeEntryRoutes)
   .route("/api/search", globalSearchRoutes)
   .route("/api/invitations", invitationRoutes)

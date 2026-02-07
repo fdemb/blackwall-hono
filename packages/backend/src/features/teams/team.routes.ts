@@ -10,7 +10,7 @@ import {
   teamParamsSchema,
   teamResponseSchema,
   teamListSchema,
-  teamWithPlanListSchema,
+  teamWithSprintListSchema,
   teamUserListSchema,
 } from "./team.zod";
 
@@ -88,24 +88,24 @@ const teamRoutes = new Hono<AppEnv>()
       return c.json({ team });
     })
   /**
-    * GET /with-active-plans - List teams the user belongs to that have active plans.
+    * GET /with-active-sprints - List teams the user belongs to that have active sprints.
     */
   .get(
-    "/with-active-plans",
+    "/with-active-sprints",
     describeRoute({
       tags: ["Teams"],
-      summary: "List teams with active plans",
+      summary: "List teams with active sprints",
       responses: {
         200: {
-          description: "Teams with active plans",
-          content: { "application/json": { schema: resolver(teamWithPlanListSchema) } },
+          description: "Teams with active sprints",
+          content: { "application/json": { schema: resolver(teamWithSprintListSchema) } },
         },
       },
     }),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const teams = await teamService.listTeamsWithActivePlans({
+      const teams = await teamService.listTeamsWithActiveSprints({
         workspaceId: workspace.id,
         userId: user.id,
       });

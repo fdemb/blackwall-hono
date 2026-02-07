@@ -6,32 +6,32 @@ import { Popover } from "@kobalte/core/popover";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import { createMemo, createSignal } from "solid-js";
-import type { SerializedIssuePlan } from "@blackwall/database/schema";
+import type { SerializedIssueSprint } from "@blackwall/database/schema";
 
-const updatePlan = action(async (issueKey: string, planId: string | null) => {
+const updateSprint = action(async (issueKey: string, sprintId: string | null) => {
   await api.api.issues[`:issueKey`].$patch({
     param: { issueKey },
-    json: { planId },
+    json: { sprintId },
   });
   await revalidate("issue");
   await revalidate("board");
 });
 
-type PlanPickerPopoverProps = {
-  planId: string | null;
-  activePlan: SerializedIssuePlan | null;
+type SprintPickerPopoverProps = {
+  sprintId: string | null;
+  activeSprint: SerializedIssueSprint | null;
   issueKey: string;
   workspaceSlug: string;
 };
 
-export function PlanPickerPopover(props: PlanPickerPopoverProps) {
+export function SprintPickerPopover(props: SprintPickerPopoverProps) {
   const [open, setOpen] = createSignal(false);
-  const _update = useAction(updatePlan);
+  const _update = useAction(updateSprint);
 
-  const currentPlan = () =>
-    props.planId && props.activePlan?.id === props.planId ? props.activePlan : null;
+  const currentSprint = () =>
+    props.sprintId && props.activeSprint?.id === props.sprintId ? props.activeSprint : null;
 
-  const planOptions = createMemo(() => {
+  const sprintOptions = createMemo(() => {
     const options: Array<{
       id: string | null;
       label: string;
@@ -39,15 +39,15 @@ export function PlanPickerPopover(props: PlanPickerPopoverProps) {
     }> = [
       {
         id: null,
-        label: "No plan",
+        label: "No sprint",
         icon: () => <LandPlotIcon class="size-4 text-muted-foreground" />,
       },
     ];
 
-    if (props.activePlan) {
+    if (props.activeSprint) {
       options.push({
-        id: props.activePlan.id,
-        label: props.activePlan.name,
+        id: props.activeSprint.id,
+        label: props.activeSprint.name,
         icon: () => <LandPlotIcon class="size-4" />,
       });
     }
@@ -69,14 +69,14 @@ export function PlanPickerPopover(props: PlanPickerPopoverProps) {
         scaleEffect={false}
       >
         <LandPlotIcon class="size-4" />
-        {currentPlan()?.name ?? "No plan"}
+        {currentSprint()?.name ?? "No sprint"}
         <ChevronsUpDownIcon class="size-4" />
       </Popover.Trigger>
 
       <PickerPopover
-        value={props.planId}
+        value={props.sprintId}
         onChange={handleChange}
-        options={planOptions()}
+        options={sprintOptions()}
       />
     </Popover>
   );

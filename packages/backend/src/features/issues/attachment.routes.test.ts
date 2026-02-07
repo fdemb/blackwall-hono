@@ -26,7 +26,7 @@ describe("Attachment Routes", () => {
             description: {},
             status: "backlog",
             assignedToId: null,
-            planId: null,
+            sprintId: null,
           },
         },
       },

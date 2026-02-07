@@ -4,23 +4,23 @@ import type { IssueStatus } from "@blackwall/database/schema";
 
 const ACTIVE_ISSUE_STATUSES = ["to_do", "in_progress"] as IssueStatus[];
 
-export async function listPlansForTeam(input: { teamId: string }) {
-    return db.query.issuePlan.findMany({
+export async function listSprintsForTeam(input: { teamId: string }) {
+    return db.query.issueSprint.findMany({
         where: { teamId: input.teamId },
         orderBy: { createdAt: "desc" },
     });
 }
 
-export async function getPlanById(input: { planId: string; teamId: string }) {
-    return db.query.issuePlan.findFirst({
+export async function getSprintById(input: { sprintId: string; teamId: string }) {
+    return db.query.issueSprint.findFirst({
         where: {
-            id: input.planId,
+            id: input.sprintId,
             teamId: input.teamId,
         },
     });
 }
 
-export async function createPlan(input: {
+export async function createSprint(input: {
     name: string;
     goal: string | null;
     startDate: Date;
@@ -29,7 +29,7 @@ export async function createPlan(input: {
     teamId: string;
 }) {
     const [result] = await db
-        .insert(dbSchema.issuePlan)
+        .insert(dbSchema.issueSprint)
         .values({
             name: input.name,
             goal: input.goal,
@@ -43,48 +43,48 @@ export async function createPlan(input: {
     return result;
 }
 
-export async function updatePlan(input: {
-    planId: string;
+export async function updateSprint(input: {
+    sprintId: string;
     name: string;
     goal: string | null;
     startDate: Date;
     endDate: Date;
 }) {
     const [result] = await db
-        .update(dbSchema.issuePlan)
+        .update(dbSchema.issueSprint)
         .set({
             name: input.name,
             goal: input.goal,
             startDate: input.startDate,
             endDate: input.endDate,
         })
-        .where(eq(dbSchema.issuePlan.id, input.planId))
+        .where(eq(dbSchema.issueSprint.id, input.sprintId))
         .returning();
 
     return result;
 }
 
-export async function completePlan(input: { planId: string }) {
+export async function completeSprint(input: { sprintId: string }) {
     await db
-        .update(dbSchema.issuePlan)
+        .update(dbSchema.issueSprint)
         .set({ finishedAt: sql`(unixepoch() * 1000)` })
-        .where(eq(dbSchema.issuePlan.id, input.planId));
+        .where(eq(dbSchema.issueSprint.id, input.sprintId));
 }
 
-export async function setActivePlanOnTeam(input: {
+export async function setActiveSprintOnTeam(input: {
     teamId: string;
-    planId: string | null;
+    sprintId: string | null;
 }) {
     await db
         .update(dbSchema.team)
-        .set({ activePlanId: input.planId })
+        .set({ activeSprintId: input.sprintId })
         .where(eq(dbSchema.team.id, input.teamId));
 }
 
-export async function moveActiveIssuesToBacklog(input: { teamId: string; planId?: string }) {
-    const whereConditions = input.planId
+export async function moveActiveIssuesToBacklog(input: { teamId: string; sprintId?: string }) {
+    const whereConditions = input.sprintId
         ? and(
-            eq(dbSchema.issue.planId, input.planId),
+            eq(dbSchema.issue.sprintId, input.sprintId),
             inArray(dbSchema.issue.status, ACTIVE_ISSUE_STATUSES),
         )
         : and(
@@ -95,20 +95,20 @@ export async function moveActiveIssuesToBacklog(input: { teamId: string; planId?
     await db
         .update(dbSchema.issue)
         .set({
-            planId: null,
+            sprintId: null,
             status: "backlog",
         })
         .where(whereConditions);
 }
 
-export async function moveActiveIssuesToPlan(input: {
+export async function moveActiveIssuesToSprint(input: {
     teamId: string;
-    fromPlanId?: string;
-    toPlanId: string;
+    fromSprintId?: string;
+    toSprintId: string;
 }) {
-    const whereConditions = input.fromPlanId
+    const whereConditions = input.fromSprintId
         ? and(
-            eq(dbSchema.issue.planId, input.fromPlanId),
+            eq(dbSchema.issue.sprintId, input.fromSprintId),
             inArray(dbSchema.issue.status, ACTIVE_ISSUE_STATUSES),
         )
         : and(
@@ -118,14 +118,14 @@ export async function moveActiveIssuesToPlan(input: {
 
     await db
         .update(dbSchema.issue)
-        .set({ planId: input.toPlanId })
+        .set({ sprintId: input.toSprintId })
         .where(whereConditions);
 }
 
-export async function moveActiveIssuesToUnplanned(input: { teamId: string; planId?: string }) {
-    const whereConditions = input.planId
+export async function moveActiveIssuesToUnsprinted(input: { teamId: string; sprintId?: string }) {
+    const whereConditions = input.sprintId
         ? and(
-            eq(dbSchema.issue.planId, input.planId),
+            eq(dbSchema.issue.sprintId, input.sprintId),
             inArray(dbSchema.issue.status, ACTIVE_ISSUE_STATUSES),
         )
         : and(
@@ -135,31 +135,31 @@ export async function moveActiveIssuesToUnplanned(input: { teamId: string; planI
 
     await db
         .update(dbSchema.issue)
-        .set({ planId: null })
+        .set({ sprintId: null })
         .where(whereConditions);
 }
 
-export async function clearPlanFromIssues(input: { planId: string }) {
+export async function clearSprintFromIssues(input: { sprintId: string }) {
     await db
         .update(dbSchema.issue)
-        .set({ planId: null })
-        .where(eq(dbSchema.issue.planId, input.planId));
+        .set({ sprintId: null })
+        .where(eq(dbSchema.issue.sprintId, input.sprintId));
 }
 
-export async function deletePlan(input: { planId: string }) {
-    await db.delete(dbSchema.issuePlan).where(eq(dbSchema.issuePlan.id, input.planId));
+export async function deleteSprint(input: { sprintId: string }) {
+    await db.delete(dbSchema.issueSprint).where(eq(dbSchema.issueSprint.id, input.sprintId));
 }
 
-export const issuePlanData = {
-    listPlansForTeam,
-    getPlanById,
-    createPlan,
-    updatePlan,
-    completePlan,
-    setActivePlanOnTeam,
+export const issueSprintData = {
+    listSprintsForTeam,
+    getSprintById,
+    createSprint,
+    updateSprint,
+    completeSprint,
+    setActiveSprintOnTeam,
     moveActiveIssuesToBacklog,
-    moveActiveIssuesToPlan,
-    moveActiveIssuesToUnplanned,
-    clearPlanFromIssues,
-    deletePlan,
+    moveActiveIssuesToSprint,
+    moveActiveIssuesToUnsprinted,
+    clearSprintFromIssues,
+    deleteSprint,
 };

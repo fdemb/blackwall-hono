@@ -105,7 +105,7 @@ export default function IssueDetailPage() {
                 teamKey={data().issue.team?.key ?? ""}
                 labels={data().labels}
                 assignableUsers={data().assignableUsers}
-                activePlan={data().issue.team?.activePlan ?? null}
+                activeSprint={data().issue.team?.activeSprint ?? null}
               />
             )}
           </Show>

@@ -5,8 +5,8 @@ import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
 import { team } from "./team.schema";
 
-export const issuePlan = sqliteTable(
-  "issue_plan",
+export const issueSprint = sqliteTable(
+  "issue_sprint",
   {
     id: text()
       .primaryKey()
@@ -26,18 +26,18 @@ export const issuePlan = sqliteTable(
       mode: "timestamp_ms",
     }).notNull(),
 
-    // when the plan was finished - not necessarily the same as endDate
+    // when the sprint was finished - not necessarily the same as endDate
     finishedAt: integer({
       mode: "timestamp_ms",
     }),
     ...lifecycleTimestamps,
   },
   (table) => [
-    index("issue_plan_created_by_id_idx").on(table.createdById),
-    index("issue_plan_team_id_idx").on(table.teamId),
+    index("issue_sprint_created_by_id_idx").on(table.createdById),
+    index("issue_sprint_team_id_idx").on(table.teamId),
   ],
 );
 
-export type IssuePlan = typeof issuePlan.$inferSelect;
-export type NewIssuePlan = typeof issuePlan.$inferInsert;
-export type SerializedIssuePlan = JSONParsed<IssuePlan>;
+export type IssueSprint = typeof issueSprint.$inferSelect;
+export type NewIssueSprint = typeof issueSprint.$inferInsert;
+export type SerializedIssueSprint = JSONParsed<IssueSprint>;

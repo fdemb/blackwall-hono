@@ -1,6 +1,6 @@
 export * from "./auth.schema";
 export * from "./color.enum.schema";
-export * from "./issue-plan.schema";
+export * from "./issue-sprint.schema";
 export * from "./issue.schema";
 export * from "./job.schema";
 export * from "./label.schema";

@@ -102,11 +102,11 @@ async function getPreferredTeam(input: { workspaceId: string; userId: string }) 
 }
 
 /**
- * List all teams the user belongs to that have active plans.
+ * List all teams the user belongs to that have active sprints.
  * @param input workspace id and user id
- * @returns list of teams with active plans
+ * @returns list of teams with active sprints
  */
-async function listTeamsWithActivePlans(input: { workspaceId: string; userId: string }) {
+async function listTeamsWithActiveSprints(input: { workspaceId: string; userId: string }) {
   return teamData.listUserTeams(input);
 }
 
@@ -119,5 +119,5 @@ export const teamService = {
   getTeamByKey,
   listTeamUsers,
   getPreferredTeam,
-  listTeamsWithActivePlans,
+  listTeamsWithActiveSprints,
 };

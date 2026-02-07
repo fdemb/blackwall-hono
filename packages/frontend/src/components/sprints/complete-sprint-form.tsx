@@ -17,45 +17,45 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "../custom-ui/toast";
 
-type CompletePlanFormProps = {
+type CompleteSprintFormProps = {
   workspaceSlug: string;
   teamKey: string;
   team: InferDbType<"team">;
-  plan: InferDbType<"issuePlan">;
+  sprint: InferDbType<"issueSprint">;
 };
 
-const completePlanAction = action(
+const completeSprintAction = action(
   async (
     workspaceSlug: string,
     teamKey: string,
-    planId: string,
-    value: { onUndoneIssues: "moveToBacklog" | "moveToNewPlan" },
+    sprintId: string,
+    value: { onUndoneIssues: "moveToBacklog" | "moveToNewSprint" },
   ) => {
-    await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].complete.$post({
-      param: { teamKey, planId },
+    await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].complete.$post({
+      param: { teamKey, sprintId },
       json: value,
     });
 
-    toast.success("Plan completed successfully");
+    toast.success("Sprint completed successfully");
     throw redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
   },
 );
 
-export function CompletePlanForm(props: CompletePlanFormProps) {
-  const _action = useAction(completePlanAction);
-  const endDateInFuture = () => new Date(props.plan.endDate).getTime() > Date.now();
+export function CompleteSprintForm(props: CompleteSprintFormProps) {
+  const _action = useAction(completeSprintAction);
+  const endDateInFuture = () => new Date(props.sprint.endDate).getTime() > Date.now();
 
   const form = useAppForm(() => ({
     defaultValues: {
-      onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewPlan",
+      onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewSprint",
     },
     validators: {
       onSubmit: z.object({
-        onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
+        onUndoneIssues: z.enum(["moveToBacklog", "moveToNewSprint"]),
       }),
     },
     onSubmit: async ({ value }) => {
-      await _action(props.workspaceSlug, props.teamKey, props.plan.id, value);
+      await _action(props.workspaceSlug, props.teamKey, props.sprint.id, value);
     },
   }));
 
@@ -64,14 +64,14 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
       <div class="flex flex-col gap-3 items-center">
         <TeamAvatar team={props.team} size="md" />
         <h1 class="text-xl sm:text-2xl font-medium text-center">
-          Complete plan for {props.team.name}
+          Complete sprint for {props.team.name}
         </h1>
       </div>
 
       <div class="flex flex-col gap-4 text-center">
         <p class="text-muted-foreground">
-          You are about to complete the plan "{props.plan.name}". After completing, you can create a
-          new plan for this team.
+          You are about to complete the sprint "{props.sprint.name}". After completing, you can create a
+          new sprint for this team.
         </p>
         <p class="text-muted-foreground text-sm">
           Choose what happens to any undone issues before you finish.
@@ -99,7 +99,7 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
                     <FieldContent>
                       <FieldTitle>Move to backlog</FieldTitle>
                       <FieldDescription>
-                        Move undone issues to the backlog for future planning.
+                        Move undone issues to the backlog for future sprinting.
                       </FieldDescription>
                     </FieldContent>
                     <RadioGroupItem
@@ -109,18 +109,18 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
                     />
                   </Field>
                 </FieldLabel>
-                <FieldLabel for="completeMoveToNewPlan">
+                <FieldLabel for="completeMoveToNewSprint">
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldTitle>Keep for next plan</FieldTitle>
+                      <FieldTitle>Keep for next sprint</FieldTitle>
                       <FieldDescription>
-                        Leave undone issues active so they can be pulled into the next plan.
+                        Leave undone issues active so they can be pulled into the next sprint.
                       </FieldDescription>
                     </FieldContent>
                     <RadioGroupItem
-                      value="moveToNewPlan"
-                      id="completeMoveToNewPlan"
-                      aria-label="Keep for next plan"
+                      value="moveToNewSprint"
+                      id="completeMoveToNewSprint"
+                      aria-label="Keep for next sprint"
                     />
                   </Field>
                 </FieldLabel>
@@ -134,11 +134,11 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
             <div class="flex flex-col gap-2 items-center mt-2">
               {endDateInFuture() && (
                 <p class="text-sm text-muted-foreground text-center">
-                  This plan ends in the future. Update the end date before completing.
+                  This sprint ends in the future. Update the end date before completing.
                 </p>
               )}
               <Button type="submit" size="lg" disabled={!state().canSubmit || endDateInFuture()}>
-                Complete plan
+                Complete sprint
               </Button>
             </div>
           )}

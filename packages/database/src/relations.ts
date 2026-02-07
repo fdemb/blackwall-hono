@@ -12,9 +12,9 @@ export const relations = defineRelations(schema, (r) => ({
   workspace: {
     labels: r.many.label(),
     issueChangeEvents: r.many.issueChangeEvent(),
-    issuePlans: r.many.issuePlan({
+    issueSprints: r.many.issueSprint({
       from: r.workspace.id.through(r.team.workspaceId),
-      to: r.issuePlan.id.through(r.team.activePlanId),
+      to: r.issueSprint.id.through(r.team.activeSprintId),
     }),
     teams: r.many.team({
       alias: "workspace_id_team_id_via_user",
@@ -58,9 +58,9 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.issue.workspaceId,
       to: r.workspace.id,
     }),
-    issuePlan: r.one.issuePlan({
-      from: r.issue.planId,
-      to: r.issuePlan.id,
+    issueSprint: r.one.issueSprint({
+      from: r.issue.sprintId,
+      to: r.issueSprint.id,
     }),
   },
   issueComment: {
@@ -148,9 +148,9 @@ export const relations = defineRelations(schema, (r) => ({
       alias: "team_id_user_id_via_userOnTeam",
     }),
     issues: r.many.issue(),
-    activePlan: r.one.issuePlan({
-      from: r.team.activePlanId,
-      to: r.issuePlan.id,
+    activeSprint: r.one.issueSprint({
+      from: r.team.activeSprintId,
+      to: r.issueSprint.id,
     }),
   },
   account: {
@@ -165,7 +165,7 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.user.id,
     }),
   },
-  issuePlan: {
+  issueSprint: {
     workspaces: r.many.workspace(),
     issues: r.many.issue(),
   },

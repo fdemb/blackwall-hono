@@ -1,6 +1,6 @@
 import { action, createAsync, redirect, useAction, useParams, A } from "@solidjs/router";
 import { Show, createMemo, createSignal } from "solid-js";
-import { planDetailLoader } from "./index.data";
+import { sprintDetailLoader } from "./index.data";
 import { useTeamData } from "../../../[teamKey]";
 import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
@@ -33,15 +33,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/custom-ui/toast";
-import { PlanStatusBadge } from "@/components/plans/plan-status-badge";
+import { SprintStatusBadge } from "@/components/sprints/sprint-status-badge";
 
-const archivePlanAction = action(async (workspaceSlug: string, teamKey: string, planId: string) => {
-  await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$delete({
-    param: { teamKey, planId },
+const archiveSprintAction = action(async (workspaceSlug: string, teamKey: string, sprintId: string) => {
+  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$delete({
+    param: { teamKey, sprintId },
   });
 
-  toast.success("Plan archived");
-  throw redirect(`/${workspaceSlug}/team/${teamKey}/plans`);
+  toast.success("Sprint archived");
+  throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
 });
 
 function calculateEstimationStats(issues: IssueForDataTable[]) {
@@ -68,16 +68,16 @@ function calculateEstimationStats(issues: IssueForDataTable[]) {
   };
 }
 
-export default function PlanDetailPage() {
+export default function SprintDetailPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const data = createAsync(() => planDetailLoader(params.teamKey!, params.planId!));
-  const archiveAction = useAction(archivePlanAction);
+  const data = createAsync(() => sprintDetailLoader(params.teamKey!, params.sprintId!));
+  const archiveAction = useAction(archiveSprintAction);
   const [archiveDialogOpen, setArchiveDialogOpen] = createSignal(false);
 
-  const plan = () => data()?.plan;
-  const isActivePlan = () => teamData().activePlanId === plan()!.id;
-  const isCompleted = () => Boolean(plan()!.finishedAt);
+  const sprint = () => data()?.sprint;
+  const isActiveSprint = () => teamData().activeSprintId === sprint()!.id;
+  const isCompleted = () => Boolean(sprint()!.finishedAt);
   const issues = () => (data()?.issues ?? []) as IssueForDataTable[];
   const stats = () => calculateEstimationStats(issues());
   const rowSelection = createRowSelection();
@@ -91,7 +91,7 @@ export default function PlanDetailPage() {
   });
 
   return (
-    <Show when={plan()}>
+    <Show when={sprint()}>
       <>
         <PageHeader>
           <Breadcrumbs>
@@ -107,12 +107,12 @@ export default function PlanDetailPage() {
             </BreadcrumbsItem>
             <BreadcrumbsItem
               linkProps={{
-                href: `/${params.workspaceSlug}/team/${params.teamKey}/plans`,
+                href: `/${params.workspaceSlug}/team/${params.teamKey}/sprints`,
               }}
             >
-              Plans
+              Sprints
             </BreadcrumbsItem>
-            <BreadcrumbsItem>{plan()!.name}</BreadcrumbsItem>
+            <BreadcrumbsItem>{sprint()!.name}</BreadcrumbsItem>
           </Breadcrumbs>
         </PageHeader>
 
@@ -120,27 +120,27 @@ export default function PlanDetailPage() {
           <div class="px-6 py-4 border-b flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <h1 class="text-lg font-semibold">{plan()!.name}</h1>
-                <PlanStatusBadge plan={plan()!} activePlanId={teamData().activePlanId} />
+                <h1 class="text-lg font-semibold">{sprint()!.name}</h1>
+                <SprintStatusBadge sprint={sprint()!} activeSprintId={teamData().activeSprintId} />
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!isCompleted()}>
                   <A
                     class={buttonVariants({ variant: "outline", size: "sm" })}
-                    href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${params.planId}/edit`}
+                    href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/edit`}
                   >
                     Edit
                   </A>
                 </Show>
-                <Show when={isActivePlan() && !isCompleted()}>
+                <Show when={isActiveSprint() && !isCompleted()}>
                   <A
                     class={buttonVariants({ variant: "default", size: "sm" })}
-                    href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${params.planId}/complete`}
+                    href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/complete`}
                   >
-                    Complete plan
+                    Complete sprint
                   </A>
                 </Show>
-                <Show when={!isActivePlan()}>
+                <Show when={!isActiveSprint()}>
                   <Button variant="outline" size="sm" onClick={() => setArchiveDialogOpen(true)}>
                     Archive
                   </Button>
@@ -152,14 +152,14 @@ export default function PlanDetailPage() {
               <div class="flex items-center gap-1.5">
                 <CalendarIcon class="size-4" />
                 <span>
-                  {formatDateShort(new Date(plan()!.startDate))} –{" "}
-                  {formatDateShort(new Date(plan()!.endDate))}
+                  {formatDateShort(new Date(sprint()!.startDate))} –{" "}
+                  {formatDateShort(new Date(sprint()!.endDate))}
                 </span>
               </div>
-              <Show when={plan()!.goal}>
+              <Show when={sprint()!.goal}>
                 <div class="flex items-center gap-1.5">
                   <TargetIcon class="size-4" />
-                  <span>{plan()!.goal}</span>
+                  <span>{sprint()!.goal}</span>
                 </div>
               </Show>
             </div>
@@ -187,10 +187,10 @@ export default function PlanDetailPage() {
           <IssueSelectionMenu
             selectedIssues={selectedIssues()}
             onClearSelection={rowSelection.clearSelection}
-            activePlan={teamData().activePlanId === plan()!.id ? plan()! : undefined}
+            activeSprint={teamData().activeSprintId === sprint()!.id ? sprint()! : undefined}
           />
 
-          <Show when={issues().length > 0} fallback={<PlanIssuesEmpty />}>
+          <Show when={issues().length > 0} fallback={<SprintIssuesEmpty />}>
             <IssueDataTable
               issues={issues()}
               workspaceSlug={params.workspaceSlug!}
@@ -203,9 +203,9 @@ export default function PlanDetailPage() {
           <AlertDialogContent size="sm">
             <AlertDialogHeader>
               <AlertDialogMedia class="bg-destructive/50" />
-              <AlertDialogTitle>Archive this plan?</AlertDialogTitle>
+              <AlertDialogTitle>Archive this sprint?</AlertDialogTitle>
               <AlertDialogDescription>
-                This removes the plan and unassigns any issues still attached to it.
+                This removes the sprint and unassigns any issues still attached to it.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -213,9 +213,9 @@ export default function PlanDetailPage() {
               <AlertDialogAction
                 size="xs"
                 variant="destructive"
-                action={() => archiveAction(params.workspaceSlug!, params.teamKey!, plan()!.id)}
+                action={() => archiveAction(params.workspaceSlug!, params.teamKey!, sprint()!.id)}
               >
-                Archive plan
+                Archive sprint
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -225,16 +225,16 @@ export default function PlanDetailPage() {
   );
 }
 
-function PlanIssuesEmpty() {
+function SprintIssuesEmpty() {
   return (
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <CircleDotIcon />
         </EmptyMedia>
-        <EmptyTitle>No issues in this plan</EmptyTitle>
+        <EmptyTitle>No issues in this sprint</EmptyTitle>
         <EmptyDescription>
-          Add issues to this plan to track progress. You can assign existing issues or create new
+          Add issues to this sprint to track progress. You can assign existing issues or create new
           ones.
         </EmptyDescription>
       </EmptyHeader>

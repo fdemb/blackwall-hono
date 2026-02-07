@@ -1,21 +1,21 @@
 import { createAsync, useParams } from "@solidjs/router";
 import { Show } from "solid-js";
-import { planDetailLoader } from "./index.data";
+import { sprintDetailLoader } from "./index.data";
 import { useTeamData } from "../../../[teamKey]";
-import { EditPlanForm } from "@/components/plans/edit-plan-form";
+import { EditSprintForm } from "@/components/sprints/edit-sprint-form";
 import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 
-export default function EditPlanPage() {
+export default function EditSprintPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const data = createAsync(() => planDetailLoader(params.teamKey!, params.planId!));
-  const plan = () => data()?.plan;
+  const data = createAsync(() => sprintDetailLoader(params.teamKey!, params.sprintId!));
+  const sprint = () => data()?.sprint;
 
   return (
-    <Show when={plan()}>
+    <Show when={sprint()}>
       <>
         <PageHeader>
           <Breadcrumbs>
@@ -30,27 +30,27 @@ export default function EditPlanPage() {
               </div>
             </BreadcrumbsItem>
             <BreadcrumbsItem
-              linkProps={{ href: `/${params.workspaceSlug}/team/${params.teamKey}/plans` }}
+              linkProps={{ href: `/${params.workspaceSlug}/team/${params.teamKey}/sprints` }}
             >
-              Plans
+              Sprints
             </BreadcrumbsItem>
             <BreadcrumbsItem
               linkProps={{
-                href: `/${params.workspaceSlug}/team/${params.teamKey}/plans/${params.planId}`,
+                href: `/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}`,
               }}
             >
-              {plan()!.name}
+              {sprint()!.name}
             </BreadcrumbsItem>
             <BreadcrumbsItem>Edit</BreadcrumbsItem>
           </Breadcrumbs>
         </PageHeader>
 
         <ScrollContainer>
-          <EditPlanForm
+          <EditSprintForm
             workspaceSlug={params.workspaceSlug!}
             teamKey={params.teamKey!}
             team={teamData()}
-            plan={plan()!}
+            sprint={sprint()!}
           />
         </ScrollContainer>
       </>

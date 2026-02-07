@@ -229,10 +229,10 @@ describe("Team Routes", () => {
     });
   });
 
-  describe("GET /teams/with-active-plans", () => {
-    it("should return teams with active plans", async () => {
+  describe("GET /teams/with-active-sprints", () => {
+    it("should return teams with active sprints", async () => {
       const { client, headers } = getCtx();
-      const res = await client.api.teams["with-active-plans"].$get({}, { headers: headers() });
+      const res = await client.api.teams["with-active-sprints"].$get({}, { headers: headers() });
 
       expect(res.status).toBe(200);
       const json = await res.json();

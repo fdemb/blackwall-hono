@@ -15,7 +15,7 @@ import { Dynamic } from "solid-js/web";
 
 export type IssueForDataTable = InferDbType<
   "issue",
-  { assignedTo: true; labels: true; issuePlan: true; team: true }
+  { assignedTo: true; labels: true; issueSprint: true; team: true }
 >;
 
 export type IssueDataTableProps = {
@@ -76,20 +76,20 @@ export function IssueDataTable(props: IssueDataTableProps) {
         </div>
       ),
     }),
-    columnHelper.accessor("issuePlan", {
-      header: "Plan",
+    columnHelper.accessor("issueSprint", {
+      header: "Sprint",
       meta: { shrink: true },
       cell: (info) => (
         <Show when={info.getValue()}>
-          {(plan) => (
+          {(sprint) => (
             <A
-              href={`/${props.workspaceSlug}/team/${info.row.original.team?.key}/plans/${plan().id}`}
+              href={`/${props.workspaceSlug}/team/${info.row.original.team?.key}/sprints/${sprint().id}`}
               class="flex items-center gap-1 px-1.5 py-0.5 text-xs bg-muted text-muted-foreground rounded-sm border whitespace-nowrap hover:bg-accent transition-colors"
-              title={plan().name}
+              title={sprint().name}
               onClick={(e) => e.stopPropagation()}
             >
               <LandPlotIcon class="size-3 shrink-0" />
-              <span class="truncate max-w-20">{plan().name}</span>
+              <span class="truncate max-w-20">{sprint().name}</span>
             </A>
           )}
         </Show>

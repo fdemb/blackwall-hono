@@ -3,7 +3,7 @@ import { index, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/s
 import type { JSONParsed } from "hono/utils/types";
 import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
-import { issuePlan } from "./issue-plan.schema";
+import { issueSprint } from "./issue-sprint.schema";
 import { workspace } from "./workspace.schema";
 
 // Team table
@@ -14,7 +14,7 @@ export const team = sqliteTable(
       .primaryKey()
       .$defaultFn(() => randomUUIDv7()),
     name: text().notNull(),
-    activePlanId: text().references(() => issuePlan.id), // issue plan that is active right now
+    activeSprintId: text().references(() => issueSprint.id), // issue sprint that is active right now
     workspaceId: text()
       .notNull()
       .references(() => workspace.id),
@@ -24,7 +24,7 @@ export const team = sqliteTable(
   },
   (table) => [
     uniqueIndex("team_workspace_id_key_unique").on(table.workspaceId, table.key),
-    index("team_active_plan_id_idx").on(table.activePlanId),
+    index("team_active_sprint_id_idx").on(table.activeSprintId),
   ],
 );
 

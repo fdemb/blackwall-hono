@@ -58,7 +58,7 @@ async function listIssuesForTeam(input: {
   teamKey: string;
   userId: string;
   statusFilters?: IssueStatus[];
-  onlyOnActivePlan?: boolean;
+  onlyOnActiveSprint?: boolean;
 }) {
   const team = await getTeamForUserOrThrow({
     workspaceId: input.workspaceId,
@@ -66,11 +66,11 @@ async function listIssuesForTeam(input: {
     userId: input.userId,
   });
 
-  if (input.onlyOnActivePlan && team.activePlanId) {
-    return issueData.listIssuesInPlan({
+  if (input.onlyOnActiveSprint && team.activeSprintId) {
+    return issueData.listIssuesInSprint({
       workspaceId: input.workspaceId,
       teamId: team.id,
-      planId: team.activePlanId,
+      sprintId: team.activeSprintId,
       statusFilters: input.statusFilters,
     });
   }

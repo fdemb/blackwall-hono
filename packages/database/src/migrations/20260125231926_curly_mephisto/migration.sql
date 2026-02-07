@@ -1,4 +1,4 @@
-CREATE TABLE `issue_plan` (
+CREATE TABLE `issue_sprint` (
 	`id` text PRIMARY KEY,
 	`created_by_id` text NOT NULL,
 	`name` text NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE `issue_plan` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
-	CONSTRAINT `fk_issue_plan_created_by_id_user_id_fk` FOREIGN KEY (`created_by_id`) REFERENCES `user`(`id`),
-	CONSTRAINT `fk_issue_plan_team_id_team_id_fk` FOREIGN KEY (`team_id`) REFERENCES `team`(`id`)
+	CONSTRAINT `fk_issue_sprint_created_by_id_user_id_fk` FOREIGN KEY (`created_by_id`) REFERENCES `user`(`id`),
+	CONSTRAINT `fk_issue_sprint_team_id_team_id_fk` FOREIGN KEY (`team_id`) REFERENCES `team`(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `job` (
@@ -68,7 +68,7 @@ CREATE TABLE `issue` (
 	`team_id` text NOT NULL,
 	`created_by_id` text NOT NULL,
 	`assigned_to_id` text,
-	`plan_id` text,
+	`sprint_id` text,
 	`key_number` integer NOT NULL,
 	`summary` text NOT NULL,
 	`status` text DEFAULT 'to_do' NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE `issue` (
 	CONSTRAINT `fk_issue_team_id_team_id_fk` FOREIGN KEY (`team_id`) REFERENCES `team`(`id`),
 	CONSTRAINT `fk_issue_created_by_id_user_id_fk` FOREIGN KEY (`created_by_id`) REFERENCES `user`(`id`),
 	CONSTRAINT `fk_issue_assigned_to_id_user_id_fk` FOREIGN KEY (`assigned_to_id`) REFERENCES `user`(`id`),
-	CONSTRAINT `fk_issue_plan_id_issue_plan_id_fk` FOREIGN KEY (`plan_id`) REFERENCES `issue_plan`(`id`)
+	CONSTRAINT `fk_issue_sprint_id_issue_sprint_id_fk` FOREIGN KEY (`sprint_id`) REFERENCES `issue_sprint`(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `issue_attachment` (
@@ -167,14 +167,14 @@ CREATE TABLE `session` (
 CREATE TABLE `team` (
 	`id` text PRIMARY KEY,
 	`name` text NOT NULL,
-	`active_plan_id` text,
+	`active_sprint_id` text,
 	`workspace_id` text NOT NULL,
 	`key` text NOT NULL,
 	`avatar` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
-	CONSTRAINT `fk_team_active_plan_id_issue_plan_id_fk` FOREIGN KEY (`active_plan_id`) REFERENCES `issue_plan`(`id`),
+	CONSTRAINT `fk_team_active_sprint_id_issue_sprint_id_fk` FOREIGN KEY (`active_sprint_id`) REFERENCES `issue_sprint`(`id`),
 	CONSTRAINT `fk_team_workspace_id_workspace_id_fk` FOREIGN KEY (`workspace_id`) REFERENCES `workspace`(`id`)
 );
 --> statement-breakpoint

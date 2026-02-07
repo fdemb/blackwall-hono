@@ -82,7 +82,7 @@ export const teamSettingsSchema = z.object({
   name: z.string(),
   key: z.string(),
   workspaceId: z.string(),
-  activePlanId: z.string().nullable().optional(),
+  activeSprintId: z.string().nullable().optional(),
   createdAt: z.any(),
   updatedAt: z.any(),
 });

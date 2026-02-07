@@ -6,7 +6,7 @@ export const boardLoader = query(async (teamKey: string) => {
     query: {
       teamKey,
       statusFilters: ["to_do", "in_progress", "done"],
-      onlyOnActivePlan: "true",
+      onlyOnActiveSprint: "true",
     },
   });
 

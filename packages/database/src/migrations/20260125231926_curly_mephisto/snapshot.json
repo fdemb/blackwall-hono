@@ -7,7 +7,7 @@
   ],
   "ddl": [
     {
-      "name": "issue_plan",
+      "name": "issue_sprint",
       "entityType": "tables"
     },
     {
@@ -90,7 +90,7 @@
       "generated": null,
       "name": "id",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "text",
@@ -100,7 +100,7 @@
       "generated": null,
       "name": "created_by_id",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "text",
@@ -110,7 +110,7 @@
       "generated": null,
       "name": "name",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "text",
@@ -120,7 +120,7 @@
       "generated": null,
       "name": "goal",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "text",
@@ -130,7 +130,7 @@
       "generated": null,
       "name": "team_id",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "integer",
@@ -140,7 +140,7 @@
       "generated": null,
       "name": "start_date",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "integer",
@@ -150,7 +150,7 @@
       "generated": null,
       "name": "end_date",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "integer",
@@ -160,7 +160,7 @@
       "generated": null,
       "name": "finished_at",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "integer",
@@ -170,7 +170,7 @@
       "generated": null,
       "name": "created_at",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "integer",
@@ -180,7 +180,7 @@
       "generated": null,
       "name": "updated_at",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "integer",
@@ -190,7 +190,7 @@
       "generated": null,
       "name": "deleted_at",
       "entityType": "columns",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "type": "text",
@@ -548,7 +548,7 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "plan_id",
+      "name": "sprint_id",
       "entityType": "columns",
       "table": "issue"
     },
@@ -1158,7 +1158,7 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "active_plan_id",
+      "name": "active_sprint_id",
       "entityType": "columns",
       "table": "team"
     },
@@ -1543,9 +1543,9 @@
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_issue_plan_created_by_id_user_id_fk",
+      "name": "fk_issue_sprint_created_by_id_user_id_fk",
       "entityType": "fks",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "columns": [
@@ -1558,9 +1558,9 @@
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_issue_plan_team_id_team_id_fk",
+      "name": "fk_issue_sprint_team_id_team_id_fk",
       "entityType": "fks",
-      "table": "issue_plan"
+      "table": "issue_sprint"
     },
     {
       "columns": [
@@ -1699,16 +1699,16 @@
     },
     {
       "columns": [
-        "plan_id"
+        "sprint_id"
       ],
-      "tableTo": "issue_plan",
+      "tableTo": "issue_sprint",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_issue_plan_id_issue_plan_id_fk",
+      "name": "fk_issue_sprint_id_issue_sprint_id_fk",
       "entityType": "fks",
       "table": "issue"
     },
@@ -1879,16 +1879,16 @@
     },
     {
       "columns": [
-        "active_plan_id"
+        "active_sprint_id"
       ],
-      "tableTo": "issue_plan",
+      "tableTo": "issue_sprint",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_team_active_plan_id_issue_plan_id_fk",
+      "name": "fk_team_active_sprint_id_issue_sprint_id_fk",
       "entityType": "fks",
       "table": "team"
     },
@@ -2072,8 +2072,8 @@
         "id"
       ],
       "nameExplicit": false,
-      "name": "issue_plan_pk",
-      "table": "issue_plan",
+      "name": "issue_sprint_pk",
+      "table": "issue_sprint",
       "entityType": "pks"
     },
     {

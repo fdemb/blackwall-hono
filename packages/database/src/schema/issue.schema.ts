@@ -12,7 +12,7 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from "driz
 import type { JSONParsed } from "hono/utils/types";
 import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
-import { issuePlan } from "./issue-plan.schema";
+import { issueSprint } from "./issue-sprint.schema";
 import { team } from "./team.schema";
 import { workspace } from "./workspace.schema";
 
@@ -94,7 +94,7 @@ export const issue = sqliteTable(
       .notNull()
       .references(() => user.id),
     assignedToId: text("assigned_to_id").references(() => user.id),
-    planId: text("plan_id").references(() => issuePlan.id),
+    sprintId: text("sprint_id").references(() => issueSprint.id),
     keyNumber: integer("key_number").notNull(),
     summary: text().notNull(),
     status: text({ enum: issueStatusValues }).notNull().default("to_do"),
@@ -110,7 +110,7 @@ export const issue = sqliteTable(
     index("issue_team_id_idx").on(table.teamId),
     index("issue_created_by_id_idx").on(table.createdById),
     index("issue_assigned_to_id_idx").on(table.assignedToId),
-    index("issue_plan_id_idx").on(table.planId),
+    index("issue_sprint_id_idx").on(table.sprintId),
   ],
 );
 

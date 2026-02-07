@@ -34,7 +34,7 @@ type CreateDialogProps = {
   status?: IssueStatus;
   teamKey?: string;
   assignedToId?: string;
-  planId?: string | null;
+  sprintId?: string | null;
   global?: boolean;
   buttonSize?: "default" | "xxs" | "xs" | "sm" | "lg";
 };
@@ -132,7 +132,7 @@ function CreateDialogContent(props: CreateDialogProps) {
       description: undefined as unknown as JSONContent,
       status: merged.status,
       assignedToId: merged.assignedToId ?? null,
-      planId: props.planId ?? null,
+      sprintId: props.sprintId ?? null,
     },
     onSubmit: async ({ value }) => {
       await _action(value, workspaceData().workspace.slug, merged.teamKey);
@@ -152,7 +152,7 @@ function CreateDialogContent(props: CreateDialogProps) {
           message: "Description is required",
         }),
         assignedToId: z.string().nullable(),
-        planId: z.string().nullable(),
+        sprintId: z.string().nullable(),
       }),
     },
   }));

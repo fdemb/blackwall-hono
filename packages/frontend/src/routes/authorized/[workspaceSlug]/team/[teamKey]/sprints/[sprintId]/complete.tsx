@@ -1,21 +1,21 @@
 import { createAsync, useParams } from "@solidjs/router";
 import { Show } from "solid-js";
-import { planDetailLoader } from "./index.data";
+import { sprintDetailLoader } from "./index.data";
 import { useTeamData } from "../../../[teamKey]";
-import { CompletePlanForm } from "@/components/plans/complete-plan-form";
+import { CompleteSprintForm } from "@/components/sprints/complete-sprint-form";
 import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 
-export default function CompletePlanPage() {
+export default function CompleteSprintPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const data = createAsync(() => planDetailLoader(params.teamKey!, params.planId!));
+  const data = createAsync(() => sprintDetailLoader(params.teamKey!, params.sprintId!));
 
   return (
     <Show when={data()} fallback={null}>
-      {(planData) => (
+      {(sprintData) => (
         <>
           <PageHeader>
             <Breadcrumbs>
@@ -29,16 +29,16 @@ export default function CompletePlanPage() {
                   {teamData().name}
                 </div>
               </BreadcrumbsItem>
-              <BreadcrumbsItem>Complete plan</BreadcrumbsItem>
+              <BreadcrumbsItem>Complete sprint</BreadcrumbsItem>
             </Breadcrumbs>
           </PageHeader>
 
           <ScrollContainer>
-            <CompletePlanForm
+            <CompleteSprintForm
               workspaceSlug={params.workspaceSlug!}
               teamKey={params.teamKey!}
               team={teamData()}
-              plan={planData().plan}
+              sprint={sprintData().sprint}
             />
           </ScrollContainer>
         </>

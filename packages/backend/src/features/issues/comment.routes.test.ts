@@ -15,7 +15,7 @@ describe("Comment Routes", () => {
             description: {},
             status: "backlog",
             assignedToId: null,
-            planId: null,
+            sprintId: null,
           },
         },
       },

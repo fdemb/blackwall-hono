@@ -42,7 +42,7 @@ function MembersEmpty() {
           <UsersIcon />
         </EmptyMedia>
         <EmptyTitle>No members yet</EmptyTitle>
-        <EmptyDescription>Invite teammates to collaborate on issues and plans.</EmptyDescription>
+        <EmptyDescription>Invite teammates to collaborate on issues and sprints.</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

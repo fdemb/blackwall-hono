@@ -19,30 +19,30 @@ export async function listIssuesInTeam(input: {
     with: {
       assignedTo: true,
       labels: true,
-      issuePlan: true,
+      issueSprint: true,
       team: true,
     },
   });
 }
 
-export async function listIssuesInPlan(input: {
+export async function listIssuesInSprint(input: {
   workspaceId: string;
   teamId: string;
-  planId: string;
+  sprintId: string;
   statusFilters?: IssueStatus[];
 }) {
   return db.query.issue.findMany({
     where: {
       workspaceId: input.workspaceId,
       teamId: input.teamId,
-      planId: input.planId,
+      sprintId: input.sprintId,
       deletedAt: { isNull: true },
       status: input.statusFilters ? { in: input.statusFilters } : undefined,
     },
     with: {
       assignedTo: true,
       labels: true,
-      issuePlan: true,
+      issueSprint: true,
       team: true,
     },
   });
@@ -61,7 +61,7 @@ export async function listIssuesAssignedToUser(input: {
     with: {
       assignedTo: true,
       labels: true,
-      issuePlan: true,
+      issueSprint: true,
       team: true, // Need team info for display often
     },
   });
@@ -69,7 +69,7 @@ export async function listIssuesAssignedToUser(input: {
 
 export type CreateIssueInput = Pick<
   NewIssue,
-  "summary" | "description" | "status" | "assignedToId" | "planId"
+  "summary" | "description" | "status" | "assignedToId" | "sprintId"
 >;
 
 export async function createIssue(input: {
@@ -129,10 +129,10 @@ export async function getIssueById(input: { issueId: string }) {
     with: {
       assignedTo: true,
       labels: true,
-      issuePlan: true,
+      issueSprint: true,
       team: {
         with: {
-          activePlan: true,
+          activeSprint: true,
         },
       },
       comments: {
@@ -162,10 +162,10 @@ export async function getIssueByKey(input: { workspaceId: string; issueKey: stri
     with: {
       assignedTo: true,
       labels: true,
-      issuePlan: true,
+      issueSprint: true,
       team: {
         with: {
-          activePlan: true,
+          activeSprint: true,
         },
       },
       comments: {
@@ -198,7 +198,7 @@ export async function getIssuesByIds(input: { issueIds: string[], workspaceId: s
 export type UpdateIssueInput = Partial<
   Pick<
     NewIssue,
-    "summary" | "description" | "status" | "priority" | "assignedToId" | "planId" | "estimationPoints" | "order"
+    "summary" | "description" | "status" | "priority" | "assignedToId" | "sprintId" | "estimationPoints" | "order"
   >
 >;
 
@@ -300,7 +300,7 @@ export async function softDeleteIssue(input: { issueId: string }) {
 
 export const issueData = {
   listIssuesInTeam,
-  listIssuesInPlan,
+  listIssuesInSprint,
   listIssuesAssignedToUser,
   createIssue,
   getIssueById,

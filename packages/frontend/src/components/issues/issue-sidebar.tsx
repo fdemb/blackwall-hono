@@ -1,8 +1,8 @@
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import type {
-  IssuePlan,
+  IssueSprint,
   Label,
-  SerializedIssuePlan,
+  SerializedIssueSprint,
   SerializedLabel,
   SerializedUser,
 } from "@blackwall/database/schema";
@@ -12,7 +12,7 @@ import {
   AssigneePickerPopover,
   EstimationPickerPopover,
   IssueLabelsPicker,
-  PlanPickerPopover,
+  SprintPickerPopover,
   PriorityPickerPopover,
   StatusPickerPopover,
   TimeEntryPickerPopover,
@@ -43,7 +43,7 @@ export function IssueSidebar(props: {
   issue: IssueForSidebar;
   labels: SerializedLabel[];
   assignableUsers: SerializedUser[];
-  activePlan: SerializedIssuePlan | null;
+  activeSprint: SerializedIssueSprint | null;
   workspaceSlug: string;
   teamKey: string;
 }) {
@@ -88,10 +88,10 @@ export function IssueSidebar(props: {
           <IssueLabelsPicker labels={props.labels} issueKey={props.issue.key} />
         </IssueSidebarItem>
 
-        <IssueSidebarItem label="Plan" orientation="col">
-          <PlanPickerPopover
-            planId={props.issue.planId}
-            activePlan={props.activePlan}
+        <IssueSidebarItem label="Sprint" orientation="col">
+          <SprintPickerPopover
+            sprintId={props.issue.sprintId}
+            activeSprint={props.activeSprint}
             issueKey={props.issue.key}
             workspaceSlug={props.workspaceSlug}
           />

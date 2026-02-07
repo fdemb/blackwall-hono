@@ -51,7 +51,7 @@ export default function BacklogPage() {
       <IssueSelectionMenu
         selectedIssues={selectedIssues()}
         onClearSelection={rowSelection.clearSelection}
-        activePlan={teamData().activePlan}
+        activeSprint={teamData().activeSprint}
       />
 
       <Show when={issues() && issues()!.length > 0} fallback={<IssueEmpty />}>
@@ -74,7 +74,7 @@ function IssueEmpty() {
         </EmptyMedia>
         <EmptyTitle>Backlog is empty</EmptyTitle>
         <EmptyDescription>
-          Add issues to the backlog to plan future work. Backlog items can be moved to active plans
+          Add issues to the backlog to sprint future work. Backlog items can be moved to active sprints
           when ready.
         </EmptyDescription>
       </EmptyHeader>

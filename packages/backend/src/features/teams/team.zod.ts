@@ -19,7 +19,7 @@ export const teamSchema = z.object({
     name: z.string(),
     key: z.string(),
     workspaceId: z.string(),
-    activePlanId: z.string().nullable().optional(),
+    activeSprintId: z.string().nullable().optional(),
     createdAt: z.any(),
     updatedAt: z.any(),
 });
@@ -32,16 +32,16 @@ export const teamResponseSchema = z.object({
     team: teamSchema.nullable().optional(),
 });
 
-export const teamWithPlanSchema = teamSchema.extend({
-    activePlan: z.object({
+export const teamWithSprintSchema = teamSchema.extend({
+    activeSprint: z.object({
         id: z.string(),
         name: z.string(),
-        // add other plan fields if needed
+        // add other sprint fields if needed
     }).optional(),
 });
 
-export const teamWithPlanListSchema = z.object({
-    teams: z.array(teamWithPlanSchema),
+export const teamWithSprintListSchema = z.object({
+    teams: z.array(teamWithSprintSchema),
 });
 
 export const teamUserSchema = z.object({

@@ -14,7 +14,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import type { IssueStatus, SerializedIssuePlan } from "@blackwall/database/schema";
+import type { IssueStatus, SerializedIssueSprint } from "@blackwall/database/schema";
 import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/dnd";
 import { issueMappings } from "@/lib/mappings";
 import { api } from "@/lib/api";
@@ -100,7 +100,7 @@ export default function BoardPage() {
               <BreadcrumbsItem>Board</BreadcrumbsItem>
             </Breadcrumbs>
 
-            <PlanSection plan={teamData().activePlan} />
+            <SprintSection sprint={teamData().activeSprint} />
           </div>
         </PageHeader>
       </div>
@@ -191,7 +191,7 @@ type BoardListProps = {
     class?: string;
   }>;
   issues: Array<IssueForBoard>;
-  activePlan?: SerializedIssuePlan;
+  activeSprint?: SerializedIssueSprint;
 };
 
 function BoardList(props: BoardListProps) {
@@ -230,7 +230,7 @@ function BoardList(props: BoardListProps) {
           <CreateDialogContent
             status={props.statusId}
             teamKey={params.teamKey}
-            planId={teamData().activePlanId}
+            sprintId={teamData().activeSprintId}
           />
         </Dialog>
       </div>
@@ -339,64 +339,64 @@ function BoardItem(props: BoardItemProps) {
   );
 }
 
-function PlanSection(props: { plan: SerializedIssuePlan | null }) {
+function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
   const params = useParams();
 
   return (
     <section class="flex flex-row gap-2 items-center">
       <Show
-        when={props.plan}
+        when={props.sprint}
         fallback={
           <>
-            <div class="text-muted-foreground">No plan</div>
+            <div class="text-muted-foreground">No sprint</div>
             <A
-              href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/create`}
+              href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
               class={buttonVariants({
                 variant: "secondary",
                 size: "xxs",
                 scaleEffect: false,
               })}
             >
-              Create plan
+              Create sprint
             </A>
           </>
         }
       >
-        {(plan) => (
+        {(sprint) => (
           <Popover>
             <PopoverTrigger as={Button} variant="ghost" size="xxs" class="gap-1.5 font-semibold">
               <LandPlotIcon class="size-4 shrink-0" />
-              {plan().name}
+              {sprint().name}
               <ChevronDownIcon class="size-3.5 text-muted-foreground" />
             </PopoverTrigger>
             <PopoverContent class="w-72 p-0">
               <div class="font-semibold text-accent-foreground flex flex-row items-center gap-1.5 px-4 py-3 border-b">
                 <LandPlotIcon class="size-4 shrink-0" />
-                {plan().name}
+                {sprint().name}
               </div>
               <div class="px-4 py-3 flex flex-col gap-3">
                 <div class="flex flex-row items-center justify-between">
                   <p class="text-xs text-muted-foreground">Start date</p>
                   <p class="text-sm font-medium">
-                    {new Date(plan().startDate).toLocaleDateString()}
+                    {new Date(sprint().startDate).toLocaleDateString()}
                   </p>
                 </div>
 
                 <div class="flex flex-row items-center justify-between">
                   <p class="text-xs text-muted-foreground">End date</p>
-                  <p class="text-sm font-medium">{new Date(plan().endDate).toLocaleDateString()}</p>
+                  <p class="text-sm font-medium">{new Date(sprint().endDate).toLocaleDateString()}</p>
                 </div>
 
-                <Show when={plan().goal}>
+                <Show when={sprint().goal}>
                   <div>
                     <p class="text-xs text-muted-foreground mb-1">Goal</p>
-                    <p class="text-sm">{plan().goal}</p>
+                    <p class="text-sm">{sprint().goal}</p>
                   </div>
                 </Show>
               </div>
               <div class="px-4 py-3 border-t flex flex-row gap-2">
                 <A
-                  href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${plan().id}`}
+                  href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}`}
                   class={buttonVariants({
                     variant: "outline",
                     size: "xs",
@@ -406,7 +406,7 @@ function PlanSection(props: { plan: SerializedIssuePlan | null }) {
                   Details
                 </A>
                 <A
-                  href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${plan().id}/edit`}
+                  href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}/edit`}
                   class={buttonVariants({
                     variant: "outline",
                     size: "xs",
@@ -416,7 +416,7 @@ function PlanSection(props: { plan: SerializedIssuePlan | null }) {
                   Edit
                 </A>
                 <A
-                  href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/${plan().id}/complete`}
+                  href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}/complete`}
                   class={buttonVariants({
                     variant: "outline",
                     size: "xs",
@@ -442,18 +442,18 @@ function BoardEmpty() {
         <EmptyMedia variant="icon">
           <LandPlotIcon />
         </EmptyMedia>
-        <EmptyTitle>No active plan</EmptyTitle>
+        <EmptyTitle>No active sprint</EmptyTitle>
         <EmptyDescription>
-          Create a plan to start tracking your issues on the board.
+          Create a sprint to start tracking your issues on the board.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="flex flex-row gap-3">
           <A
-            href={`/${params.workspaceSlug}/team/${params.teamKey}/plans/create`}
+            href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
             class={buttonVariants()}
           >
-            Create plan
+            Create sprint
           </A>
           <A
             href={`/${params.workspaceSlug}/team/${params.teamKey}/issues/backlog`}

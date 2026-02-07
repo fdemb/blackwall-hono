@@ -9,37 +9,37 @@ import { parseDate } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
-import type { UpdateIssuePlan } from "@blackwall/backend/src/features/issue-plans/issue-plan.zod";
+import type { UpdateIssueSprint } from "@blackwall/backend/src/features/issue-sprints/issue-sprint.zod";
 import { toast } from "../custom-ui/toast";
 
-type EditPlanFormProps = {
+type EditSprintFormProps = {
   workspaceSlug: string;
   teamKey: string;
   team: InferDbType<"team">;
-  plan: InferDbType<"issuePlan">;
+  sprint: InferDbType<"issueSprint">;
 };
 
-const updatePlanAction = action(
-  async (workspaceSlug: string, teamKey: string, planId: string, value: UpdateIssuePlan) => {
-    await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$patch({
-      param: { teamKey, planId },
+const updateSprintAction = action(
+  async (workspaceSlug: string, teamKey: string, sprintId: string, value: UpdateIssueSprint) => {
+    await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$patch({
+      param: { teamKey, sprintId },
       json: value,
     });
 
-    toast.success("Plan updated successfully");
-    throw redirect(`/${workspaceSlug}/team/${teamKey}/plans/${planId}`);
+    toast.success("Sprint updated successfully");
+    throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints/${sprintId}`);
   },
 );
 
-export function EditPlanForm(props: EditPlanFormProps) {
-  const _action = useAction(updatePlanAction);
+export function EditSprintForm(props: EditSprintFormProps) {
+  const _action = useAction(updateSprintAction);
 
   const form = useAppForm(() => ({
     defaultValues: {
-      name: props.plan.name,
-      goal: props.plan.goal,
-      startDate: parseDate(props.plan.startDate.split("T")[0]).toString(),
-      endDate: parseDate(props.plan.endDate.split("T")[0]).toString(),
+      name: props.sprint.name,
+      goal: props.sprint.goal,
+      startDate: parseDate(props.sprint.startDate.split("T")[0]).toString(),
+      endDate: parseDate(props.sprint.endDate.split("T")[0]).toString(),
     },
     validators: {
       onSubmit: z
@@ -55,7 +55,7 @@ export function EditPlanForm(props: EditPlanFormProps) {
         }),
     },
     onSubmit: async ({ value }) => {
-      await _action(props.workspaceSlug, props.teamKey, props.plan.id, value);
+      await _action(props.workspaceSlug, props.teamKey, props.sprint.id, value);
     },
   }));
 
@@ -63,7 +63,7 @@ export function EditPlanForm(props: EditPlanFormProps) {
     <div class="flex flex-col gap-6 mx-auto max-w-2xl p-4 sm:pt-12 sm:pb-12">
       <div class="flex flex-col gap-3 items-center">
         <TeamAvatar team={props.team} size="md" />
-        <h1 class="text-xl sm:text-2xl font-medium text-center">Edit plan</h1>
+        <h1 class="text-xl sm:text-2xl font-medium text-center">Edit sprint</h1>
       </div>
 
       <form
