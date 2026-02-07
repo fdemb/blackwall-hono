@@ -12,9 +12,11 @@
     "typecheck": "bun run --bun tsc --noEmit",
     "db:generate": "bun --env-file=../../.env run --bun drizzle-kit generate",
     "db:migrate": "bun --env-file=../../.env run --bun drizzle-kit migrate",
-    "db:drop": "bun --env-file=../../.env run src/drop.ts"
+    "db:drop": "bun --env-file=../../.env run src/drop.ts",
+    "db:seed": "bun --env-file=../../.env run src/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@blackwall/shared": "workspace:*",
     "drizzle-orm": "^1.0.0-beta.12-a5629fb",
     "drizzle-zod": "^1.0.0-beta.12-a5629fb",
