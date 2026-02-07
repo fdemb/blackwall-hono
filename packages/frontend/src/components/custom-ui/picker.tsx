@@ -17,13 +17,13 @@ export type PickerOption<TId extends string | number | null = string> = {
 } & BaseMapping;
 
 type SinglePickerProps<TId extends string | number | null> = {
-  value?: TId | null;
+  value?: NoInfer<TId> | null;
   onChange?: (val: TId) => void;
   multiple?: false;
 };
 
 type MultiplePickerProps<TId extends string | number | null> = {
-  value?: TId[];
+  value?: NoInfer<TId>[];
   onChange?: (val: TId) => void;
   multiple: true;
 };

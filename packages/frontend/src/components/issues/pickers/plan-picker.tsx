@@ -76,7 +76,6 @@ export function PlanPickerPopover(props: PlanPickerPopoverProps) {
       <PickerPopover
         value={props.planId}
         onChange={handleChange}
-        /* @ts-ignore */
         options={planOptions()}
       />
     </Popover>

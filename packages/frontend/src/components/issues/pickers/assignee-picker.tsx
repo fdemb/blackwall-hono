@@ -94,7 +94,6 @@ export function AssigneePickerPopover(props: AssigneePickerPopoverProps) {
       <PickerPopover
         value={props.assignedToId}
         onChange={handleChange}
-        /* @ts-ignore */
         options={assignableUsersOptions()}
         loading={props.loading}
       />
