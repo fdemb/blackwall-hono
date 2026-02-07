@@ -22,8 +22,7 @@ import { useAppForm } from "@/context/form-context";
 import type { IssueChangeEventType, SerializedUser } from "@blackwall/database/schema";
 import type { InferDbType } from "@blackwall/database/types";
 import { action } from "@/lib/form.utils";
-import { api } from "@/lib/api";
-import { backendUrl } from "@/lib/env";
+import { api, apiFetch } from "@/lib/api";
 import { issueMappings } from "@/lib/mappings";
 import { revalidate } from "@solidjs/router";
 import type { JSONContent } from "@tiptap/core";
@@ -215,16 +214,13 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
     const formData = new FormData();
     formData.append("file", file);
 
-    // Use fetch directly since the attachment endpoint uses formData
-    const res = await fetch(
-      `${backendUrl}/issues/${props.issue.key}/attachments`,
+    const res = await apiFetch(
+      api.api.issues[":issueKey"].attachments.$url({
+        param: { issueKey: props.issue.key },
+      }),
       {
         method: "POST",
         body: formData,
-        credentials: "include",
-        headers: {
-          "x-blackwall-workspace-slug": props.workspaceSlug,
-        },
       },
     );
     const { attachment } = await res.json();

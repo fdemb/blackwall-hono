@@ -4,13 +4,14 @@ import { getCurrentWorkspaceSlug } from "./workspace-slug";
 import { toast } from "@/components/custom-ui/toast";
 import { backendUrl } from "./env";
 
-const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+export const apiFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const headers = new Headers(init?.headers);
   headers.set("x-blackwall-workspace-slug", getCurrentWorkspaceSlug()!);
 
   const res = await fetch(input, {
     ...init,
     headers,
+    credentials: "include",
   });
 
   if (res.status === 401) {
@@ -31,10 +32,7 @@ const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 };
 
 const api = hc<AppType>(backendUrl, {
-  init: {
-    credentials: "include",
-  },
-  fetch: customFetch,
+  fetch: apiFetch,
 });
 
 export { api };

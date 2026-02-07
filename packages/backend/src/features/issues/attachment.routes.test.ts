@@ -242,8 +242,10 @@ describe("Attachment Routes", () => {
       );
 
       expect(res.status).toBe(200);
-      const json = await res.json();
-      expect(json.attachment.id).toBe(uploadJson.attachment.id);
+      expect(res.headers.get("content-type")).toContain("image/png");
+      expect(res.headers.get("content-disposition")).toContain("inline");
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      expect(Array.from(bytes)).toEqual([0x89, 0x50, 0x4e, 0x47]);
     });
 
     it("should return 404 for non-existent attachment", async () => {

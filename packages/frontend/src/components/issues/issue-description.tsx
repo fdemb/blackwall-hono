@@ -1,8 +1,7 @@
 import { TiptapEditor } from "@/components/tiptap/tiptap-editor";
 import { useWorkspaceData } from "@/context/workspace-context";
 import type { SerializedIssue } from "@blackwall/database/schema";
-import { api } from "@/lib/api";
-import { backendUrl } from "@/lib/env";
+import { api, apiFetch } from "@/lib/api";
 import { action } from "@/lib/form.utils";
 import type { JSONContent } from "@tiptap/core";
 import CheckIcon from "lucide-solid/icons/check";
@@ -19,15 +18,13 @@ export function IssueDescription(props: { issue: SerializedIssue }) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch(
-      `${backendUrl}/issues/${props.issue.key}/attachments`,
+    const res = await apiFetch(
+      api.api.issues[":issueKey"].attachments.$url({
+        param: { issueKey: props.issue.key },
+      }),
       {
         method: "POST",
         body: formData,
-        credentials: "include",
-        headers: {
-          "x-blackwall-workspace-slug": workspaceData().workspace.slug,
-        },
       },
     );
     const { attachment } = await res.json();

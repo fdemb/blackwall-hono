@@ -13,6 +13,9 @@ import {
   getAttachmentParamsSchema,
   attachmentResponseSchema,
 } from "./attachment.zod";
+import { BadRequestError } from "../../lib/errors";
+import { getFile } from "../../lib/file-upload";
+import { HTTPException } from "hono/http-exception";
 
 const attachmentRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
@@ -49,7 +52,8 @@ const attachmentRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ attachment });
-    })
+    },
+  )
   /**
    * POST /attachments - Upload an orphan attachment (not linked to any issue yet).
    */
@@ -69,7 +73,12 @@ const attachmentRoutes = new Hono<AppEnv>()
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const { file } = c.req.valid("form");
+      const body = await c.req.parseBody();
+      const file = body["file"];
+
+      if (!(file instanceof File)) {
+        throw new BadRequestError("File is missing or invalid");
+      }
 
       const attachment = await attachmentService.uploadAttachment({
         workspaceSlug: workspace.slug,
@@ -80,7 +89,8 @@ const attachmentRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ attachment });
-    })
+    },
+  )
   /**
    * POST /:issueKey/attachments/associate - Associate orphan attachments with an issue.
    */
@@ -176,11 +186,10 @@ const attachmentRoutes = new Hono<AppEnv>()
   );
 
 /**
- * GET /attachments/:attachmentId/download - Get attachment details for downloading.
+ * GET /attachments/:attachmentId/download - Download attachment file.
  */
 const attachmentDownloadRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
-  .use("*", workspaceMiddleware)
   .get(
     "/attachments/:attachmentId/download",
     describeRoute({
@@ -188,8 +197,8 @@ const attachmentDownloadRoutes = new Hono<AppEnv>()
       summary: "Download attachment",
       responses: {
         200: {
-          description: "Attachment download details",
-          content: { "application/json": { schema: resolver(attachmentResponseSchema) } },
+          description: "Attachment content",
+          content: { "*/*": { schema: resolver(z.any()) } },
         },
       },
     }),
@@ -203,7 +212,15 @@ const attachmentDownloadRoutes = new Hono<AppEnv>()
         attachmentId,
       });
 
-      return c.json({ attachment });
+      const { file, exists } = await getFile(attachment.filePath);
+      if (!exists) {
+        throw new HTTPException(404, { message: "Attachment file not found" });
+      }
+
+      return c.newResponse(file.stream(), 200, {
+        "content-type": attachment.mimeType || "application/octet-stream",
+        "content-disposition": `inline; filename="${encodeURIComponent(attachment.originalFileName)}"`,
+      });
     },
   );
 

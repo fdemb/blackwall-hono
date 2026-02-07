@@ -1,8 +1,20 @@
 import { PickerPopover } from "@/components/custom-ui/picker-popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { revalidate, action, useAction } from "@solidjs/router";
 import { Popover } from "@kobalte/core/popover";
+import AlertCircleIcon from "lucide-solid/icons/alert-circle";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import { createMemo, createSignal, Show, type JSX } from "solid-js";
@@ -27,6 +39,8 @@ type SprintPickerPopoverProps = {
 
 export function SprintPickerPopover(props: SprintPickerPopoverProps) {
   const [open, setOpen] = createSignal(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = createSignal(false);
+  const [pendingSprintId, setPendingSprintId] = createSignal<string | null>(null);
   const _update = useAction(updateSprint);
 
   const currentSprint = createMemo(() =>
@@ -57,7 +71,11 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
     return options;
   });
 
-  const handleChange = async (id: string | null) => {
+  const pendingSprint = createMemo(() =>
+    props.openSprints.find((sprint) => sprint.id === pendingSprintId()),
+  );
+
+  const applyChange = async (id: string | null) => {
     if (props.onChange) {
       await props.onChange(id);
       return;
@@ -70,27 +88,80 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
     await _update(props.issueKey, id);
   };
 
-  return (
-    <Popover open={open()} onOpenChange={setOpen} placement="bottom-start" gutter={8}>
-      <Show when={!props.trigger} fallback={props.trigger}>
-        <Popover.Trigger
-          class="flex flex-row gap-2 items-center text-base px-2!"
-          as={Button}
-          variant="outline"
-          size="lg"
-          scaleEffect={false}
-        >
-          {props.trigger ?? (
-            <>
-              <LandPlotIcon class="size-4" />
-              {currentSprint()?.name ?? "No sprint"}
-              <ChevronsUpDownIcon class="size-4" />
-            </>
-          )}
-        </Popover.Trigger>
-      </Show>
+  const handleChange = async (id: string | null) => {
+    const nextSprint = props.openSprints.find((sprint) => sprint.id === id);
+    const shouldConfirm = Boolean(nextSprint && nextSprint.status === "active" && props.sprintId !== id);
 
-      <PickerPopover value={props.sprintId} onChange={handleChange} options={sprintOptions()} />
-    </Popover>
+    if (shouldConfirm) {
+      setPendingSprintId(id);
+      setConfirmDialogOpen(true);
+      return;
+    }
+
+    await applyChange(id);
+  };
+
+  const handleConfirm = async () => {
+    const id = pendingSprintId();
+    if (!id) {
+      return;
+    }
+
+    await applyChange(id);
+    setPendingSprintId(null);
+  };
+
+  return (
+    <>
+      <Popover open={open()} onOpenChange={setOpen} placement="bottom-start" gutter={8}>
+        <Show when={!props.trigger} fallback={props.trigger}>
+          <Popover.Trigger
+            class="flex flex-row gap-2 items-center text-base px-2!"
+            as={Button}
+            variant="outline"
+            size="lg"
+            scaleEffect={false}
+          >
+            {props.trigger ?? (
+              <>
+                <LandPlotIcon class="size-4" />
+                {currentSprint()?.name ?? "No sprint"}
+                <ChevronsUpDownIcon class="size-4" />
+              </>
+            )}
+          </Popover.Trigger>
+        </Show>
+
+        <PickerPopover value={props.sprintId} onChange={handleChange} options={sprintOptions()} />
+      </Popover>
+
+      <AlertDialog
+        open={confirmDialogOpen()}
+        onOpenChange={(isOpen) => {
+          setConfirmDialogOpen(isOpen);
+          if (!isOpen) {
+            setPendingSprintId(null);
+          }
+        }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogMedia class="bg-muted">
+              <AlertCircleIcon class="text-muted-foreground" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Add issue to an active sprint?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`"${pendingSprint()?.name ?? "This sprint"}" is currently active. Adding an issue now may impact the current sprint scope.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogAction size="xs" action={handleConfirm}>
+              Add to sprint
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

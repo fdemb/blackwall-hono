@@ -1,6 +1,10 @@
 import { AssigneePickerPopover, StatusPickerPopover } from "@/components/issues/pickers";
 import { useAppForm } from "@/context/form-context";
-import type { IssueStatus, SerializedTeam } from "@blackwall/database/schema";
+import type {
+  IssueStatus,
+  SerializedIssueAttachment,
+  SerializedTeam,
+} from "@blackwall/database/schema";
 import { useDialogContext } from "@kobalte/core/dialog";
 import { Popover } from "@kobalte/core/popover";
 import type { JSONContent } from "@tiptap/core";
@@ -26,8 +30,8 @@ import {
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { TanStackErrorMessages, TextField } from "../ui/text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { action, createAsync, query, redirect, useAction, useNavigate } from "@solidjs/router";
-import { api } from "@/lib/api";
+import { action, createAsync, query, redirect, useAction } from "@solidjs/router";
+import { api, apiFetch } from "@/lib/api";
 import type { CreateIssue } from "@blackwall/backend/src/features/issues/issue.zod";
 
 type CreateDialogProps = {
@@ -67,11 +71,14 @@ const createIssueAction = action(
 );
 
 const uploadAttachmentAction = action(async (formData: FormData) => {
-  api.api.issues.attachments.$post({
-    form: {
-      file: formData.get("file"),
-    },
+  const res = await apiFetch(api.api.issues.attachments.$url(), {
+    method: "POST",
+    body: formData,
   });
+
+  const { attachment } = (await res.json()) as { attachment: SerializedIssueAttachment };
+
+  return attachment;
 });
 
 function CreateDialog(props: CreateDialogProps) {
@@ -117,14 +124,13 @@ function CreateDialogContent(props: CreateDialogProps) {
   const [summaryInputElement, setSummaryInputElement] = createSignal<HTMLInputElement | null>(null);
   const assignableUsers = createAsync(() => getTeamUsers(merged.teamKey));
   const _action = useAction(createIssueAction);
+  const _uploadAttachmentAction = useAction(uploadAttachmentAction);
 
   const handleUpload = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("workspaceSlug", workspaceData().workspace.slug);
-    // No issueKey - creates orphan attachment for new issue
 
-    const attachment = await uploadAttachmentAction(formData);
+    const attachment = await _uploadAttachmentAction(formData);
     return attachment;
   };
 

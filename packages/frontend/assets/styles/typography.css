@@ -121,7 +121,7 @@
     pointer-events: none;
   }
 
-  .prose p.is-empty:not(.is-editor-empty:first-child)::before {
+  .prose p.is-empty:not(.is-editor-empty:first-child)::before, .prose.ProseMirror-focused p.is-empty:first-child::before {
     color: var(--color-muted-foreground);
     content: "/ to show commands";
     float: left;

@@ -12,32 +12,10 @@ import ImageIcon from "lucide-solid/icons/image";
 import ListIcon from "lucide-solid/icons/list";
 import ListOrderedIcon from "lucide-solid/icons/list-ordered";
 import QuoteIcon from "lucide-solid/icons/quote";
-import type { JSX } from "solid-js";
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  mergeProps,
-  on,
-  onCleanup,
-  Show,
-  type ParentComponent,
-} from "solid-js";
+import { createEffect, createMemo, createSignal, mergeProps, on, onCleanup } from "solid-js";
 import { SlashCommand, type SlashCommandItem } from "./extensions/slash-command";
 import { createSuggestionRenderer } from "./suggestion-renderer";
-
-// Simple client-only wrapper since Solid Router doesn't have ClientOnly
-const ClientOnly: ParentComponent<{ fallback?: JSX.Element }> = (props) => {
-  const [isClient, setIsClient] = createSignal(false);
-  createEffect(() => {
-    setIsClient(true);
-  });
-  return (
-    <Show when={isClient()} fallback={props.fallback}>
-      {props.children}
-    </Show>
-  );
-};
+import { backendUrl } from "@/lib/env";
 
 export type TiptapProps = {
   initialContent?: Content;
@@ -105,16 +83,15 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
       const file = input.files?.[0];
       if (!file || !merged.onAttachmentUpload) return;
 
-      // Delete the slash command text
       editor.chain().focus().deleteRange(range).run();
 
       const result = await merged.onAttachmentUpload(file);
-      if (result && merged.workspaceSlug) {
+      if (result) {
         editor
           .chain()
           .focus()
           .setImage({
-            src: `/${merged.workspaceSlug}/issue-attachment/${result.id}`,
+            src: `${backendUrl}/api/issues/attachments/${result.id}/download`,
           })
           .run();
       }
@@ -257,25 +234,12 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
   });
 
   return (
-    <>
-      <ClientOnly
-        fallback={
-          <div class="w-full h-full whitespace-pre-wrap wrap-break-word" data-fallback>
-            <div
-              class={cn(tiptapVariants({ variant: merged.variant }), merged.class)}
-              innerHTML={html()}
-            />
-          </div>
-        }
-      >
-        <div
-          ref={(el) => {
-            setElement(el);
-          }}
-          class="w-full h-full"
-          onPointerDown={props.onPointerDown}
-        />
-      </ClientOnly>
-    </>
+    <div
+      ref={(el) => {
+        setElement(el);
+      }}
+      class="w-full h-full"
+      onPointerDown={props.onPointerDown}
+    />
   );
 };

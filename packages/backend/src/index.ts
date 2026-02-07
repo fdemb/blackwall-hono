@@ -36,19 +36,22 @@ const app = new Hono<AppEnv>()
     }),
   )
   .onError(errorHandler)
+
   // Public routes
   .route("/api/better-auth", betterAuthRoutes)
   .route("/api/auth", authRoutes)
   .route("/api/invitations", publicInvitationRoutes)
-  // Protected routes (auth middleware inside each)
+
+  // Protected routes
   .route("/api/workspaces", workspaceRoutes)
   .route("/api/invitations", protectedInvitationRoutes)
-  // Protected per-workspace routes (auth + workspace middleware inside each)
+  .route("/api/issues", attachmentDownloadRoutes)
+
+  // Protected per-workspace routes
   .route("/api/teams", teamRoutes)
   .route("/api/issues", issueRoutes)
   .route("/api/issues", commentRoutes)
   .route("/api/issues", attachmentRoutes)
-  .route("/api/issues", attachmentDownloadRoutes)
   .route("/api/labels", labelRoutes)
   .route("/api/issue-sprints", issueSprintRoutes)
   .route("/api/time-entries", timeEntryRoutes)
