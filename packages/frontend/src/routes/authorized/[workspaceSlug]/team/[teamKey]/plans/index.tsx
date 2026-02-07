@@ -1,5 +1,13 @@
-import { createAsync, useParams, A } from "@solidjs/router";
-import { Show } from "solid-js";
+import {
+  action,
+  createAsync,
+  redirect,
+  useAction,
+  useNavigate,
+  useParams,
+  A,
+} from "@solidjs/router";
+import { Show, createSignal } from "solid-js";
 import { plansLoader } from "./index.data";
 import { useTeamData } from "../../[teamKey]";
 import { PageHeader } from "@/components/blocks/page-header";
@@ -20,6 +28,38 @@ import { createColumnHelper, type ColumnDef } from "@tanstack/solid-table";
 import { formatDateShort } from "@/lib/dates";
 import { createDataTable } from "@/components/datatable/create-datatable";
 import { DataTable } from "@/components/datatable/datatable";
+import { api } from "@/lib/api";
+import { toast } from "@/components/custom-ui/toast";
+import { PlanStatusBadge } from "@/components/plans/plan-status-badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import MoreHorizontalIcon from "lucide-solid/icons/more-horizontal";
+import { Button } from "@/components/ui/button";
+
+const archivePlanAction = action(async (workspaceSlug: string, teamKey: string, planId: string) => {
+  await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].$delete({
+    param: { teamKey, planId },
+  });
+
+  toast.success("Plan archived");
+  throw redirect(`/${workspaceSlug}/team/${teamKey}/plans`);
+});
 
 export default function PlansPage() {
   const params = useParams();
@@ -86,6 +126,11 @@ type PlanTableProps = {
 
 function PlanTable(props: PlanTableProps) {
   const columnHelper = createColumnHelper<SerializedIssuePlan>();
+  const teamData = useTeamData();
+  const navigate = useNavigate();
+  const archiveAction = useAction(archivePlanAction);
+  const [archiveDialogOpen, setArchiveDialogOpen] = createSignal(false);
+  const [selectedPlan, setSelectedPlan] = createSignal<SerializedIssuePlan | null>(null);
 
   const columns = [
     columnHelper.accessor("name", {
@@ -96,6 +141,13 @@ function PlanTable(props: PlanTableProps) {
       header: "Goal",
       meta: { expand: true },
       cell: (info) => info.getValue(),
+    }),
+    columnHelper.display({
+      id: "status",
+      header: "Status",
+      cell: (info) => (
+        <PlanStatusBadge plan={info.row.original} activePlanId={teamData().activePlanId} />
+      ),
     }),
     columnHelper.accessor("startDate", {
       header: "Start date",
@@ -108,15 +160,64 @@ function PlanTable(props: PlanTableProps) {
     columnHelper.display({
       id: "actions",
       header: "Actions",
-      cell: (info) => (
-        <A
-          class={buttonVariants({ variant: "ghost", size: "xs" })}
-          href={`/${props.workspaceSlug}/team/${props.teamKey}/plans/${info.row.original.id}/edit`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          Edit
-        </A>
-      ),
+      cell: (info) => {
+        const plan = info.row.original;
+        const isActive = teamData().activePlanId === plan.id;
+        const isCompleted = Boolean(plan.finishedAt);
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              as={Button}
+              variant="ghost"
+              size="iconXs"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreHorizontalIcon class="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                onSelect={() =>
+                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}`)
+                }
+              >
+                View
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() =>
+                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/edit`)
+                }
+                disabled={isCompleted}
+              >
+                Edit
+              </DropdownMenuItem>
+              <Show when={isActive && !isCompleted}>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    navigate(
+                      `/${props.workspaceSlug}/team/${props.teamKey}/plans/${plan.id}/complete`,
+                    )
+                  }
+                >
+                  Complete plan
+                </DropdownMenuItem>
+              </Show>
+              <Show when={!isActive}>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={() => {
+                    setSelectedPlan(plan);
+                    setArchiveDialogOpen(true);
+                  }}
+                >
+                  Archive
+                </DropdownMenuItem>
+              </Show>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     }),
   ];
 
@@ -130,5 +231,34 @@ function PlanTable(props: PlanTableProps) {
     },
   });
 
-  return <DataTable {...datatableProps} />;
+  return (
+    <>
+      <DataTable {...datatableProps} />
+      <AlertDialog open={archiveDialogOpen()} onOpenChange={setArchiveDialogOpen}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogMedia class="bg-destructive/50" />
+            <AlertDialogTitle>Archive this plan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes the plan and unassigns any issues still attached to it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              size="xs"
+              variant="destructive"
+              action={() =>
+                selectedPlan()
+                  ? archiveAction(props.workspaceSlug, props.teamKey, selectedPlan()!.id)
+                  : Promise.resolve()
+              }
+            >
+              Archive plan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 }

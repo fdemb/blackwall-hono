@@ -30,7 +30,12 @@ export function IssueList(props: IssueListProps) {
       return issue.createdAt.getFullYear() !== currentYear();
     });
 
-  const { rowSelection, setRowSelection, getSelectedRowIds: _getSelectedRowIds, clearSelection: _clearSelection } = createRowSelection();
+  const {
+    rowSelection,
+    setRowSelection,
+    getSelectedRowIds: _getSelectedRowIds,
+    clearSelection: _clearSelection,
+  } = createRowSelection();
 
   const isRowSelected = (issueId: string) => !!rowSelection()[issueId];
   const toggleRowSelection = (issueId: string) => {

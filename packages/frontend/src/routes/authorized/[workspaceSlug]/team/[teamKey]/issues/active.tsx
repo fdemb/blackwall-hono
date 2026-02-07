@@ -51,6 +51,7 @@ export default function ActiveIssuesPage() {
       <IssueSelectionMenu
         selectedIssues={selectedIssues()}
         onClearSelection={rowSelection.clearSelection}
+        activePlan={teamData().activePlan}
       />
 
       <Show when={issues() && issues()!.length > 0} fallback={<IssueEmpty />}>

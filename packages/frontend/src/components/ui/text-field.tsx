@@ -8,22 +8,13 @@ import { labelClasses } from "./label";
 import { inputVariants } from "./input";
 
 const TextField = <T extends Solid.ValidComponent = "div">(
-  props: PolymorphicProps<
-    T,
-    Solid.ComponentProps<typeof TextFieldPrimitive<T>>
-  >,
+  props: PolymorphicProps<T, Solid.ComponentProps<typeof TextFieldPrimitive<T>>>,
 ) => {
-  const [local, rest] = Solid.splitProps(
-    props as Solid.ComponentProps<typeof TextFieldPrimitive>,
-    ["class"],
-  );
+  const [local, rest] = Solid.splitProps(props as Solid.ComponentProps<typeof TextFieldPrimitive>, [
+    "class",
+  ]);
 
-  return (
-    <TextFieldPrimitive
-      class={cn("flex flex-col gap-2", local.class)}
-      {...rest}
-    />
-  );
+  return <TextFieldPrimitive class={cn("flex flex-col gap-2", local.class)} {...rest} />;
 };
 
 const textAreaVariants = cva("", {
@@ -40,10 +31,7 @@ const textAreaVariants = cva("", {
 });
 
 const TextFieldInput = <T extends Solid.ValidComponent = "input">(
-  props: PolymorphicProps<
-    T,
-    Solid.ComponentProps<typeof TextFieldPrimitive<T>>
-  > &
+  props: PolymorphicProps<T, Solid.ComponentProps<typeof TextFieldPrimitive<T>>> &
     VariantProps<typeof inputVariants>,
 ) => {
   const [local, rest] = Solid.splitProps(
@@ -61,26 +49,18 @@ const TextFieldInput = <T extends Solid.ValidComponent = "input">(
 };
 
 const TextFieldLabel = <T extends Solid.ValidComponent = "label">(
-  props: PolymorphicProps<
-    T,
-    Solid.ComponentProps<typeof TextFieldPrimitive.Label<T>>
-  >,
+  props: PolymorphicProps<T, Solid.ComponentProps<typeof TextFieldPrimitive.Label<T>>>,
 ) => {
   const [local, rest] = Solid.splitProps(
     props as Solid.ComponentProps<typeof TextFieldPrimitive.Label>,
     ["class"],
   );
 
-  return (
-    <TextFieldPrimitive.Label class={cn(labelClasses, local.class)} {...rest} />
-  );
+  return <TextFieldPrimitive.Label class={cn(labelClasses, local.class)} {...rest} />;
 };
 
 const TextFieldTextArea = <T extends Solid.ValidComponent = "textarea">(
-  props: PolymorphicProps<
-    T,
-    Solid.ComponentProps<typeof TextFieldPrimitive.TextArea<T>>
-  > &
+  props: PolymorphicProps<T, Solid.ComponentProps<typeof TextFieldPrimitive.TextArea<T>>> &
     VariantProps<typeof textAreaVariants>,
 ) => {
   const [local, rest] = Solid.splitProps(
@@ -97,10 +77,7 @@ const TextFieldTextArea = <T extends Solid.ValidComponent = "textarea">(
 };
 
 const TextFieldDescription = <T extends Solid.ValidComponent = "p">(
-  props: PolymorphicProps<
-    T,
-    Solid.ComponentProps<typeof TextFieldPrimitive.Description<T>>
-  >,
+  props: PolymorphicProps<T, Solid.ComponentProps<typeof TextFieldPrimitive.Description<T>>>,
 ) => {
   const [local, rest] = Solid.splitProps(
     props as Solid.ComponentProps<typeof TextFieldPrimitive.Description>,
@@ -116,10 +93,7 @@ const TextFieldDescription = <T extends Solid.ValidComponent = "p">(
 };
 
 const TextFieldErrorMessage = <T extends Solid.ValidComponent = "p">(
-  props: PolymorphicProps<
-    T,
-    Solid.ComponentProps<typeof TextFieldPrimitive.ErrorMessage<T>>
-  >,
+  props: PolymorphicProps<T, Solid.ComponentProps<typeof TextFieldPrimitive.ErrorMessage<T>>>,
 ) => {
   const [local, rest] = Solid.splitProps(
     props as Solid.ComponentProps<typeof TextFieldPrimitive.ErrorMessage>,
@@ -152,18 +126,9 @@ type FullTextFieldProps = {
   required?: boolean | undefined;
   disabled?: boolean | undefined;
   ref: (element: HTMLInputElement | HTMLTextAreaElement) => void;
-  onInput: Solid.JSX.EventHandler<
-    HTMLInputElement | HTMLTextAreaElement,
-    InputEvent
-  >;
-  onChange: Solid.JSX.EventHandler<
-    HTMLInputElement | HTMLTextAreaElement,
-    Event
-  >;
-  onBlur: Solid.JSX.EventHandler<
-    HTMLInputElement | HTMLTextAreaElement,
-    FocusEvent
-  >;
+  onInput: Solid.JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, InputEvent>;
+  onChange: Solid.JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, Event>;
+  onBlur: Solid.JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, FocusEvent>;
 };
 
 function FullTextField(props: FullTextFieldProps) {
@@ -173,10 +138,7 @@ function FullTextField(props: FullTextFieldProps) {
     ["placeholder", "ref", "onInput", "onChange", "onBlur"],
   );
   return (
-    <TextField
-      {...rootProps}
-      validationState={props.error ? "invalid" : "valid"}
-    >
+    <TextField {...rootProps} validationState={props.error ? "invalid" : "valid"}>
       <Solid.Show when={props.label}>
         <TextField.Label>{props.label}</TextField.Label>
       </Solid.Show>
@@ -204,10 +166,7 @@ type TanStackTextFieldProps = {
   beforeInput?: Solid.JSX.Element;
   id?: string;
   describedBy?: string;
-  onBlur?: Solid.JSX.EventHandler<
-    HTMLInputElement | HTMLTextAreaElement,
-    FocusEvent
-  >;
+  onBlur?: Solid.JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, FocusEvent>;
 };
 
 function parseError(error: any) {
@@ -278,10 +237,7 @@ type TanStackTextAreaProps = {
   beforeTextArea?: Solid.JSX.Element;
   id?: string;
   describedBy?: string;
-  onBlur?: Solid.JSX.EventHandler<
-    HTMLInputElement | HTMLTextAreaElement,
-    FocusEvent
-  >;
+  onBlur?: Solid.JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, FocusEvent>;
 };
 
 function TanStackTextArea(props: TanStackTextAreaProps) {
@@ -289,9 +245,7 @@ function TanStackTextArea(props: TanStackTextAreaProps) {
 
   Solid.onMount(() => {
     if (props.autofocus) {
-      const textarea = document.querySelector(
-        `#${props.id}`,
-      ) as HTMLTextAreaElement;
+      const textarea = document.querySelector(`#${props.id}`) as HTMLTextAreaElement;
       textarea?.focus();
     }
   });
@@ -335,17 +289,9 @@ function TanStackErrorMessages() {
 
   return (
     <Solid.For each={field().state.meta.errors}>
-      {(item) => (
-        <TextField.ErrorMessage>{parseError(item)}</TextField.ErrorMessage>
-      )}
+      {(item) => <TextField.ErrorMessage>{parseError(item)}</TextField.ErrorMessage>}
     </Solid.For>
   );
 }
 
-export {
-  FullTextField,
-  TanStackErrorMessages,
-  TanStackTextField,
-  TanStackTextArea,
-  TextField,
-};
+export { FullTextField, TanStackErrorMessages, TanStackTextField, TanStackTextArea, TextField };

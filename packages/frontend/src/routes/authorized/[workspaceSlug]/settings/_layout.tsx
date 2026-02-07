@@ -7,9 +7,7 @@ const SettingsLayout: ParentComponent = (props) => {
   return (
     <SidebarProvider>
       <SettingsSidebar />
-      <ScrollContainer class="bg-background">
-        {props.children}
-      </ScrollContainer>
+      <ScrollContainer class="bg-background">{props.children}</ScrollContainer>
     </SidebarProvider>
   );
 };

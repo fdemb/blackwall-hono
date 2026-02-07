@@ -9,6 +9,7 @@ import { teamData } from "../teams/team.data";
 import { issueData } from "../issues/issue.data";
 import {
   createIssuePlanSchema,
+  completeIssuePlanSchema,
   updateIssuePlanSchema,
   issuePlanListSchema,
   issuePlanResponseSchema,
@@ -256,6 +257,48 @@ const issuePlanRoutes = new Hono<AppEnv>()
       },
     }),
     validator("param", z.object({ teamKey: z.string(), planId: z.string() })),
+    validator("json", completeIssuePlanSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey, planId } = c.req.valid("param");
+      const body = c.req.valid("json");
+
+      const team = await teamData.getTeamForUser({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+      });
+
+      if (!team) {
+        throw new NotFoundError("Team not found");
+      }
+
+      await issuePlanService.completePlan({
+        planId,
+        teamId: team.id,
+        onUndoneIssues: body.onUndoneIssues,
+      });
+
+      return c.json({ success: true });
+    },
+  )
+  /**
+   * DELETE /teams/:teamKey/plans/:planId - Delete a non-active plan.
+   */
+  .delete(
+    "/teams/:teamKey/plans/:planId",
+    describeRoute({
+      tags: ["Plans"],
+      summary: "Delete a plan",
+      responses: {
+        200: {
+          description: "Success",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("param", z.object({ teamKey: z.string(), planId: z.string() })),
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
@@ -271,9 +314,10 @@ const issuePlanRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      await issuePlanService.completePlan({
+      await issuePlanService.deletePlan({
         planId,
         teamId: team.id,
+        activePlanId: team.activePlanId,
       });
 
       return c.json({ success: true });

@@ -1,9 +1,20 @@
+import * as z from "zod";
 import { useAppForm } from "@/context/form-context";
 import { action, redirect, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 import type { InferDbType } from "@blackwall/database/types";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+  FieldTitle,
+} from "@/components/ui/field";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "../custom-ui/toast";
 
 type CompletePlanFormProps = {
@@ -14,9 +25,15 @@ type CompletePlanFormProps = {
 };
 
 const completePlanAction = action(
-  async (workspaceSlug: string, teamKey: string, planId: string) => {
+  async (
+    workspaceSlug: string,
+    teamKey: string,
+    planId: string,
+    value: { onUndoneIssues: "moveToBacklog" | "moveToNewPlan" },
+  ) => {
     await api.api["issue-plans"].teams[":teamKey"].plans[":planId"].complete.$post({
       param: { teamKey, planId },
+      json: value,
     });
 
     toast.success("Plan completed successfully");
@@ -26,11 +43,19 @@ const completePlanAction = action(
 
 export function CompletePlanForm(props: CompletePlanFormProps) {
   const _action = useAction(completePlanAction);
+  const endDateInFuture = () => new Date(props.plan.endDate).getTime() > Date.now();
 
   const form = useAppForm(() => ({
-    defaultValues: {},
-    onSubmit: async () => {
-      await _action(props.workspaceSlug, props.teamKey, props.plan.id);
+    defaultValues: {
+      onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewPlan",
+    },
+    validators: {
+      onSubmit: z.object({
+        onUndoneIssues: z.enum(["moveToBacklog", "moveToNewPlan"]),
+      }),
+    },
+    onSubmit: async ({ value }) => {
+      await _action(props.workspaceSlug, props.teamKey, props.plan.id, value);
     },
   }));
 
@@ -48,6 +73,9 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
           You are about to complete the plan "{props.plan.name}". After completing, you can create a
           new plan for this team.
         </p>
+        <p class="text-muted-foreground text-sm">
+          Choose what happens to any undone issues before you finish.
+        </p>
       </div>
 
       <form
@@ -58,10 +86,58 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
           form.handleSubmit();
         }}
       >
+        <form.AppField name="onUndoneIssues">
+          {(field) => (
+            <FieldSet>
+              <FieldLegend variant="label">On undone issues</FieldLegend>
+              <RadioGroup
+                value={field().state.value}
+                onValueChange={(value) => field().handleChange(value)}
+              >
+                <FieldLabel for="completeMoveToBacklog">
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldTitle>Move to backlog</FieldTitle>
+                      <FieldDescription>
+                        Move undone issues to the backlog for future planning.
+                      </FieldDescription>
+                    </FieldContent>
+                    <RadioGroupItem
+                      value="moveToBacklog"
+                      id="completeMoveToBacklog"
+                      aria-label="Move to backlog"
+                    />
+                  </Field>
+                </FieldLabel>
+                <FieldLabel for="completeMoveToNewPlan">
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldTitle>Keep for next plan</FieldTitle>
+                      <FieldDescription>
+                        Leave undone issues active so they can be pulled into the next plan.
+                      </FieldDescription>
+                    </FieldContent>
+                    <RadioGroupItem
+                      value="moveToNewPlan"
+                      id="completeMoveToNewPlan"
+                      aria-label="Keep for next plan"
+                    />
+                  </Field>
+                </FieldLabel>
+              </RadioGroup>
+            </FieldSet>
+          )}
+        </form.AppField>
+
         <form.Subscribe>
           {(state) => (
             <div class="flex flex-col gap-2 items-center mt-2">
-              <Button type="submit" size="lg" disabled={!state().canSubmit}>
+              {endDateInFuture() && (
+                <p class="text-sm text-muted-foreground text-center">
+                  This plan ends in the future. Update the end date before completing.
+                </p>
+              )}
+              <Button type="submit" size="lg" disabled={!state().canSubmit || endDateInFuture()}>
                 Complete plan
               </Button>
             </div>

@@ -13,7 +13,16 @@ import ListIcon from "lucide-solid/icons/list";
 import ListOrderedIcon from "lucide-solid/icons/list-ordered";
 import QuoteIcon from "lucide-solid/icons/quote";
 import type { JSX } from "solid-js";
-import { createEffect, createMemo, createSignal, mergeProps, on, onCleanup, Show, type ParentComponent } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  mergeProps,
+  on,
+  onCleanup,
+  Show,
+  type ParentComponent,
+} from "solid-js";
 import { SlashCommand, type SlashCommandItem } from "./extensions/slash-command";
 import { createSuggestionRenderer } from "./suggestion-renderer";
 

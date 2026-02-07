@@ -1,10 +1,5 @@
 import type { IssueForDataTable } from "./issue-datatable";
-import type {
-  IssuePlan,
-  IssuePriority,
-  IssueStatus,
-  SerializedIssuePlan,
-} from "@blackwall/database/schema";
+import type { IssuePriority, IssueStatus, SerializedIssuePlan } from "@blackwall/database/schema";
 import type { User } from "better-auth";
 import { Button } from "../ui/button";
 import {
@@ -92,6 +87,10 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
     props.onClearSelection();
   };
 
+  const displayAddToActivePlan = () =>
+    !!props.activePlan &&
+    !props.selectedIssues.every((issue) => issue.planId === props.activePlan?.id);
+
   const assignableUsersOptions = () => {
     if (!props.assignableUsers?.length) return [];
 
@@ -146,7 +145,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           />
         </Popover>
 
-        <Show when={props.activePlan}>
+        <Show when={displayAddToActivePlan()}>
           <Button
             variant="outline"
             size="xs"

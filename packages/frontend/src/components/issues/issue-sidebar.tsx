@@ -1,5 +1,11 @@
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
-import type { IssuePlan, Label, SerializedIssuePlan, SerializedLabel, SerializedUser } from "@blackwall/database/schema";
+import type {
+  IssuePlan,
+  Label,
+  SerializedIssuePlan,
+  SerializedLabel,
+  SerializedUser,
+} from "@blackwall/database/schema";
 import type { InferDbType } from "@blackwall/database/types";
 import type { JSX } from "solid-js";
 import {
@@ -45,10 +51,7 @@ export function IssueSidebar(props: {
     <Sidebar side="right">
       <SidebarContent class="p-0">
         <IssueSidebarItem label="Status" orientation="col">
-          <StatusPickerPopover
-            status={props.issue.status}
-            issueKey={props.issue.key}
-          />
+          <StatusPickerPopover status={props.issue.status} issueKey={props.issue.key} />
         </IssueSidebarItem>
 
         <IssueSidebarItem label="Priority" orientation="col">
@@ -68,10 +71,7 @@ export function IssueSidebar(props: {
         </IssueSidebarItem>
 
         <IssueSidebarItem label="Time Logged" orientation="col">
-          <TimeEntryPickerPopover
-            issueKey={props.issue.key}
-            workspaceSlug={props.workspaceSlug}
-          />
+          <TimeEntryPickerPopover issueKey={props.issue.key} workspaceSlug={props.workspaceSlug} />
         </IssueSidebarItem>
 
         <IssueSidebarItem label="Assigned to" orientation="col">
