@@ -118,43 +118,50 @@ export default function BoardPage() {
               <BreadcrumbsItem>Board</BreadcrumbsItem>
             </Breadcrumbs>
 
-            <SprintSection
-              sprint={activeSprint()}
+            <SprintSection sprint={activeSprint()} />
+          </div>
+        </PageHeader>
+      </div>
+      <Show
+        when={activeSprint()}
+        fallback={
+          <div class="p-4">
+            <BoardEmpty
               plannedSprint={firstPlannedSprint()}
               onStartPlannedSprint={(sprintId) => _startSprint(params.teamKey!, sprintId)}
             />
           </div>
-        </PageHeader>
-      </div>
+        }
+      >
+        <ScrollContainer>
+          <div class="p-4">
+            <div class="flex flex-row gap-4 min-h-96 w-full relative">
+              <BoardList
+                statusName="To do"
+                statusId="to_do"
+                issues={data().to_do ?? []}
+                statusIcon={CircleIcon}
+              />
+              <BoardList
+                statusName="In progress"
+                statusId="in_progress"
+                issues={data().in_progress ?? []}
+                statusIcon={CircleDotDashedIcon}
+              />
+              <BoardList
+                statusName="Done"
+                statusId="done"
+                issues={data().done ?? []}
+                statusIcon={CircleCheckIcon}
+              />
 
-      <ScrollContainer>
-        <div class="p-4">
-          <div class="flex flex-row gap-4 min-h-96 w-full relative">
-            <BoardList
-              statusName="To do"
-              statusId="to_do"
-              issues={data().to_do ?? []}
-              statusIcon={CircleIcon}
-            />
-            <BoardList
-              statusName="In progress"
-              statusId="in_progress"
-              issues={data().in_progress ?? []}
-              statusIcon={CircleDotDashedIcon}
-            />
-            <BoardList
-              statusName="Done"
-              statusId="done"
-              issues={data().done ?? []}
-              statusIcon={CircleCheckIcon}
-            />
-
-            <Show when={dragState.isDragging && dragState.initialRect}>
-              <DragOverlay issues={loaderData() ?? []} />
-            </Show>
+              <Show when={dragState.isDragging && dragState.initialRect}>
+                <DragOverlay issues={loaderData() ?? []} />
+              </Show>
+            </div>
           </div>
-        </div>
-      </ScrollContainer>
+        </ScrollContainer>
+      </Show>
     </BoardDnDContext.Provider>
   );
 }
@@ -363,53 +370,12 @@ function BoardItem(props: BoardItemProps) {
 
 function SprintSection(props: {
   sprint: SerializedIssueSprint | null;
-  plannedSprint: SerializedIssueSprint | null;
-  onStartPlannedSprint: (sprintId: string) => Promise<void>;
 }) {
   const params = useParams();
 
   return (
     <section class="flex flex-row gap-2 items-center">
-      <Show
-        when={props.sprint}
-        fallback={
-          <>
-            <Show
-              when={props.plannedSprint}
-              fallback={
-                <>
-                  <div class="text-muted-foreground">No sprint</div>
-                  <A
-                    href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
-                    class={buttonVariants({
-                      variant: "secondary",
-                      size: "xxs",
-                      scaleEffect: false,
-                    })}
-                  >
-                    Create sprint
-                  </A>
-                </>
-              }
-            >
-              {(plannedSprint) => (
-                <>
-                  <div class="text-muted-foreground">No active sprint</div>
-                  <Button
-                    variant="default"
-                    size="xxs"
-                    scaleEffect={false}
-                    onClick={() => props.onStartPlannedSprint(plannedSprint().id)}
-                  >
-                    <PlayIcon class="size-3.5" />
-                    Start {plannedSprint().name}
-                  </Button>
-                </>
-              )}
-            </Show>
-          </>
-        }
-      >
+      <Show when={props.sprint}>
         {(sprint) => (
           <Popover>
             <PopoverTrigger as={Button} variant="ghost" size="xxs" class="gap-1.5 font-semibold">
@@ -482,32 +448,37 @@ function SprintSection(props: {
   );
 }
 
-function BoardEmpty() {
+function BoardEmpty(props: {
+  plannedSprint: SerializedIssueSprint | null;
+  onStartPlannedSprint: (sprintId: string) => Promise<void>;
+}) {
   const params = useParams();
   return (
-    <Empty class="min-h-96">
+    <Empty class="min-h-[calc(100dvh-16rem)] w-full flex items-center justify-center">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <LandPlotIcon />
         </EmptyMedia>
         <EmptyTitle>No active sprint</EmptyTitle>
         <EmptyDescription>
-          Create a sprint to start tracking your issues on the board.
+          Start a planned sprint or create a new one to use the board.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="flex flex-row gap-3">
+          <Show when={props.plannedSprint}>
+            {(plannedSprint) => (
+              <Button onClick={() => props.onStartPlannedSprint(plannedSprint().id)}>
+                <PlayIcon class="size-4" />
+                Start {plannedSprint().name}
+              </Button>
+            )}
+          </Show>
           <A
             href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
-            class={buttonVariants()}
+            class={buttonVariants({ variant: props.plannedSprint ? "secondary" : "default" })}
           >
             Create sprint
-          </A>
-          <A
-            href={`/${params.workspaceSlug}/team/${params.teamKey}/issues/backlog`}
-            class={buttonVariants({ variant: "secondary" })}
-          >
-            View backlog
           </A>
         </div>
       </EmptyContent>
