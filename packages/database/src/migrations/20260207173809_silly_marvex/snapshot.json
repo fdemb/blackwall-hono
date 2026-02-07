@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "1b4f9cb2-20b8-423a-9630-ba34865fbed1",
+  "id": "2f6179f1-d9b7-4f3e-9e01-5b94d017f72e",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -2205,6 +2205,34 @@
     {
       "columns": [
         {
+          "value": "created_by_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_sprint_created_by_id_idx",
+      "entityType": "indexes",
+      "table": "issue_sprint"
+    },
+    {
+      "columns": [
+        {
+          "value": "team_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_sprint_team_id_idx",
+      "entityType": "indexes",
+      "table": "issue_sprint"
+    },
+    {
+      "columns": [
+        {
           "value": "queue",
           "isExpression": false
         },
@@ -2241,6 +2269,20 @@
       "name": "job_status_locked_until_idx",
       "entityType": "indexes",
       "table": "job"
+    },
+    {
+      "columns": [
+        {
+          "value": "workspace_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "label_workspace_id_idx",
+      "entityType": "indexes",
+      "table": "label"
     },
     {
       "columns": [
@@ -2287,6 +2329,104 @@
       "name": "issue_key_workspace_id_unique",
       "entityType": "indexes",
       "table": "issue"
+    },
+    {
+      "columns": [
+        {
+          "value": "workspace_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_workspace_id_idx",
+      "entityType": "indexes",
+      "table": "issue"
+    },
+    {
+      "columns": [
+        {
+          "value": "team_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_team_id_idx",
+      "entityType": "indexes",
+      "table": "issue"
+    },
+    {
+      "columns": [
+        {
+          "value": "created_by_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_created_by_id_idx",
+      "entityType": "indexes",
+      "table": "issue"
+    },
+    {
+      "columns": [
+        {
+          "value": "assigned_to_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_assigned_to_id_idx",
+      "entityType": "indexes",
+      "table": "issue"
+    },
+    {
+      "columns": [
+        {
+          "value": "sprint_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_sprint_id_idx",
+      "entityType": "indexes",
+      "table": "issue"
+    },
+    {
+      "columns": [
+        {
+          "value": "issue_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_attachment_issue_id_idx",
+      "entityType": "indexes",
+      "table": "issue_attachment"
+    },
+    {
+      "columns": [
+        {
+          "value": "created_by_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_attachment_created_by_id_idx",
+      "entityType": "indexes",
+      "table": "issue_attachment"
     },
     {
       "columns": [
@@ -2351,6 +2491,62 @@
     {
       "columns": [
         {
+          "value": "issue_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_comment_issue_id_idx",
+      "entityType": "indexes",
+      "table": "issue_comment"
+    },
+    {
+      "columns": [
+        {
+          "value": "author_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "issue_comment_author_id_idx",
+      "entityType": "indexes",
+      "table": "issue_comment"
+    },
+    {
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "account_user_id_idx",
+      "entityType": "indexes",
+      "table": "account"
+    },
+    {
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "session_user_id_idx",
+      "entityType": "indexes",
+      "table": "session"
+    },
+    {
+      "columns": [
+        {
           "value": "workspace_id",
           "isExpression": false
         },
@@ -2369,6 +2565,48 @@
     {
       "columns": [
         {
+          "value": "active_sprint_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "team_active_sprint_id_idx",
+      "entityType": "indexes",
+      "table": "team"
+    },
+    {
+      "columns": [
+        {
+          "value": "last_workspace_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "user_last_workspace_id_idx",
+      "entityType": "indexes",
+      "table": "user"
+    },
+    {
+      "columns": [
+        {
+          "value": "last_team_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "user_last_team_id_idx",
+      "entityType": "indexes",
+      "table": "user"
+    },
+    {
+      "columns": [
+        {
           "value": "slug",
           "isExpression": false
         }
@@ -2379,6 +2617,34 @@
       "name": "workspace_slug_unique",
       "entityType": "indexes",
       "table": "workspace"
+    },
+    {
+      "columns": [
+        {
+          "value": "workspace_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "workspace_invitation_workspace_id_idx",
+      "entityType": "indexes",
+      "table": "workspace_invitation"
+    },
+    {
+      "columns": [
+        {
+          "value": "created_by_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "workspace_invitation_created_by_id_idx",
+      "entityType": "indexes",
+      "table": "workspace_invitation"
     },
     {
       "columns": [

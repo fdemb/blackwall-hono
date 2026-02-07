@@ -237,14 +237,33 @@ CREATE TABLE `workspace_user` (
 	CONSTRAINT `fk_workspace_user_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 );
 --> statement-breakpoint
+CREATE INDEX `issue_sprint_created_by_id_idx` ON `issue_sprint` (`created_by_id`);--> statement-breakpoint
+CREATE INDEX `issue_sprint_team_id_idx` ON `issue_sprint` (`team_id`);--> statement-breakpoint
 CREATE INDEX `job_queue_status_run_at_idx` ON `job` (`queue`,`status`,`run_at`);--> statement-breakpoint
 CREATE INDEX `job_status_locked_until_idx` ON `job` (`status`,`locked_until`);--> statement-breakpoint
+CREATE INDEX `label_workspace_id_idx` ON `label` (`workspace_id`);--> statement-breakpoint
 CREATE INDEX `time_entry_issue_id_idx` ON `time_entry` (`issue_id`);--> statement-breakpoint
 CREATE INDEX `time_entry_user_id_idx` ON `time_entry` (`user_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `issue_key_workspace_id_unique` ON `issue` (`key`,`workspace_id`);--> statement-breakpoint
+CREATE INDEX `issue_workspace_id_idx` ON `issue` (`workspace_id`);--> statement-breakpoint
+CREATE INDEX `issue_team_id_idx` ON `issue` (`team_id`);--> statement-breakpoint
+CREATE INDEX `issue_created_by_id_idx` ON `issue` (`created_by_id`);--> statement-breakpoint
+CREATE INDEX `issue_assigned_to_id_idx` ON `issue` (`assigned_to_id`);--> statement-breakpoint
+CREATE INDEX `issue_sprint_id_idx` ON `issue` (`sprint_id`);--> statement-breakpoint
+CREATE INDEX `issue_attachment_issue_id_idx` ON `issue_attachment` (`issue_id`);--> statement-breakpoint
+CREATE INDEX `issue_attachment_created_by_id_idx` ON `issue_attachment` (`created_by_id`);--> statement-breakpoint
 CREATE INDEX `issue_change_event_issue_id_idx` ON `issue_change_event` (`issue_id`);--> statement-breakpoint
 CREATE INDEX `issue_change_event_workspace_created_idx` ON `issue_change_event` (`workspace_id`,`created_at`);--> statement-breakpoint
 CREATE INDEX `issue_change_event_type_idx` ON `issue_change_event` (`event_type`);--> statement-breakpoint
 CREATE INDEX `issue_change_event_actor_id_idx` ON `issue_change_event` (`actor_id`);--> statement-breakpoint
+CREATE INDEX `issue_comment_issue_id_idx` ON `issue_comment` (`issue_id`);--> statement-breakpoint
+CREATE INDEX `issue_comment_author_id_idx` ON `issue_comment` (`author_id`);--> statement-breakpoint
+CREATE INDEX `account_user_id_idx` ON `account` (`user_id`);--> statement-breakpoint
+CREATE INDEX `session_user_id_idx` ON `session` (`user_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `team_workspace_id_key_unique` ON `team` (`workspace_id`,`key`);--> statement-breakpoint
-CREATE UNIQUE INDEX `workspace_slug_unique` ON `workspace` (`slug`);
+CREATE INDEX `team_active_sprint_id_idx` ON `team` (`active_sprint_id`);--> statement-breakpoint
+CREATE INDEX `user_last_workspace_id_idx` ON `user` (`last_workspace_id`);--> statement-breakpoint
+CREATE INDEX `user_last_team_id_idx` ON `user` (`last_team_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `workspace_slug_unique` ON `workspace` (`slug`);--> statement-breakpoint
+CREATE INDEX `workspace_invitation_workspace_id_idx` ON `workspace_invitation` (`workspace_id`);--> statement-breakpoint
+CREATE INDEX `workspace_invitation_created_by_id_idx` ON `workspace_invitation` (`created_by_id`);
