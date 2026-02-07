@@ -13,6 +13,7 @@ import {
   updateIssueSprintSchema,
   issueSprintListSchema,
   issueSprintResponseSchema,
+  issueSprintCompleteContextSchema,
   issueSprintWithIssuesSchema,
 } from "./issue-sprint.zod";
 import { NotFoundError } from "../../lib/errors";
@@ -140,7 +141,46 @@ const issueSprintRoutes = new Hono<AppEnv>()
     },
   )
   /**
-   * POST /teams/:teamKey/sprints - Create a new sprint and set it as active.
+   * GET /teams/:teamKey/sprints/:sprintId/complete-context - Get data needed for completing a sprint.
+   */
+  .get(
+    "/teams/:teamKey/sprints/:sprintId/complete-context",
+    describeRoute({
+      tags: ["Sprints"],
+      summary: "Get complete sprint context",
+      responses: {
+        200: {
+          description: "Sprint complete context",
+          content: { "application/json": { schema: resolver(issueSprintCompleteContextSchema) } },
+        },
+      },
+    }),
+    validator("param", z.object({ teamKey: z.string(), sprintId: z.string() })),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey, sprintId } = c.req.valid("param");
+
+      const team = await teamData.getTeamForUser({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+      });
+
+      if (!team) {
+        throw new NotFoundError("Team not found");
+      }
+
+      const completeContext = await issueSprintService.getSprintCompleteContext({
+        sprintId,
+        teamId: team.id,
+      });
+
+      return c.json(completeContext);
+    },
+  )
+  /**
+   * POST /teams/:teamKey/sprints - Create a new sprint.
    */
   .post(
     "/teams/:teamKey/sprints",
@@ -177,18 +217,56 @@ const issueSprintRoutes = new Hono<AppEnv>()
       const endDate = new Date(body.endDate);
       endDate.setUTCHours(23, 59, 59, 999);
 
-      const sprint = await issueSprintService.createAndActivateSprint({
+      const sprint = await issueSprintService.createSprint({
         name: body.name,
         goal: body.goal,
         startDate,
         endDate,
         createdById: user.id,
         teamId: team.id,
-        activeSprintId: team.activeSprintId,
-        onUndoneIssues: body.onUndoneIssues,
       });
 
       return c.json({ sprint }, 201);
+    },
+  )
+  /**
+   * POST /teams/:teamKey/sprints/:sprintId/start - Start a planned sprint.
+   */
+  .post(
+    "/teams/:teamKey/sprints/:sprintId/start",
+    describeRoute({
+      tags: ["Sprints"],
+      summary: "Start a sprint",
+      responses: {
+        200: {
+          description: "Started sprint",
+          content: { "application/json": { schema: resolver(issueSprintResponseSchema) } },
+        },
+      },
+    }),
+    validator("param", z.object({ teamKey: z.string(), sprintId: z.string() })),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { teamKey, sprintId } = c.req.valid("param");
+
+      const team = await teamData.getTeamForUser({
+        workspaceId: workspace.id,
+        teamKey,
+        userId: user.id,
+      });
+
+      if (!team) {
+        throw new NotFoundError("Team not found");
+      }
+
+      const sprint = await issueSprintService.startSprint({
+        sprintId,
+        teamId: team.id,
+        activeSprintId: team.activeSprintId,
+      });
+
+      return c.json({ sprint });
     },
   )
   /**
@@ -277,20 +355,22 @@ const issueSprintRoutes = new Hono<AppEnv>()
       await issueSprintService.completeSprint({
         sprintId,
         teamId: team.id,
-        onUndoneIssues: body.onUndoneIssues,
+        createdById: user.id,
+        activeSprintId: team.activeSprintId,
+        completion: body,
       });
 
       return c.json({ success: true });
     },
   )
   /**
-   * DELETE /teams/:teamKey/sprints/:sprintId - Delete a non-active sprint.
+   * DELETE /teams/:teamKey/sprints/:sprintId - Archive a non-active sprint.
    */
   .delete(
     "/teams/:teamKey/sprints/:sprintId",
     describeRoute({
       tags: ["Sprints"],
-      summary: "Delete a sprint",
+      summary: "Archive a sprint",
       responses: {
         200: {
           description: "Success",
@@ -314,7 +394,7 @@ const issueSprintRoutes = new Hono<AppEnv>()
         throw new NotFoundError("Team not found");
       }
 
-      await issueSprintService.deleteSprint({
+      await issueSprintService.archiveSprint({
         sprintId,
         teamId: team.id,
         activeSprintId: team.activeSprintId,

@@ -39,7 +39,7 @@ function KbdGroup(props: ComponentProps<"div">) {
   return (
     <div
       data-slot="kbd-group"
-      class={cn("inline-flex items-center gap-1", local.class)}
+      class={cn("inline-flex items-center gap-1 text-xs", local.class)}
       {...rest}
     />
   );

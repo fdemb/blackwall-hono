@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { issueSprintStatusValues } from "@blackwall/database/schema";
 
 const sprintBaseSchema = z.object({
   name: z.string().min(1).max(100),
@@ -16,9 +17,7 @@ const withValidDateRange = <TSchema extends z.ZodType<{ startDate: string; endDa
   });
 
 export const createIssueSprintSchema = withValidDateRange(
-  sprintBaseSchema.extend({
-    onUndoneIssues: z.enum(["moveToBacklog", "moveToNewSprint"]),
-  }),
+  sprintBaseSchema,
 );
 
 export type CreateIssueSprint = z.infer<typeof createIssueSprintSchema>;
@@ -29,9 +28,27 @@ export const updateIssueSprintSchema = withValidDateRange(sprintBaseSchema);
 
 export type UpdateIssueSprint = z.infer<typeof updateIssueSprintSchema>;
 
-export const completeIssueSprintSchema = z.object({
-  onUndoneIssues: z.enum(["moveToBacklog", "moveToNewSprint"]),
-});
+const newSprintForCompletionSchema = withValidDateRange(
+  z.object({
+    name: z.string().min(1).max(100),
+    startDate: z.iso.date(),
+    endDate: z.iso.date(),
+  }),
+);
+
+export const completeIssueSprintSchema = z.discriminatedUnion("onUndoneIssues", [
+  z.object({
+    onUndoneIssues: z.literal("moveToBacklog"),
+  }),
+  z.object({
+    onUndoneIssues: z.literal("moveToPlannedSprint"),
+    targetSprintId: z.string(),
+  }),
+  z.object({
+    onUndoneIssues: z.literal("moveToNewSprint"),
+    newSprint: newSprintForCompletionSchema,
+  }),
+]);
 
 export type CompleteIssueSprint = z.infer<typeof completeIssueSprintSchema>;
 
@@ -48,7 +65,8 @@ export const issueSprintSchema = z.object({
   endDate: z.iso.date(),
   teamId: z.string(),
   createdById: z.string(),
-  status: z.string().optional(), // active, completed, etc. if exists
+  status: z.enum(issueSprintStatusValues),
+  archivedAt: z.string().nullable().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });
@@ -64,4 +82,10 @@ export const issueSprintResponseSchema = z.object({
 export const issueSprintWithIssuesSchema = z.object({
   sprint: issueSprintSchema,
   issues: z.array(issueSchema),
+});
+
+export const issueSprintCompleteContextSchema = z.object({
+  sprint: issueSprintSchema,
+  plannedSprints: z.array(issueSprintSchema),
+  hasUndoneIssues: z.boolean(),
 });

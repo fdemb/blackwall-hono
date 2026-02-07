@@ -5,7 +5,7 @@ import { revalidate, action, useAction } from "@solidjs/router";
 import { Popover } from "@kobalte/core/popover";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
-import { createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal, Show, type JSX } from "solid-js";
 import type { SerializedIssueSprint } from "@blackwall/database/schema";
 
 const updateSprint = action(async (issueKey: string, sprintId: string | null) => {
@@ -19,17 +19,19 @@ const updateSprint = action(async (issueKey: string, sprintId: string | null) =>
 
 type SprintPickerPopoverProps = {
   sprintId: string | null;
-  activeSprint: SerializedIssueSprint | null;
-  issueKey: string;
-  workspaceSlug: string;
+  openSprints: SerializedIssueSprint[];
+  issueKey?: string;
+  onChange?: (id: string | null) => Promise<void> | void;
+  trigger?: JSX.Element;
 };
 
 export function SprintPickerPopover(props: SprintPickerPopoverProps) {
   const [open, setOpen] = createSignal(false);
   const _update = useAction(updateSprint);
 
-  const currentSprint = () =>
-    props.sprintId && props.activeSprint?.id === props.sprintId ? props.activeSprint : null;
+  const currentSprint = createMemo(() =>
+    props.openSprints.find((sprint) => sprint.id === props.sprintId),
+  );
 
   const sprintOptions = createMemo(() => {
     const options: Array<{
@@ -44,10 +46,10 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
       },
     ];
 
-    if (props.activeSprint) {
+    for (const sprint of props.openSprints) {
       options.push({
-        id: props.activeSprint.id,
-        label: props.activeSprint.name,
+        id: sprint.id,
+        label: sprint.name,
         icon: () => <LandPlotIcon class="size-4" />,
       });
     }
@@ -56,28 +58,39 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
   });
 
   const handleChange = async (id: string | null) => {
-    _update(props.issueKey, id);
+    if (props.onChange) {
+      await props.onChange(id);
+      return;
+    }
+
+    if (!props.issueKey) {
+      return;
+    }
+
+    await _update(props.issueKey, id);
   };
 
   return (
     <Popover open={open()} onOpenChange={setOpen} placement="bottom-start" gutter={8}>
-      <Popover.Trigger
-        class="flex flex-row gap-2 items-center text-base px-2!"
-        as={Button}
-        variant="outline"
-        size="lg"
-        scaleEffect={false}
-      >
-        <LandPlotIcon class="size-4" />
-        {currentSprint()?.name ?? "No sprint"}
-        <ChevronsUpDownIcon class="size-4" />
-      </Popover.Trigger>
+      <Show when={!props.trigger} fallback={props.trigger}>
+        <Popover.Trigger
+          class="flex flex-row gap-2 items-center text-base px-2!"
+          as={Button}
+          variant="outline"
+          size="lg"
+          scaleEffect={false}
+        >
+          {props.trigger ?? (
+            <>
+              <LandPlotIcon class="size-4" />
+              {currentSprint()?.name ?? "No sprint"}
+              <ChevronsUpDownIcon class="size-4" />
+            </>
+          )}
+        </Popover.Trigger>
+      </Show>
 
-      <PickerPopover
-        value={props.sprintId}
-        onChange={handleChange}
-        options={sprintOptions()}
-      />
+      <PickerPopover value={props.sprintId} onChange={handleChange} options={sprintOptions()} />
     </Popover>
   );
 }

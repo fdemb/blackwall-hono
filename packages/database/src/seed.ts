@@ -361,6 +361,7 @@ async function main() {
         createdById: users[0]!.id,
         startDate: new Date(now.getTime() - 28 * DAY_MS),
         endDate: new Date(now.getTime() - 14 * DAY_MS),
+        status: "completed",
         finishedAt: new Date(now.getTime() - 13 * DAY_MS),
       },
       {
@@ -370,6 +371,7 @@ async function main() {
         createdById: users[0]!.id,
         startDate: new Date(now.getTime() - 7 * DAY_MS),
         endDate: new Date(now.getTime() + 7 * DAY_MS),
+        status: "active",
       },
       {
         name: `${team.key} Sprint 26`,
@@ -378,6 +380,7 @@ async function main() {
         createdById: users[0]!.id,
         startDate: new Date(now.getTime() + 14 * DAY_MS),
         endDate: new Date(now.getTime() + 28 * DAY_MS),
+        status: "planned",
       },
     );
   }

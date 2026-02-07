@@ -1,11 +1,5 @@
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
-import type {
-  IssueSprint,
-  Label,
-  SerializedIssueSprint,
-  SerializedLabel,
-  SerializedUser,
-} from "@blackwall/database/schema";
+import type { SerializedIssueSprint, SerializedLabel, SerializedUser } from "@blackwall/database/schema";
 import type { InferDbType } from "@blackwall/database/types";
 import type { JSX } from "solid-js";
 import {
@@ -43,7 +37,7 @@ export function IssueSidebar(props: {
   issue: IssueForSidebar;
   labels: SerializedLabel[];
   assignableUsers: SerializedUser[];
-  activeSprint: SerializedIssueSprint | null;
+  openSprints: SerializedIssueSprint[];
   workspaceSlug: string;
   teamKey: string;
 }) {
@@ -91,9 +85,8 @@ export function IssueSidebar(props: {
         <IssueSidebarItem label="Sprint" orientation="col">
           <SprintPickerPopover
             sprintId={props.issue.sprintId}
-            activeSprint={props.activeSprint}
+            openSprints={props.openSprints}
             issueKey={props.issue.key}
-            workspaceSlug={props.workspaceSlug}
           />
         </IssueSidebarItem>
       </SidebarContent>

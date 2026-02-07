@@ -9,16 +9,6 @@ import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-  FieldTitle,
-} from "@/components/ui/field";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "../custom-ui/toast";
 
 type SprintFormProps = {
@@ -38,7 +28,6 @@ const createSprintAction = action(
       goal: string | null;
       startDate: string;
       endDate: string;
-      onUndoneIssues: "moveToBacklog" | "moveToNewSprint";
     },
   ) => {
     await api.api["issue-sprints"].teams[":teamKey"].sprints.$post({
@@ -48,7 +37,6 @@ const createSprintAction = action(
         goal: value.goal,
         startDate: value.startDate,
         endDate: value.endDate,
-        onUndoneIssues: value.onUndoneIssues,
       },
     });
 
@@ -67,7 +55,6 @@ export function SprintForm(props: SprintFormProps) {
       goal: null as string | null,
       startDate: today(getLocalTimeZone()).toString(),
       endDate: today(getLocalTimeZone()).add({ weeks: 2 }).toString(),
-      onUndoneIssues: "moveToBacklog" as "moveToBacklog" | "moveToNewSprint",
     },
     validators: {
       onSubmit: z
@@ -76,7 +63,6 @@ export function SprintForm(props: SprintFormProps) {
           goal: z.string().nullable(),
           startDate: z.iso.date(),
           endDate: z.iso.date(),
-          onUndoneIssues: z.enum(["moveToBacklog", "moveToNewSprint"]),
         })
         .refine((data) => data.endDate >= data.startDate, {
           message: "End date must be on or after start date",
@@ -155,45 +141,6 @@ export function SprintForm(props: SprintFormProps) {
             }}
           </form.AppField>
         </div>
-
-        <form.AppField name="onUndoneIssues">
-          {(field) => (
-            <FieldSet>
-              <FieldLegend variant="label">On undone issues</FieldLegend>
-              <RadioGroup
-                value={field().state.value}
-                onValueChange={(value) => field().handleChange(value)}
-              >
-                <FieldLabel for="moveToBacklog">
-                  <Field orientation="horizontal">
-                    <FieldContent>
-                      <FieldTitle>Move to backlog</FieldTitle>
-                      <FieldDescription>Move undone issues to the backlog.</FieldDescription>
-                    </FieldContent>
-                    <RadioGroupItem
-                      value="moveToBacklog"
-                      id="moveToBacklog"
-                      aria-label="Move to backlog"
-                    />
-                  </Field>
-                </FieldLabel>
-                <FieldLabel for="moveToNewSprint">
-                  <Field orientation="horizontal">
-                    <FieldContent>
-                      <FieldTitle>Move to new sprint</FieldTitle>
-                      <FieldDescription>Move undone issues to a new sprint.</FieldDescription>
-                    </FieldContent>
-                    <RadioGroupItem
-                      value="moveToNewSprint"
-                      id="moveToNewSprint"
-                      aria-label="Move to new sprint"
-                    />
-                  </Field>
-                </FieldLabel>
-              </RadioGroup>
-            </FieldSet>
-          )}
-        </form.AppField>
 
         <form.Subscribe>
           {(state) => (

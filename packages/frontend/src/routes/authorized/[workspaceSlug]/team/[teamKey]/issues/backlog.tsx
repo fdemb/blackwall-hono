@@ -18,11 +18,14 @@ import { createAsync, useParams } from "@solidjs/router";
 import { createMemo, Show } from "solid-js";
 import { backlogLoader } from "./backlog.data";
 import { useTeamData } from "../../[teamKey]";
+import { sprintsLoader } from "../sprints/index.data";
 
 export default function BacklogPage() {
   const params = useParams();
   const teamData = useTeamData();
   const issues = createAsync(() => backlogLoader(params.teamKey!));
+  const sprints = createAsync(() => sprintsLoader(params.teamKey!));
+  const openSprints = createMemo(() => (sprints() ?? []).filter((sprint) => sprint.status !== "completed"));
 
   const rowSelection = createRowSelection();
 
@@ -51,7 +54,7 @@ export default function BacklogPage() {
       <IssueSelectionMenu
         selectedIssues={selectedIssues()}
         onClearSelection={rowSelection.clearSelection}
-        activeSprint={teamData().activeSprint}
+        openSprints={openSprints()}
       />
 
       <Show when={issues() && issues()!.length > 0} fallback={<IssueEmpty />}>

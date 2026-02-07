@@ -1,6 +1,6 @@
 import { createAsync, useParams } from "@solidjs/router";
 import { Show } from "solid-js";
-import { sprintDetailLoader } from "./index.data";
+import { sprintCompleteContextLoader } from "./complete.data";
 import { useTeamData } from "../../../[teamKey]";
 import { CompleteSprintForm } from "@/components/sprints/complete-sprint-form";
 import { PageHeader } from "@/components/blocks/page-header";
@@ -11,7 +11,7 @@ import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 export default function CompleteSprintPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const data = createAsync(() => sprintDetailLoader(params.teamKey!, params.sprintId!));
+  const data = createAsync(() => sprintCompleteContextLoader(params.teamKey!, params.sprintId!));
 
   return (
     <Show when={data()} fallback={null}>
@@ -39,6 +39,8 @@ export default function CompleteSprintPage() {
               teamKey={params.teamKey!}
               team={teamData()}
               sprint={sprintData().sprint}
+              plannedSprints={sprintData().plannedSprints}
+              hasUndoneIssues={sprintData().hasUndoneIssues}
             />
           </ScrollContainer>
         </>

@@ -20,6 +20,7 @@ import { myIssuesLoader } from "./routes/authorized/[workspaceSlug]/my-issues.da
 import { sprintsLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/index.data";
 
 import { sprintDetailLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/[sprintId]/index.data";
+import { sprintCompleteContextLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/sprints/[sprintId]/complete.data";
 import { membersLoader } from "./routes/authorized/[workspaceSlug]/members/index.data";
 import { memberDetailLoader } from "./routes/authorized/[workspaceSlug]/members/[userId].data";
 import { workspaceMembersLoader } from "./routes/authorized/[workspaceSlug]/settings/workspace.data";
@@ -168,7 +169,7 @@ const AppRouter = () => (
             <Route
               path="/sprints/:sprintId/complete"
               component={CompleteSprintPage}
-              preload={({ params }) => sprintDetailLoader(params.teamKey!, params.sprintId!)}
+              preload={({ params }) => sprintCompleteContextLoader(params.teamKey!, params.sprintId!)}
             />
             <Route
               path="/sprints/:sprintId/edit"

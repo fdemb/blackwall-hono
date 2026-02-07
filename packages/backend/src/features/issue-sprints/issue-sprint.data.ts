@@ -1,12 +1,37 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db, dbSchema } from "@blackwall/database";
-import type { IssueStatus } from "@blackwall/database/schema";
+import type { IssueStatus, IssueSprintStatus } from "@blackwall/database/schema";
 
 const ACTIVE_ISSUE_STATUSES = ["to_do", "in_progress"] as IssueStatus[];
 
 export async function listSprintsForTeam(input: { teamId: string }) {
     return db.query.issueSprint.findMany({
-        where: { teamId: input.teamId },
+        where: {
+            teamId: input.teamId,
+            archivedAt: { isNull: true },
+        },
+        orderBy: { createdAt: "desc" },
+    });
+}
+
+export async function listOpenSprintsForTeam(input: { teamId: string }) {
+    return db.query.issueSprint.findMany({
+        where: {
+            teamId: input.teamId,
+            status: { in: ["planned", "active"] },
+            archivedAt: { isNull: true },
+        },
+        orderBy: { createdAt: "desc" },
+    });
+}
+
+export async function listPlannedSprintsForTeam(input: { teamId: string }) {
+    return db.query.issueSprint.findMany({
+        where: {
+            teamId: input.teamId,
+            status: "planned",
+            archivedAt: { isNull: true },
+        },
         orderBy: { createdAt: "desc" },
     });
 }
@@ -37,6 +62,7 @@ export async function createSprint(input: {
             endDate: input.endDate,
             createdById: input.createdById,
             teamId: input.teamId,
+            status: "planned",
         })
         .returning();
 
@@ -67,7 +93,19 @@ export async function updateSprint(input: {
 export async function completeSprint(input: { sprintId: string }) {
     await db
         .update(dbSchema.issueSprint)
-        .set({ finishedAt: sql`(unixepoch() * 1000)` })
+        .set({
+            status: "completed",
+            finishedAt: sql`(unixepoch() * 1000)`,
+        })
+        .where(eq(dbSchema.issueSprint.id, input.sprintId));
+}
+
+export async function setSprintStatus(input: { sprintId: string; status: IssueSprintStatus }) {
+    await db
+        .update(dbSchema.issueSprint)
+        .set({
+            status: input.status,
+        })
         .where(eq(dbSchema.issueSprint.id, input.sprintId));
 }
 
@@ -145,20 +183,43 @@ export async function clearSprintFromIssues(input: { sprintId: string }) {
         .where(eq(dbSchema.issue.sprintId, input.sprintId));
 }
 
-export async function deleteSprint(input: { sprintId: string }) {
-    await db.delete(dbSchema.issueSprint).where(eq(dbSchema.issueSprint.id, input.sprintId));
+export async function countUndoneIssuesInSprint(input: { sprintId: string }) {
+    const [result] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(dbSchema.issue)
+        .where(
+            and(
+                eq(dbSchema.issue.sprintId, input.sprintId),
+                inArray(dbSchema.issue.status, ACTIVE_ISSUE_STATUSES),
+            ),
+        );
+
+    return Number(result?.count ?? 0);
+}
+
+export async function archiveSprint(input: { sprintId: string }) {
+    await db
+        .update(dbSchema.issueSprint)
+        .set({
+            archivedAt: sql`(unixepoch() * 1000)`,
+        })
+        .where(eq(dbSchema.issueSprint.id, input.sprintId));
 }
 
 export const issueSprintData = {
     listSprintsForTeam,
+    listOpenSprintsForTeam,
+    listPlannedSprintsForTeam,
     getSprintById,
     createSprint,
     updateSprint,
     completeSprint,
+    setSprintStatus,
     setActiveSprintOnTeam,
     moveActiveIssuesToBacklog,
     moveActiveIssuesToSprint,
     moveActiveIssuesToUnsprinted,
     clearSprintFromIssues,
-    deleteSprint,
+    countUndoneIssuesInSprint,
+    archiveSprint,
 };

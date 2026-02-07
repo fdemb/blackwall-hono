@@ -7,6 +7,7 @@ export const issueLoader = query(async (issueKey: string, workspaceSlug: string)
   });
 
   const { issue } = await issueRes.json();
+  const teamKey = issue.team?.key;
 
   const labelsRes = await api.api.labels.$get();
   const { labels } = await labelsRes.json();
@@ -17,9 +18,19 @@ export const issueLoader = query(async (issueKey: string, workspaceSlug: string)
 
   const { members } = await res.json();
 
+  const sprintsRes = teamKey
+    ? await api.api["issue-sprints"].teams[":teamKey"].sprints.$get({
+        param: { teamKey },
+      })
+    : null;
+
+  const sprints = sprintsRes ? (await sprintsRes.json()).sprints : [];
+  const openSprints = sprints.filter((sprint) => sprint.status !== "completed");
+
   return {
     issue,
     labels,
     assignableUsers: members,
+    openSprints,
   };
 }, "issueShow");

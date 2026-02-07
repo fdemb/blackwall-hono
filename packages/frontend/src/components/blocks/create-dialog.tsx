@@ -67,10 +67,11 @@ const createIssueAction = action(
 );
 
 const uploadAttachmentAction = action(async (formData: FormData) => {
-  // TODO: implement
-  return {
-    id: "placeholder",
-  };
+  api.api.issues.attachments.$post({
+    form: {
+      file: formData.get("file"),
+    },
+  });
 });
 
 function CreateDialog(props: CreateDialogProps) {
@@ -88,6 +89,8 @@ function CreateDialog(props: CreateDialogProps) {
             <span class="mr-2">Create a new issue</span>
             <KbdGroup>
               <Kbd>C</Kbd>
+              then
+              <Kbd>R</Kbd>
             </KbdGroup>
           </TooltipContent>
         </Show>
@@ -145,8 +148,7 @@ function CreateDialogContent(props: CreateDialogProps) {
         teamKey: z.string().min(1, "Team key is required"),
         summary: z.string().min(1, "Summary is required"),
         status: z.enum(["to_do", "in_progress", "done"], {
-          error:
-            "Status is required and must be one of the following: to_do, in_progress, done",
+          error: "Status is required and must be one of the following: to_do, in_progress, done",
         }),
         description: z.any().refine((val) => val !== null && val !== undefined, {
           message: "Description is required",
@@ -159,14 +161,14 @@ function CreateDialogContent(props: CreateDialogProps) {
 
   onMount(() => {
     if (props.global) {
-      addKeybind("c", () => {
+      addKeybind("c r", () => {
         if (isOpen()) return;
         toggle();
       });
     }
 
     onCleanup(() => {
-      removeKeybind("c");
+      removeKeybind("c r");
     });
   });
 

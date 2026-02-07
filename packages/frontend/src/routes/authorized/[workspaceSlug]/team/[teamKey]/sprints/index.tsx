@@ -3,8 +3,8 @@ import {
   createAsync,
   redirect,
   useAction,
-  useNavigate,
   useParams,
+  useSubmission,
   A,
 } from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
@@ -31,6 +31,7 @@ import { DataTable } from "@/components/datatable/datatable";
 import { api } from "@/lib/api";
 import { toast } from "@/components/custom-ui/toast";
 import { SprintStatusBadge } from "@/components/sprints/sprint-status-badge";
+import { ArchiveSprintDialog } from "@/components/sprints/archive-sprint-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,27 +39,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import MoreHorizontalIcon from "lucide-solid/icons/more-horizontal";
+import PlayIcon from "lucide-solid/icons/play";
+import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import { Button } from "@/components/ui/button";
 
-const archiveSprintAction = action(async (workspaceSlug: string, teamKey: string, sprintId: string) => {
-  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$delete({
+const archiveSprintAction = action(
+  async (workspaceSlug: string, teamKey: string, sprintId: string) => {
+    await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$delete({
+      param: { teamKey, sprintId },
+    });
+
+    toast.success("Sprint archived and hidden from default lists");
+    throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
+  },
+);
+
+const startSprintAction = action(async (teamKey: string, sprintId: string) => {
+  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].start.$post({
     param: { teamKey, sprintId },
   });
 
-  toast.success("Sprint archived");
-  throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
+  toast.success("Sprint started");
 });
 
 export default function SprintsPage() {
@@ -103,7 +105,8 @@ function SprintEmpty(props: { workspaceSlug: string; teamKey: string }) {
         </EmptyMedia>
         <EmptyTitle>No sprints yet</EmptyTitle>
         <EmptyDescription>
-          Sprints help you organize and track work over time. Create your first sprint to get started.
+          Sprints help you organize and track work over time. Create your first sprint to get
+          started.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
@@ -126,9 +129,8 @@ type SprintTableProps = {
 
 function SprintTable(props: SprintTableProps) {
   const columnHelper = createColumnHelper<SerializedIssueSprint>();
-  const teamData = useTeamData();
-  const navigate = useNavigate();
   const archiveAction = useAction(archiveSprintAction);
+  const startAction = useAction(startSprintAction);
   const [archiveDialogOpen, setArchiveDialogOpen] = createSignal(false);
   const [selectedSprint, setSelectedSprint] = createSignal<SerializedIssueSprint | null>(null);
 
@@ -145,9 +147,7 @@ function SprintTable(props: SprintTableProps) {
     columnHelper.display({
       id: "status",
       header: "Status",
-      cell: (info) => (
-        <SprintStatusBadge sprint={info.row.original} activeSprintId={teamData().activeSprintId} />
-      ),
+      cell: (info) => <SprintStatusBadge sprint={info.row.original} />,
     }),
     columnHelper.accessor("startDate", {
       header: "Start date",
@@ -162,60 +162,94 @@ function SprintTable(props: SprintTableProps) {
       header: "Actions",
       cell: (info) => {
         const sprint = info.row.original;
-        const isActive = teamData().activeSprintId === sprint.id;
-        const isCompleted = Boolean(sprint.finishedAt);
+        const isActive = sprint.status === "active";
+        const isPlanned = sprint.status === "planned";
+        const startSubmission = useSubmission(
+          startSprintAction,
+          ([teamKey, sprintId]) => teamKey === props.teamKey && sprintId === sprint.id,
+        );
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              as={Button}
-              variant="ghost"
-              size="iconXs"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreHorizontalIcon class="size-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onSelect={() =>
-                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}`)
-                }
+          <div
+            class="flex items-center gap-1"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <Show when={isPlanned}>
+              <Button
+                variant="secondary"
+                size="xs"
+                disabled={startSubmission.pending}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  await startAction(props.teamKey, sprint.id);
+                }}
               >
-                View
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() =>
-                  navigate(`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}/edit`)
-                }
-                disabled={isCompleted}
+                <PlayIcon class="size-3.5" />
+                {startSubmission.pending ? "Starting..." : "Start"}
+              </Button>
+            </Show>
+
+            <Show when={isActive}>
+              <Button
+                as={A}
+                href={`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}/complete`}
+                size="xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
-                Edit
-              </DropdownMenuItem>
-              <Show when={isActive && !isCompleted}>
+                <CircleCheckIcon class="size-3.5" />
+                Complete
+              </Button>
+            </Show>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                as={Button}
+                variant="ghost"
+                size="iconXs"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontalIcon class="size-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
                 <DropdownMenuItem
-                  onSelect={() =>
-                    navigate(
-                      `/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}/complete`,
-                    )
-                  }
-                >
-                  Complete sprint
-                </DropdownMenuItem>
-              </Show>
-              <Show when={!isActive}>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  onSelect={() => {
-                    setSelectedSprint(sprint);
-                    setArchiveDialogOpen(true);
+                  as={A}
+                  href={`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
                   }}
                 >
-                  Archive
+                  View
                 </DropdownMenuItem>
-              </Show>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem
+                  as={A}
+                  href={`/${props.workspaceSlug}/team/${props.teamKey}/sprints/${sprint.id}/edit`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  disabled={!isPlanned}
+                >
+                  Edit
+                </DropdownMenuItem>
+                <Show when={!isActive}>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onSelect={() => {
+                      setSelectedSprint(sprint);
+                      setArchiveDialogOpen(true);
+                    }}
+                  >
+                    Archive
+                  </DropdownMenuItem>
+                </Show>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
     }),
@@ -234,31 +268,15 @@ function SprintTable(props: SprintTableProps) {
   return (
     <>
       <DataTable {...datatableProps} />
-      <AlertDialog open={archiveDialogOpen()} onOpenChange={setArchiveDialogOpen}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogMedia class="bg-destructive/50" />
-            <AlertDialogTitle>Archive this sprint?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This removes the sprint and unassigns any issues still attached to it.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              size="xs"
-              variant="destructive"
-              action={() =>
-                selectedSprint()
-                  ? archiveAction(props.workspaceSlug, props.teamKey, selectedSprint()!.id)
-                  : Promise.resolve()
-              }
-            >
-              Archive sprint
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ArchiveSprintDialog
+        open={archiveDialogOpen()}
+        onOpenChange={setArchiveDialogOpen}
+        onConfirm={() =>
+          selectedSprint()
+            ? archiveAction(props.workspaceSlug, props.teamKey, selectedSprint()!.id)
+            : Promise.resolve()
+        }
+      />
     </>
   );
 }

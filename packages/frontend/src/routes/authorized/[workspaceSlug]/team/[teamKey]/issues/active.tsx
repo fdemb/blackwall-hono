@@ -14,15 +14,18 @@ import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs
 import { createRowSelection } from "@/components/datatable/row-selection-feature";
 import { IssueDataTable, type IssueForDataTable } from "@/components/issues/issue-datatable";
 import { IssueSelectionMenu } from "@/components/issues/issue-selection-menu";
-import { action, createAsync, useParams } from "@solidjs/router";
+import { createAsync, useParams } from "@solidjs/router";
 import { createMemo, Show } from "solid-js";
 import { activeIssuesLoader } from "./active.data";
 import { useTeamData } from "../../[teamKey]";
+import { sprintsLoader } from "../sprints/index.data";
 
 export default function ActiveIssuesPage() {
   const params = useParams();
   const teamData = useTeamData();
   const issues = createAsync(() => activeIssuesLoader(params.teamKey!));
+  const sprints = createAsync(() => sprintsLoader(params.teamKey!));
+  const openSprints = createMemo(() => (sprints() ?? []).filter((sprint) => sprint.status !== "completed"));
 
   const rowSelection = createRowSelection();
 
@@ -51,7 +54,7 @@ export default function ActiveIssuesPage() {
       <IssueSelectionMenu
         selectedIssues={selectedIssues()}
         onClearSelection={rowSelection.clearSelection}
-        activeSprint={teamData().activeSprint}
+        openSprints={openSprints()}
       />
 
       <Show when={issues() && issues()!.length > 0} fallback={<IssueEmpty />}>

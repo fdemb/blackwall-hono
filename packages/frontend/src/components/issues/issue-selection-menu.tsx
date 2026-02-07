@@ -37,11 +37,12 @@ import type {
 } from "@blackwall/backend/src/features/issues/issue.zod";
 import { api } from "@/lib/api";
 import { toast } from "../custom-ui/toast";
+import { SprintPickerPopover } from "./pickers/sprint-picker";
 
 type IssueSelectionMenuProps = {
   selectedIssues: IssueForDataTable[];
   onClearSelection: () => void;
-  activeSprint?: SerializedIssueSprint | null;
+  openSprints?: SerializedIssueSprint[];
   assignableUsers?: User[];
 };
 
@@ -86,19 +87,6 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
     setDeleteDialogOpen(false);
     props.onClearSelection();
   };
-
-  const hasOnlyBackloggedIssues = () =>
-    props.selectedIssues.length > 0 && props.selectedIssues.every((issue) => issue.sprintId === null);
-
-  const hasOnlySprintedIssues = () =>
-    props.selectedIssues.length > 0 && props.selectedIssues.every((issue) => issue.sprintId !== null);
-
-  const hasMixedSprintSelection = () => !hasOnlyBackloggedIssues() && !hasOnlySprintedIssues();
-
-  const canAssignToActiveSprint = () =>
-    !!props.activeSprint && (hasOnlyBackloggedIssues() || hasMixedSprintSelection());
-
-  const canMoveToBacklog = () => hasOnlySprintedIssues() || hasMixedSprintSelection();
 
   const assignableUsersOptions = () => {
     if (!props.assignableUsers?.length) return [];
@@ -154,23 +142,19 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           />
         </Popover>
 
-        <Show when={canAssignToActiveSprint()}>
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={() => handleUpdate({ sprintId: props.activeSprint!.id })}
-          >
-            <LandPlotIcon class="size-4" />
-            Assign to active sprint
-          </Button>
-        </Show>
-
-        <Show when={canMoveToBacklog()}>
-          <Button variant="outline" size="xs" onClick={() => handleUpdate({ sprintId: null })}>
-            <LandPlotIcon class="size-4" />
-            Move to backlog
-          </Button>
-        </Show>
+        <SprintPickerPopover
+          sprintId={null}
+          openSprints={props.openSprints ?? []}
+          onChange={(id) => handleUpdate({ sprintId: id })}
+          trigger={
+            <>
+              <Popover.Trigger as={Button} variant="outline" size="xs" scaleEffect={false}>
+                <LandPlotIcon class="size-4" />
+                Move to sprint
+              </Popover.Trigger>
+            </>
+          }
+        />
 
         <Show when={props.assignableUsers}>
           <Popover placement="top" gutter={8}>

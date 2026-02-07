@@ -23,6 +23,7 @@ import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import CircleDotDashedIcon from "lucide-solid/icons/circle-dot-dashed";
 import PlusIcon from "lucide-solid/icons/plus";
+import PlayIcon from "lucide-solid/icons/play";
 import { createMemo, For, Index, Show, type Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { boardLoader } from "./board.data";
@@ -31,6 +32,8 @@ import type { InferDbType } from "@blackwall/database/types";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { sprintsLoader } from "../sprints/index.data";
+import { toast } from "@/components/custom-ui/toast";
 
 type IssueForBoard = InferDbType<
   "issue",
@@ -47,11 +50,20 @@ const moveIssue = action(async (issueKey: string, status: IssueStatus, order: nu
   });
 });
 
+const startSprintAction = action(async (teamKey: string, sprintId: string) => {
+  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].start.$post({
+    param: { teamKey, sprintId },
+  });
+  toast.success("Sprint started");
+});
+
 export default function BoardPage() {
   const params = useParams();
   const teamData = useTeamData();
   const loaderData = createAsync(() => boardLoader(params.teamKey!));
+  const sprints = createAsync(() => sprintsLoader(params.teamKey!));
   const _moveIssue = useAction(moveIssue);
+  const _startSprint = useAction(startSprintAction);
 
   const dnd = createBoardDnD();
   const { dragState, calculateNewOrder, resetDrag } = dnd;
@@ -69,6 +81,12 @@ export default function BoardPage() {
       {} as Record<IssueStatus, IssueForBoard[]>,
     );
   });
+  const activeSprint = createMemo(() =>
+    (sprints() ?? []).find((sprint) => sprint.status === "active") ?? teamData().activeSprint ?? null,
+  );
+  const firstPlannedSprint = createMemo(() =>
+    (sprints() ?? []).find((sprint) => sprint.status === "planned") ?? null,
+  );
 
   async function handleDrop() {
     if (!dragState.draggedIssueKey || !dragState.overColumnId) {
@@ -100,7 +118,11 @@ export default function BoardPage() {
               <BreadcrumbsItem>Board</BreadcrumbsItem>
             </Breadcrumbs>
 
-            <SprintSection sprint={teamData().activeSprint} />
+            <SprintSection
+              sprint={activeSprint()}
+              plannedSprint={firstPlannedSprint()}
+              onStartPlannedSprint={(sprintId) => _startSprint(params.teamKey!, sprintId)}
+            />
           </div>
         </PageHeader>
       </div>
@@ -339,7 +361,11 @@ function BoardItem(props: BoardItemProps) {
   );
 }
 
-function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
+function SprintSection(props: {
+  sprint: SerializedIssueSprint | null;
+  plannedSprint: SerializedIssueSprint | null;
+  onStartPlannedSprint: (sprintId: string) => Promise<void>;
+}) {
   const params = useParams();
 
   return (
@@ -348,17 +374,39 @@ function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
         when={props.sprint}
         fallback={
           <>
-            <div class="text-muted-foreground">No sprint</div>
-            <A
-              href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
-              class={buttonVariants({
-                variant: "secondary",
-                size: "xxs",
-                scaleEffect: false,
-              })}
+            <Show
+              when={props.plannedSprint}
+              fallback={
+                <>
+                  <div class="text-muted-foreground">No sprint</div>
+                  <A
+                    href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
+                    class={buttonVariants({
+                      variant: "secondary",
+                      size: "xxs",
+                      scaleEffect: false,
+                    })}
+                  >
+                    Create sprint
+                  </A>
+                </>
+              }
             >
-              Create sprint
-            </A>
+              {(plannedSprint) => (
+                <>
+                  <div class="text-muted-foreground">No active sprint</div>
+                  <Button
+                    variant="default"
+                    size="xxs"
+                    scaleEffect={false}
+                    onClick={() => props.onStartPlannedSprint(plannedSprint().id)}
+                  >
+                    <PlayIcon class="size-3.5" />
+                    Start {plannedSprint().name}
+                  </Button>
+                </>
+              )}
+            </Show>
           </>
         }
       >

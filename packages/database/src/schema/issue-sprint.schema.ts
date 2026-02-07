@@ -5,6 +5,9 @@ import { lifecycleTimestamps } from "../utils";
 import { user } from "./auth.schema";
 import { team } from "./team.schema";
 
+export const issueSprintStatusValues = ["planned", "active", "completed"] as const;
+export type IssueSprintStatus = (typeof issueSprintStatusValues)[number];
+
 export const issueSprint = sqliteTable(
   "issue_sprint",
   {
@@ -25,9 +28,13 @@ export const issueSprint = sqliteTable(
     endDate: integer({
       mode: "timestamp_ms",
     }).notNull(),
+    status: text({ enum: issueSprintStatusValues }).notNull().default("planned"),
 
     // when the sprint was finished - not necessarily the same as endDate
     finishedAt: integer({
+      mode: "timestamp_ms",
+    }),
+    archivedAt: integer("archived_at", {
       mode: "timestamp_ms",
     }),
     ...lifecycleTimestamps,

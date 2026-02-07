@@ -1,6 +1,6 @@
 import { issueSprintData } from "./issue-sprint.data";
-import { teamData } from "../teams/team.data";
 import { BadRequestError, NotFoundError } from "../../lib/errors";
+import type { CompleteIssueSprint } from "./issue-sprint.zod";
 
 /**
  * List all sprints for a team.
@@ -25,6 +25,28 @@ async function getSprintById(input: { sprintId: string; teamId: string }) {
     return sprint;
 }
 
+async function getSprintCompleteContext(input: { sprintId: string; teamId: string }) {
+    const sprint = await issueSprintData.getSprintById({
+        sprintId: input.sprintId,
+        teamId: input.teamId,
+    });
+
+    if (!sprint) {
+        throw new NotFoundError("Issue sprint not found");
+    }
+
+    const [plannedSprints, undoneIssuesCount] = await Promise.all([
+        issueSprintData.listPlannedSprintsForTeam({ teamId: input.teamId }),
+        issueSprintData.countUndoneIssuesInSprint({ sprintId: input.sprintId }),
+    ]);
+
+    return {
+        sprint,
+        plannedSprints: plannedSprints.filter((plannedSprint) => plannedSprint.id !== input.sprintId),
+        hasUndoneIssues: undoneIssuesCount > 0,
+    };
+}
+
 /**
  * Get the active sprint for a team.
  * @param input team id and active sprint id
@@ -34,26 +56,30 @@ async function getActiveSprint(input: { teamId: string; activeSprintId: string |
     if (!input.activeSprintId) {
         return null;
     }
-    return issueSprintData.getSprintById({ sprintId: input.activeSprintId, teamId: input.teamId });
+    const sprint = await issueSprintData.getSprintById({
+        sprintId: input.activeSprintId,
+        teamId: input.teamId,
+    });
+    if (!sprint || sprint.status !== "active") {
+        return null;
+    }
+    return sprint;
 }
 
 /**
- * Create a new sprint and set it as the active sprint for the team.
- * Handles moving undone issues from the previous sprint.
- * @param input sprint details, team id, and strategy for undone issues
+ * Create a new planned sprint.
+ * @param input sprint details and team id
  * @returns newly created sprint
  */
-async function createAndActivateSprint(input: {
+async function createSprint(input: {
     name: string;
     goal: string | null;
     startDate: Date;
     endDate: Date;
     createdById: string;
     teamId: string;
-    activeSprintId: string | null;
-    onUndoneIssues: "moveToBacklog" | "moveToNewSprint";
 }) {
-    const sprint = await issueSprintData.createSprint({
+    return issueSprintData.createSprint({
         name: input.name,
         goal: input.goal,
         startDate: input.startDate,
@@ -61,39 +87,58 @@ async function createAndActivateSprint(input: {
         createdById: input.createdById,
         teamId: input.teamId,
     });
+}
+
+async function startSprint(input: {
+    sprintId: string;
+    teamId: string;
+    activeSprintId: string | null;
+}) {
+    const sprint = await issueSprintData.getSprintById({
+        sprintId: input.sprintId,
+        teamId: input.teamId,
+    });
+
+    if (!sprint) {
+        throw new NotFoundError("Issue sprint not found");
+    }
+
+    if (sprint.archivedAt) {
+        throw new BadRequestError("Cannot start archived sprint");
+    }
+
+    if (sprint.status === "completed") {
+        throw new BadRequestError("Cannot start completed sprint");
+    }
+
+    if (sprint.status === "active") {
+        throw new BadRequestError("Sprint is already active");
+    }
 
     if (input.activeSprintId) {
-        if (input.onUndoneIssues === "moveToBacklog") {
-            await issueSprintData.moveActiveIssuesToBacklog({
-                teamId: input.teamId,
-                sprintId: input.activeSprintId,
-            });
-        } else {
-            await issueSprintData.moveActiveIssuesToSprint({
-                teamId: input.teamId,
-                fromSprintId: input.activeSprintId,
-                toSprintId: sprint.id,
-            });
-        }
-    } else {
-        if (input.onUndoneIssues === "moveToBacklog") {
-            await issueSprintData.moveActiveIssuesToBacklog({
-                teamId: input.teamId,
-            });
-        } else {
-            await issueSprintData.moveActiveIssuesToSprint({
-                teamId: input.teamId,
-                toSprintId: sprint.id,
-            });
-        }
+        throw new BadRequestError("Cannot start sprint while another sprint is active");
     }
+
+    await issueSprintData.setSprintStatus({
+        sprintId: input.sprintId,
+        status: "active",
+    });
 
     await issueSprintData.setActiveSprintOnTeam({
         teamId: input.teamId,
-        sprintId: sprint.id,
+        sprintId: input.sprintId,
     });
 
-    return sprint;
+    const startedSprint = await issueSprintData.getSprintById({
+        sprintId: input.sprintId,
+        teamId: input.teamId,
+    });
+
+    if (!startedSprint) {
+        throw new NotFoundError("Issue sprint not found");
+    }
+
+    return startedSprint;
 }
 
 /**
@@ -120,7 +165,11 @@ async function updateSprint(input: {
         throw new NotFoundError("Issue sprint not found");
     }
 
-    if (sprint.finishedAt) {
+    if (sprint.archivedAt) {
+        throw new BadRequestError("Cannot update archived sprint");
+    }
+
+    if (sprint.status === "completed") {
         throw new BadRequestError("Cannot update completed sprint");
     }
 
@@ -142,7 +191,9 @@ async function updateSprint(input: {
 async function completeSprint(input: {
     sprintId: string;
     teamId: string;
-    onUndoneIssues: "moveToBacklog" | "moveToNewSprint";
+    createdById: string;
+    activeSprintId: string | null;
+    completion: CompleteIssueSprint;
 }) {
     const sprint = await issueSprintData.getSprintById({
         sprintId: input.sprintId,
@@ -153,38 +204,79 @@ async function completeSprint(input: {
         throw new NotFoundError("Issue sprint not found");
     }
 
-    if (sprint.finishedAt) {
+    if (sprint.archivedAt) {
+        throw new BadRequestError("Cannot complete archived sprint");
+    }
+
+    if (sprint.status === "completed") {
         throw new BadRequestError("Sprint already completed");
     }
 
-    if (sprint.endDate.getTime() > Date.now()) {
-        throw new BadRequestError("Cannot complete sprint before its end date");
+    if (sprint.status !== "active") {
+        throw new BadRequestError("Only active sprints can be completed");
     }
 
-    if (input.onUndoneIssues === "moveToBacklog") {
+    if (input.activeSprintId !== input.sprintId) {
+        throw new BadRequestError("Sprint is not currently active");
+    }
+
+    if (input.completion.onUndoneIssues === "moveToBacklog") {
         await issueSprintData.moveActiveIssuesToBacklog({
             teamId: input.teamId,
             sprintId: input.sprintId,
         });
-    } else {
-        await issueSprintData.moveActiveIssuesToUnsprinted({
+    } else if (input.completion.onUndoneIssues === "moveToPlannedSprint") {
+        const targetSprint = await issueSprintData.getSprintById({
+            sprintId: input.completion.targetSprintId,
             teamId: input.teamId,
-            sprintId: input.sprintId,
+        });
+
+        if (!targetSprint) {
+            throw new NotFoundError("Target sprint not found");
+        }
+
+        if (targetSprint.status !== "planned") {
+            throw new BadRequestError("Target sprint must be planned");
+        }
+
+        await issueSprintData.moveActiveIssuesToSprint({
+            teamId: input.teamId,
+            fromSprintId: input.sprintId,
+            toSprintId: input.completion.targetSprintId,
+        });
+    } else {
+        const nextSprintStartDate = new Date(input.completion.newSprint.startDate);
+        nextSprintStartDate.setUTCHours(0, 0, 0, 0);
+        const nextSprintEndDate = new Date(input.completion.newSprint.endDate);
+        nextSprintEndDate.setUTCHours(23, 59, 59, 999);
+
+        const newSprint = await issueSprintData.createSprint({
+            name: input.completion.newSprint.name,
+            goal: null,
+            startDate: nextSprintStartDate,
+            endDate: nextSprintEndDate,
+            createdById: input.createdById,
+            teamId: input.teamId,
+        });
+
+        await issueSprintData.moveActiveIssuesToSprint({
+            teamId: input.teamId,
+            fromSprintId: input.sprintId,
+            toSprintId: newSprint.id,
         });
     }
 
-    await issueSprintData.clearSprintFromIssues({ sprintId: input.sprintId });
     await issueSprintData.completeSprint({ sprintId: input.sprintId });
     await issueSprintData.setActiveSprintOnTeam({ teamId: input.teamId, sprintId: null });
 }
 
 /**
- * Delete a non-active sprint and detach its issues.
+ * Archive a non-active sprint and detach only undone issues.
  * @param input sprint id, team id, and active sprint id
  * @throws NotFoundError if sprint not found
- * @throws BadRequestError if sprint is active
+ * @throws BadRequestError if sprint is active or archived
  */
-async function deleteSprint(input: {
+async function archiveSprint(input: {
     sprintId: string;
     teamId: string;
     activeSprintId: string | null;
@@ -198,8 +290,12 @@ async function deleteSprint(input: {
         throw new NotFoundError("Issue sprint not found");
     }
 
-    if (input.activeSprintId === input.sprintId) {
-        throw new BadRequestError("Cannot delete active sprint");
+    if (sprint.archivedAt) {
+        throw new BadRequestError("Sprint is already archived");
+    }
+
+    if (input.activeSprintId === input.sprintId || sprint.status === "active") {
+        throw new BadRequestError("Cannot archive active sprint");
     }
 
     await issueSprintData.moveActiveIssuesToBacklog({
@@ -207,16 +303,17 @@ async function deleteSprint(input: {
         sprintId: input.sprintId,
     });
 
-    await issueSprintData.clearSprintFromIssues({ sprintId: input.sprintId });
-    await issueSprintData.deleteSprint({ sprintId: input.sprintId });
+    await issueSprintData.archiveSprint({ sprintId: input.sprintId });
 }
 
 export const issueSprintService = {
     listSprints,
     getSprintById,
+    getSprintCompleteContext,
     getActiveSprint,
-    createAndActivateSprint,
+    createSprint,
+    startSprint,
     updateSprint,
     completeSprint,
-    deleteSprint,
+    archiveSprint,
 };

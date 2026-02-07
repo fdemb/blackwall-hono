@@ -1,5 +1,14 @@
-import { action, createAsync, redirect, useAction, useParams, A } from "@solidjs/router";
-import { Show, createMemo, createSignal } from "solid-js";
+import {
+  action,
+  createAsync,
+  redirect,
+  useAction,
+  useNavigate,
+  useParams,
+  useSubmission,
+  A,
+} from "@solidjs/router";
+import { Show, createMemo, createSignal, createEffect, onCleanup } from "solid-js";
 import { sprintDetailLoader } from "./index.data";
 import { useTeamData } from "../../../[teamKey]";
 import { PageHeader } from "@/components/blocks/page-header";
@@ -21,27 +30,33 @@ import { api } from "@/lib/api";
 import { buttonVariants, Button } from "@/components/ui/button";
 import CalendarIcon from "lucide-solid/icons/calendar";
 import TargetIcon from "lucide-solid/icons/target";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import PlayIcon from "lucide-solid/icons/play";
+import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import { toast } from "@/components/custom-ui/toast";
 import { SprintStatusBadge } from "@/components/sprints/sprint-status-badge";
+import { ArchiveSprintDialog } from "@/components/sprints/archive-sprint-dialog";
+import { sprintsLoader } from "../index.data";
+import { useKeybinds } from "@/context/keybind.context";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
-const archiveSprintAction = action(async (workspaceSlug: string, teamKey: string, sprintId: string) => {
-  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$delete({
+const archiveSprintAction = action(
+  async (workspaceSlug: string, teamKey: string, sprintId: string) => {
+    await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].$delete({
+      param: { teamKey, sprintId },
+    });
+
+    toast.success("Sprint archived and hidden from default lists");
+    throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
+  },
+);
+
+const startSprintAction = action(async (teamKey: string, sprintId: string) => {
+  await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].start.$post({
     param: { teamKey, sprintId },
   });
 
-  toast.success("Sprint archived");
-  throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
+  toast.success("Sprint started");
 });
 
 function calculateEstimationStats(issues: IssueForDataTable[]) {
@@ -70,15 +85,27 @@ function calculateEstimationStats(issues: IssueForDataTable[]) {
 
 export default function SprintDetailPage() {
   const params = useParams();
+  const navigate = useNavigate();
   const teamData = useTeamData();
   const data = createAsync(() => sprintDetailLoader(params.teamKey!, params.sprintId!));
+  const sprints = createAsync(() => sprintsLoader(params.teamKey!));
   const archiveAction = useAction(archiveSprintAction);
+  const startAction = useAction(startSprintAction);
+  const startSubmission = useSubmission(
+    startSprintAction,
+    ([teamKey, sprintId]) => teamKey === params.teamKey! && sprintId === params.sprintId!,
+  );
+  const { addKeybind, removeKeybind } = useKeybinds();
   const [archiveDialogOpen, setArchiveDialogOpen] = createSignal(false);
 
   const sprint = () => data()?.sprint;
-  const isActiveSprint = () => teamData().activeSprintId === sprint()!.id;
-  const isCompleted = () => Boolean(sprint()!.finishedAt);
+  const isActiveSprint = () => sprint()?.status === "active";
+  const isPlanned = () => sprint()?.status === "planned";
+  const isCompleted = () => sprint()?.status === "completed";
   const issues = () => (data()?.issues ?? []) as IssueForDataTable[];
+  const openSprints = createMemo(() =>
+    (sprints() ?? []).filter((item) => item.status !== "completed"),
+  );
   const stats = () => calculateEstimationStats(issues());
   const rowSelection = createRowSelection();
 
@@ -88,6 +115,33 @@ export default function SprintDetailPage() {
     return selectedIds
       .map((id) => issueMap.get(id))
       .filter((issue): issue is IssueForDataTable => !!issue);
+  });
+
+  const startCurrentSprint = async () => {
+    if (!isPlanned() || startSubmission.pending) {
+      return;
+    }
+    await startAction(params.teamKey!, params.sprintId!);
+  };
+
+  const goToCompleteSprint = () => {
+    if (!isActiveSprint() || isCompleted()) {
+      return;
+    }
+    navigate(`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/complete`);
+  };
+
+  createEffect(() => {
+    addKeybind("s t", () => {
+      void startCurrentSprint();
+    });
+    addKeybind("c o", () => {
+      goToCompleteSprint();
+    });
+    onCleanup(() => {
+      removeKeybind("s t");
+      removeKeybind("c o");
+    });
   });
 
   return (
@@ -121,10 +175,10 @@ export default function SprintDetailPage() {
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <h1 class="text-lg font-semibold">{sprint()!.name}</h1>
-                <SprintStatusBadge sprint={sprint()!} activeSprintId={teamData().activeSprintId} />
+                <SprintStatusBadge sprint={sprint()!} />
               </div>
               <div class="flex items-center gap-2">
-                <Show when={!isCompleted()}>
+                <Show when={isPlanned()}>
                   <A
                     class={buttonVariants({ variant: "outline", size: "sm" })}
                     href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/edit`}
@@ -133,17 +187,53 @@ export default function SprintDetailPage() {
                   </A>
                 </Show>
                 <Show when={isActiveSprint() && !isCompleted()}>
-                  <A
-                    class={buttonVariants({ variant: "default", size: "sm" })}
-                    href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/complete`}
-                  >
-                    Complete sprint
-                  </A>
+                  <Tooltip>
+                    <TooltipTrigger as="div">
+                      <A
+                        class={buttonVariants({ variant: "default", size: "sm" })}
+                        href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/complete`}
+                      >
+                        <CircleCheckIcon class="size-4" />
+                        Complete sprint
+                      </A>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span class="mr-2">Complete sprint</span>
+                      <KbdGroup>
+                        <Kbd>C</Kbd>
+                        then
+                        <Kbd>O</Kbd>
+                      </KbdGroup>
+                    </TooltipContent>
+                  </Tooltip>
                 </Show>
                 <Show when={!isActiveSprint()}>
                   <Button variant="outline" size="sm" onClick={() => setArchiveDialogOpen(true)}>
                     Archive
                   </Button>
+                </Show>
+                <Show when={isPlanned()}>
+                  <Tooltip>
+                    <TooltipTrigger as="div">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        disabled={startSubmission.pending}
+                        onClick={() => void startCurrentSprint()}
+                      >
+                        <PlayIcon class="size-4" />
+                        {startSubmission.pending ? "Starting..." : "Start sprint"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span class="mr-2">Start sprint</span>
+                      <KbdGroup>
+                        <Kbd>S</Kbd>
+                        then
+                        <Kbd>T</Kbd>
+                      </KbdGroup>
+                    </TooltipContent>
+                  </Tooltip>
                 </Show>
               </div>
             </div>
@@ -184,11 +274,13 @@ export default function SprintDetailPage() {
             </Show>
           </div>
 
-          <IssueSelectionMenu
-            selectedIssues={selectedIssues()}
-            onClearSelection={rowSelection.clearSelection}
-            activeSprint={teamData().activeSprintId === sprint()!.id ? sprint()! : undefined}
-          />
+          <Show when={!isCompleted()}>
+            <IssueSelectionMenu
+              selectedIssues={selectedIssues()}
+              onClearSelection={rowSelection.clearSelection}
+              openSprints={openSprints()}
+            />
+          </Show>
 
           <Show when={issues().length > 0} fallback={<SprintIssuesEmpty />}>
             <IssueDataTable
@@ -199,27 +291,11 @@ export default function SprintDetailPage() {
           </Show>
         </div>
 
-        <AlertDialog open={archiveDialogOpen()} onOpenChange={setArchiveDialogOpen}>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogMedia class="bg-destructive/50" />
-              <AlertDialogTitle>Archive this sprint?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This removes the sprint and unassigns any issues still attached to it.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                size="xs"
-                variant="destructive"
-                action={() => archiveAction(params.workspaceSlug!, params.teamKey!, sprint()!.id)}
-              >
-                Archive sprint
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ArchiveSprintDialog
+          open={archiveDialogOpen()}
+          onOpenChange={setArchiveDialogOpen}
+          onConfirm={() => archiveAction(params.workspaceSlug!, params.teamKey!, sprint()!.id)}
+        />
       </>
     </Show>
   );
