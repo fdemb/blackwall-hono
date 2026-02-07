@@ -61,6 +61,7 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           rsync -avz --delete --exclude='blackwall_data' --exclude='.env' -e "ssh -i ~/.ssh/deploy_key" ./dist/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH/
+          ssh -i ~/.ssh/deploy_key $SSH_USER@$SSH_HOST "chmod +x $DEPLOY_PATH/blackwall"
 
       - name: Restart systemd service
         env:
