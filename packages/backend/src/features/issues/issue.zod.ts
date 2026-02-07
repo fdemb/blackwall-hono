@@ -8,6 +8,7 @@ export const listIssuesQuerySchema = z.object({
     .transform((val) => (Array.isArray(val) ? val : [val]))
     .optional(),
   onlyOnActiveSprint: z.coerce.boolean().optional(),
+  withoutSprint: z.coerce.boolean().optional(),
 });
 
 export type ListIssuesQuery = z.infer<typeof listIssuesQuerySchema>;
@@ -17,7 +18,7 @@ export const createIssueSchema = z.object({
   issue: z.object({
     summary: z.string().min(1),
     description: z.any(),
-    status: z.enum(issueStatusValues).optional().default("backlog"),
+    status: z.enum(issueStatusValues).optional().default("to_do"),
     assignedToId: z.string().nullable().optional(),
     sprintId: z.string().nullable().optional(),
   }),

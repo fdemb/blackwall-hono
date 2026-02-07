@@ -87,9 +87,18 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
     props.onClearSelection();
   };
 
-  const displayAddToActiveSprint = () =>
-    !!props.activeSprint &&
-    !props.selectedIssues.every((issue) => issue.sprintId === props.activeSprint?.id);
+  const hasOnlyBackloggedIssues = () =>
+    props.selectedIssues.length > 0 && props.selectedIssues.every((issue) => issue.sprintId === null);
+
+  const hasOnlySprintedIssues = () =>
+    props.selectedIssues.length > 0 && props.selectedIssues.every((issue) => issue.sprintId !== null);
+
+  const hasMixedSprintSelection = () => !hasOnlyBackloggedIssues() && !hasOnlySprintedIssues();
+
+  const canAssignToActiveSprint = () =>
+    !!props.activeSprint && (hasOnlyBackloggedIssues() || hasMixedSprintSelection());
+
+  const canMoveToBacklog = () => hasOnlySprintedIssues() || hasMixedSprintSelection();
 
   const assignableUsersOptions = () => {
     if (!props.assignableUsers?.length) return [];
@@ -145,14 +154,21 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           />
         </Popover>
 
-        <Show when={displayAddToActiveSprint()}>
+        <Show when={canAssignToActiveSprint()}>
           <Button
             variant="outline"
             size="xs"
             onClick={() => handleUpdate({ sprintId: props.activeSprint!.id })}
           >
             <LandPlotIcon class="size-4" />
-            Add to {props.activeSprint!.name}
+            Assign to active sprint
+          </Button>
+        </Show>
+
+        <Show when={canMoveToBacklog()}>
+          <Button variant="outline" size="xs" onClick={() => handleUpdate({ sprintId: null })}>
+            <LandPlotIcon class="size-4" />
+            Move to backlog
           </Button>
         </Show>
 

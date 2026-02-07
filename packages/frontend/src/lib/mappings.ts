@@ -1,7 +1,6 @@
 import type { Issue } from "@blackwall/database/schema";
 import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheck from "lucide-solid/icons/circle-check";
-import CircleDotDashed from "lucide-solid/icons/circle-dot-dashed";
 import CircleFadingArrowUpIcon from "lucide-solid/icons/circle-fading-arrow-up";
 import type { JSX } from "solid-js";
 
@@ -13,11 +12,6 @@ export type BaseMapping = {
 
 export const issueMappings = {
   status: {
-    backlog: {
-      label: "Backlog",
-      textClass: "text-theme-gray",
-      icon: CircleDotDashed,
-    },
     to_do: {
       label: "To Do",
       textClass: "text-theme-teal",

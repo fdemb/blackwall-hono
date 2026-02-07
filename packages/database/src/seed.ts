@@ -14,10 +14,9 @@ const TEAM_BLUEPRINTS = [
 ] as const;
 
 const ISSUE_STATUS_WEIGHTS = [
-  { value: "backlog" as const, weight: 18 },
-  { value: "to_do" as const, weight: 22 },
-  { value: "in_progress" as const, weight: 32 },
-  { value: "done" as const, weight: 28 },
+  { value: "to_do" as const, weight: 34 },
+  { value: "in_progress" as const, weight: 36 },
+  { value: "done" as const, weight: 30 },
 ] as const;
 
 const ISSUE_PRIORITY_WEIGHTS = [
@@ -470,17 +469,23 @@ async function main() {
       const status = issueStatus();
       const priority = issuePriority();
       const createdBy = faker.helpers.arrayElement(teamMembers);
-      const shouldAssign = status !== "backlog" || faker.number.float({ min: 0, max: 1 }) > 0.65;
-      const assignedTo = shouldAssign ? faker.helpers.arrayElement(teamMembers) : null;
 
       let sprintId: string | null = null;
       if (status === "done") {
         sprintId = faker.number.float({ min: 0, max: 1 }) > 0.6 ? activeSprint.id : pastSprint.id;
-      } else if (status === "in_progress" || status === "to_do") {
+      } else if (status === "in_progress") {
         sprintId = activeSprint.id;
-      } else if (faker.number.float({ min: 0, max: 1 }) > 0.85) {
-        sprintId = nextSprint.id;
+      } else if (status === "to_do") {
+        const sprintRoll = faker.number.float({ min: 0, max: 1 });
+        if (sprintRoll > 0.85) {
+          sprintId = nextSprint.id;
+        } else if (sprintRoll > 0.4) {
+          sprintId = activeSprint.id;
+        }
       }
+
+      const shouldAssign = sprintId !== null || faker.number.float({ min: 0, max: 1 }) > 0.65;
+      const assignedTo = shouldAssign ? faker.helpers.arrayElement(teamMembers) : null;
 
       const createdAt = faker.date.between({
         from: new Date(now.getTime() - 45 * DAY_MS),
@@ -558,7 +563,7 @@ async function main() {
       createdAt: issue.createdAt,
     });
 
-    if (issue.status !== "backlog") {
+    if (issue.status !== "to_do") {
       events.push({
         issueId: issue.id,
         workspaceId: workspace.id,
@@ -566,7 +571,7 @@ async function main() {
         eventType: "status_changed",
         changes: {
           status: {
-            from: "backlog",
+            from: "to_do",
             to: issue.status,
           },
         } as never,

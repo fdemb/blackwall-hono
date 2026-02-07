@@ -8,6 +8,7 @@ export async function listIssuesInTeam(input: {
   workspaceId: string;
   teamId: string;
   statusFilters?: IssueStatus[];
+  withoutSprint?: boolean;
 }) {
   return db.query.issue.findMany({
     where: {
@@ -15,6 +16,7 @@ export async function listIssuesInTeam(input: {
       teamId: input.teamId,
       deletedAt: { isNull: true },
       status: input.statusFilters ? { in: input.statusFilters } : undefined,
+      sprintId: input.withoutSprint ? { isNull: true } : undefined,
     },
     with: {
       assignedTo: true,

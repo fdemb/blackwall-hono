@@ -103,7 +103,7 @@ function CreateDialogContent(props: CreateDialogProps) {
   const teams = () => workspaceData().teams;
   const merged = mergeProps(
     {
-      status: "backlog" as IssueStatus,
+      status: "to_do" as IssueStatus,
       teamKey: teams().length > 0 ? teams()[0].key : "",
     },
     props,
@@ -144,9 +144,9 @@ function CreateDialogContent(props: CreateDialogProps) {
       onSubmit: z.object({
         teamKey: z.string().min(1, "Team key is required"),
         summary: z.string().min(1, "Summary is required"),
-        status: z.enum(["backlog", "to_do", "in_progress", "done"], {
+        status: z.enum(["to_do", "in_progress", "done"], {
           error:
-            "Status is required and must be one of the following: backlog, to_do, in_progress, done",
+            "Status is required and must be one of the following: to_do, in_progress, done",
         }),
         description: z.any().refine((val) => val !== null && val !== undefined, {
           message: "Description is required",

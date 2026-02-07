@@ -59,6 +59,7 @@ async function listIssuesForTeam(input: {
   userId: string;
   statusFilters?: IssueStatus[];
   onlyOnActiveSprint?: boolean;
+  withoutSprint?: boolean;
 }) {
   const team = await getTeamForUserOrThrow({
     workspaceId: input.workspaceId,
@@ -66,7 +67,7 @@ async function listIssuesForTeam(input: {
     userId: input.userId,
   });
 
-  if (input.onlyOnActiveSprint && team.activeSprintId) {
+  if (input.onlyOnActiveSprint && team.activeSprintId && !input.withoutSprint) {
     return issueData.listIssuesInSprint({
       workspaceId: input.workspaceId,
       teamId: team.id,
@@ -79,6 +80,7 @@ async function listIssuesForTeam(input: {
     workspaceId: input.workspaceId,
     teamId: team.id,
     statusFilters: input.statusFilters,
+    withoutSprint: input.withoutSprint,
   });
 }
 

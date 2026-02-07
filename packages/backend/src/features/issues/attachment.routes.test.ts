@@ -24,7 +24,7 @@ describe("Attachment Routes", () => {
           issue: {
             summary: "Test Issue",
             description: {},
-            status: "backlog",
+            status: "to_do",
             assignedToId: null,
             sprintId: null,
           },

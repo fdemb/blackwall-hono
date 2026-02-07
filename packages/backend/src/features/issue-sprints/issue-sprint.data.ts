@@ -96,7 +96,6 @@ export async function moveActiveIssuesToBacklog(input: { teamId: string; sprintI
         .update(dbSchema.issue)
         .set({
             sprintId: null,
-            status: "backlog",
         })
         .where(whereConditions);
 }

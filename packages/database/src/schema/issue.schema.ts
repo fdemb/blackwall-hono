@@ -17,7 +17,7 @@ import { team } from "./team.schema";
 import { workspace } from "./workspace.schema";
 
 // Issue status and priority types
-export const issueStatusValues = ["backlog", "to_do", "in_progress", "done"] as const;
+export const issueStatusValues = ["to_do", "in_progress", "done"] as const;
 export type IssueStatus = (typeof issueStatusValues)[number];
 
 export const issuePriorityValues = ["low", "medium", "high", "urgent"] as const;

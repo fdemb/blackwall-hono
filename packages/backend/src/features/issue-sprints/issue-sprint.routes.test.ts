@@ -412,9 +412,9 @@ describe("Issue Sprint Routes", () => {
         .where(eq(dbSchema.issue.id, doneIssue.id));
 
       expect(activeUpdated.sprintId).toBeNull();
-      expect(activeUpdated.status).toBe("backlog");
+      expect(activeUpdated.status).toBe("to_do");
       expect(inProgressUpdated.sprintId).toBeNull();
-      expect(inProgressUpdated.status).toBe("backlog");
+      expect(inProgressUpdated.status).toBe("in_progress");
       expect(doneUpdated.sprintId).toBeNull();
       expect(doneUpdated.status).toBe("done");
     });

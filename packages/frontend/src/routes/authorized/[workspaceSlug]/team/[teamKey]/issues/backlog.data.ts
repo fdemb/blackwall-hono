@@ -5,7 +5,7 @@ export const backlogLoader = query(async (teamKey: string) => {
   const res = await api.api.issues.$get({
     query: {
       teamKey,
-      statusFilters: ["backlog"],
+      withoutSprint: "true",
     },
   });
 

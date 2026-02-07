@@ -39,7 +39,7 @@ const issueRoutes = new Hono<AppEnv>()
     async (c) => {
       const workspace = c.get("workspace");
       const user = c.get("user")!;
-      const { teamKey, statusFilters, onlyOnActiveSprint } = c.req.valid("query");
+      const { teamKey, statusFilters, onlyOnActiveSprint, withoutSprint } = c.req.valid("query");
 
       const issues = await issueService.listIssuesForTeam({
         workspaceId: workspace.id,
@@ -47,6 +47,7 @@ const issueRoutes = new Hono<AppEnv>()
         userId: user.id,
         statusFilters,
         onlyOnActiveSprint,
+        withoutSprint,
       });
 
       return c.json({ issues });

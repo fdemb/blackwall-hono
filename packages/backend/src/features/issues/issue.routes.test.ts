@@ -8,7 +8,7 @@ describe("Issue Routes", () => {
   const createIssue = (issue: {
     summary: string;
     description?: object;
-    status: "backlog" | "to_do" | "in_progress" | "done";
+    status: "to_do" | "in_progress" | "done";
     assignedToId: string | null;
     sprintId: string | null;
   }) => {
@@ -163,7 +163,7 @@ describe("Issue Routes", () => {
     it("should create a new issue", async () => {
       const res = await createIssue({
         summary: "New Test Issue",
-        status: "backlog",
+        status: "to_do",
         assignedToId: null,
         sprintId: null,
       });
@@ -213,7 +213,7 @@ describe("Issue Routes", () => {
             // @ts-expect-error - intentionally missing summary for validation test
             issue: {
               description: {},
-              status: "backlog",
+              status: "to_do",
             },
           },
         },
@@ -234,7 +234,7 @@ describe("Issue Routes", () => {
             issue: {
               summary: "Test Issue",
               description: {},
-              status: "backlog",
+              status: "to_do",
             },
           },
         },

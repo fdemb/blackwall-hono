@@ -80,7 +80,7 @@ function IssueEmpty() {
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
-          <CreateDialog status="backlog" buttonSize="default" />
+          <CreateDialog buttonSize="default" />
         </div>
       </EmptyContent>
     </Empty>
