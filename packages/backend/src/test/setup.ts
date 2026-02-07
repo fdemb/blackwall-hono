@@ -24,7 +24,7 @@ async function resetTestDatabase() {
 export async function createTestDb() {
   await resetTestDatabase();
   migrate(db, {
-    migrationsFolder: "../database/src/migrations",
+    migrationsFolder: process.env.MIGRATIONS_DIR ?? "./migrations",
   });
 
   return { db, client };
