@@ -57,7 +57,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          scp -i ~/.ssh/deploy_key -r ./dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH/
+          rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key" ./dist/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH/
 
       - name: Restart systemd service
         env:
