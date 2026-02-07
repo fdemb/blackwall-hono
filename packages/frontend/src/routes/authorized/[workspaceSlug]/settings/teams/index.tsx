@@ -49,7 +49,7 @@ function TeamTable() {
       id: "name",
       header: "Name",
       meta: {
-        expand: true
+        expand: true,
       },
       cell: (info) => (
         <div class="flex items-center gap-2 font-medium">

@@ -132,7 +132,10 @@ export function getInitials(name: string) {
 }
 
 const UserAvatar = (
-  props: { user?: Pick<SerializedUser, "name" | "image"> | Pick<User, "name" | "image"> | null; class?: string } & VariantProps<typeof avatarVariants>,
+  props: {
+    user?: Pick<SerializedUser, "name" | "image"> | Pick<User, "name" | "image"> | null;
+    class?: string;
+  } & VariantProps<typeof avatarVariants>,
 ) => {
   return (
     <Avatar variant={props.variant} size={props.size} class={props.class}>

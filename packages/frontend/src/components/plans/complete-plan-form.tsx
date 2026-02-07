@@ -137,11 +137,7 @@ export function CompletePlanForm(props: CompletePlanFormProps) {
                   This plan ends in the future. Update the end date before completing.
                 </p>
               )}
-              <Button
-                type="submit"
-                size="lg"
-                disabled={!state().canSubmit || endDateInFuture()}
-              >
+              <Button type="submit" size="lg" disabled={!state().canSubmit || endDateInFuture()}>
                 Complete plan
               </Button>
             </div>

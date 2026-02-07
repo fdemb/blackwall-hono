@@ -19,9 +19,7 @@ type DatePickerProps = {
 };
 
 export function DatePicker(props: DatePickerProps) {
-  const [state, setState] = Solid.createSignal<DateValue | undefined>(
-    props.selected,
-  );
+  const [state, setState] = Solid.createSignal<DateValue | undefined>(props.selected);
 
   const formattedDate = () => {
     const nativeDate = state()?.toDate(getLocalTimeZone());
@@ -57,11 +55,7 @@ export function DatePicker(props: DatePickerProps) {
         <ChevronDownIcon class="size-5 ml-auto" />
       </PopoverTrigger>
       <PopoverContent class="w-auto p-0 border-none shadow-none">
-        <Calendar
-          selected={state()}
-          onSelect={handleSelect}
-          name={props.name}
-        />
+        <Calendar selected={state()} onSelect={handleSelect} name={props.name} />
       </PopoverContent>
     </Popover>
   );

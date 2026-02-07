@@ -19,12 +19,12 @@ const signinAction = action(async (email: string, password: string) => {
     return;
   }
 
-  throw redirect("/")
+  throw redirect("/");
 });
 
 export default function SignInPage() {
   const { setThemeToUserPreference } = useTheme();
-  const _action = useAction(signinAction)
+  const _action = useAction(signinAction);
 
   const form = useAppForm(() => ({
     defaultValues: {
@@ -38,7 +38,7 @@ export default function SignInPage() {
       }),
     },
     onSubmit: async ({ value }) => {
-      _action(value.email, value.password)
+      _action(value.email, value.password);
     },
   }));
 

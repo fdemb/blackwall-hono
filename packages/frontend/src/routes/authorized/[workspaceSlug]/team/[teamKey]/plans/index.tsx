@@ -1,4 +1,12 @@
-import { action, createAsync, redirect, useAction, useNavigate, useParams, A } from "@solidjs/router";
+import {
+  action,
+  createAsync,
+  redirect,
+  useAction,
+  useNavigate,
+  useParams,
+  A,
+} from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
 import { plansLoader } from "./index.data";
 import { useTeamData } from "../../[teamKey]";
@@ -125,13 +133,6 @@ function PlanTable(props: PlanTableProps) {
   const [selectedPlan, setSelectedPlan] = createSignal<SerializedIssuePlan | null>(null);
 
   const columns = [
-    columnHelper.display({
-      id: "status",
-      header: "Status",
-      cell: (info) => (
-        <PlanStatusBadge plan={info.row.original} activePlanId={teamData().activePlanId} />
-      ),
-    }),
     columnHelper.accessor("name", {
       header: "Name",
       cell: (info) => info.getValue(),
@@ -140,6 +141,13 @@ function PlanTable(props: PlanTableProps) {
       header: "Goal",
       meta: { expand: true },
       cell: (info) => info.getValue(),
+    }),
+    columnHelper.display({
+      id: "status",
+      header: "Status",
+      cell: (info) => (
+        <PlanStatusBadge plan={info.row.original} activePlanId={teamData().activePlanId} />
+      ),
     }),
     columnHelper.accessor("startDate", {
       header: "Start date",

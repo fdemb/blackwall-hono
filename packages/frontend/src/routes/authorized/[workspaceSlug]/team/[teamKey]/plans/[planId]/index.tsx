@@ -141,11 +141,7 @@ export default function PlanDetailPage() {
                   </A>
                 </Show>
                 <Show when={!isActivePlan()}>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setArchiveDialogOpen(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setArchiveDialogOpen(true)}>
                     Archive
                   </Button>
                 </Show>

@@ -21,10 +21,7 @@ const statusStyles: Record<PlanStatus, { label: string; color: "green" | "blue" 
   inactive: { label: "Inactive", color: "normal" },
 };
 
-export function PlanStatusBadge(props: {
-  plan: SerializedIssuePlan;
-  activePlanId: string | null;
-}) {
+export function PlanStatusBadge(props: { plan: SerializedIssuePlan; activePlanId: string | null }) {
   const status = () => getPlanStatus(props.plan, props.activePlanId);
   const style = () => statusStyles[status()];
 

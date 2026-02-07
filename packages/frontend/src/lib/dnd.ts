@@ -1,10 +1,4 @@
-import {
-  createContext,
-  createEffect,
-  createSignal,
-  onCleanup,
-  useContext,
-} from "solid-js";
+import { createContext, createEffect, createSignal, onCleanup, useContext } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import type { IssueStatus } from "@blackwall/database/schema";
 import { DragGesture } from "@use-gesture/vanilla";
@@ -42,9 +36,7 @@ export function createBoardDnD() {
   function getIssueElementsInColumn(columnId: IssueStatus): HTMLElement[] {
     const column = columnRefs.get(columnId);
     if (!column) return [];
-    return Array.from(
-      column.querySelectorAll("[data-issue-key]"),
-    ) as HTMLElement[];
+    return Array.from(column.querySelectorAll("[data-issue-key]")) as HTMLElement[];
   }
 
   function calculateDropTarget(
@@ -55,15 +47,11 @@ export function createBoardDnD() {
     let closestDistance = Infinity;
 
     const draggedCenterY = dragState.initialRect
-      ? dragState.initialRect.top +
-      dragState.initialRect.height / 2 +
-      dragState.dragY
+      ? dragState.initialRect.top + dragState.initialRect.height / 2 + dragState.dragY
       : _cursorY;
 
     const draggedCenterX = dragState.initialRect
-      ? dragState.initialRect.left +
-      dragState.initialRect.width / 2 +
-      dragState.dragX
+      ? dragState.initialRect.left + dragState.initialRect.width / 2 + dragState.dragX
       : cursorX;
 
     for (const [columnId, columnEl] of columnRefs.entries()) {
@@ -119,9 +107,7 @@ export function createBoardDnD() {
     targetIndex: number,
     draggedIssueKey: string | null,
   ): number {
-    const issues = columnIssues.filter(
-      (issue) => issue.key !== draggedIssueKey,
-    );
+    const issues = columnIssues.filter((issue) => issue.key !== draggedIssueKey);
 
     if (issues.length === 0) {
       return ORDER_GAP;
@@ -246,9 +232,7 @@ export const BoardDnDContext = createContext<BoardDnDContextType>();
 export function useBoardDnD() {
   const context = useContext(BoardDnDContext);
   if (!context) {
-    throw new Error(
-      "useBoardDnD must be used within a BoardDnDContext.Provider",
-    );
+    throw new Error("useBoardDnD must be used within a BoardDnDContext.Provider");
   }
   return context;
 }
