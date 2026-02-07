@@ -2,6 +2,7 @@ import { hc } from "hono/client";
 import type { AppType } from "@blackwall/backend/src/index";
 import { getCurrentWorkspaceSlug } from "./workspace-slug";
 import { toast } from "@/components/custom-ui/toast";
+import { backendUrl } from "./env";
 
 const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const headers = new Headers(init?.headers);
@@ -29,7 +30,7 @@ const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   return res;
 };
 
-const api = hc<AppType>(import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000", {
+const api = hc<AppType>(backendUrl, {
   init: {
     credentials: "include",
   },

@@ -23,6 +23,7 @@ import type { IssueChangeEventType, SerializedUser } from "@blackwall/database/s
 import type { InferDbType } from "@blackwall/database/types";
 import { action } from "@/lib/form.utils";
 import { api } from "@/lib/api";
+import { backendUrl } from "@/lib/env";
 import { issueMappings } from "@/lib/mappings";
 import { revalidate } from "@solidjs/router";
 import type { JSONContent } from "@tiptap/core";
@@ -216,7 +217,7 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
 
     // Use fetch directly since the attachment endpoint uses formData
     const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/issues/${props.issue.key}/attachments`,
+      `${backendUrl}/issues/${props.issue.key}/attachments`,
       {
         method: "POST",
         body: formData,

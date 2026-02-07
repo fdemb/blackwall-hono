@@ -2,6 +2,7 @@ import { TiptapEditor } from "@/components/tiptap/tiptap-editor";
 import { useWorkspaceData } from "@/context/workspace-context";
 import type { SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
+import { backendUrl } from "@/lib/env";
 import { action } from "@/lib/form.utils";
 import type { JSONContent } from "@tiptap/core";
 import CheckIcon from "lucide-solid/icons/check";
@@ -19,7 +20,7 @@ export function IssueDescription(props: { issue: SerializedIssue }) {
     formData.append("file", file);
 
     const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/issues/${props.issue.key}/attachments`,
+      `${backendUrl}/issues/${props.issue.key}/attachments`,
       {
         method: "POST",
         body: formData,

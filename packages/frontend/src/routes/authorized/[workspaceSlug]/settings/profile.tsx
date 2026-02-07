@@ -20,6 +20,7 @@ import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { useSessionData } from "@/context/session-context";
 import { api } from "@/lib/api";
+import { backendUrl } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import Trash2 from "lucide-solid/icons/trash-2";
 import { createSignal, Show } from "solid-js";
@@ -172,7 +173,7 @@ function AvatarUpload() {
 
     try {
       await fetch(
-        `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/settings/profile/avatar`,
+        `${backendUrl}/settings/profile/avatar`,
         {
           method: "PATCH",
           body: formData,
@@ -196,7 +197,7 @@ function AvatarUpload() {
 
     try {
       await fetch(
-        `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/settings/profile/avatar`,
+        `${backendUrl}/settings/profile/avatar`,
         {
           method: "PATCH",
           body: formData,
