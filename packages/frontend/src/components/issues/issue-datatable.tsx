@@ -103,11 +103,10 @@ export function IssueDataTable(props: IssueDataTableProps) {
           {formatDateShort(new Date(info.getValue()))}
         </span>
       ),
-    }) as ColumnDef<IssueForDataTable, Date>,
+    }) as ColumnDef<IssueForDataTable>,
   ];
 
   const datatableProps = createDataTable({
-    // @ts-ignore TODO - fix column types
     columns,
     data: () => props.issues,
     getLinkProps: (row) => ({

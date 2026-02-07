@@ -8,7 +8,7 @@ import { Popover } from "@kobalte/core/popover";
 import PlusIcon from "lucide-solid/icons/plus";
 import { createResource, createSignal, Index } from "solid-js";
 import { action, useAction, revalidate } from "@solidjs/router";
-import type { Label } from "@blackwall/database/schema";
+import type { SerializedLabel } from "@blackwall/database/schema";
 
 const createAndAddLabel = action(async (name: string, issueKey: string) => {
   const createRes = await api.api.labels.$post({
@@ -37,7 +37,7 @@ const removeLabel = action(async (labelId: string, issueKey: string) => {
   await revalidate("issue");
 });
 
-export function IssueLabelsPicker(props: { labels: Label[]; issueKey: string }) {
+export function IssueLabelsPicker(props: { labels: SerializedLabel[]; issueKey: string }) {
   const [addOpen, setAddOpen] = createSignal(false);
   const workspaceData = useWorkspaceData();
 

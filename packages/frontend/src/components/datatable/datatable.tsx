@@ -12,9 +12,9 @@ import { For } from "solid-js";
 import { ScrollContainer } from "../custom-ui/scroll-area";
 import type { createDataTable } from "./create-datatable";
 
-type DataTableProps<TData, TValue> = ReturnType<typeof createDataTable<TData, TValue>>;
+type DataTableProps<TData> = ReturnType<typeof createDataTable<TData>>;
 
-export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
+export function DataTable<TData>(props: DataTableProps<TData>) {
   return (
     <DataTableRoot>
       <DataTableHeaders {...props} />
@@ -26,7 +26,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   );
 }
 
-export function DataTableHeaderless<TData, TValue>(props: DataTableProps<TData, TValue>) {
+export function DataTableHeaderless<TData>(props: DataTableProps<TData>) {
   return (
     <DataTableRoot>
       <ScrollContainer>
@@ -36,7 +36,7 @@ export function DataTableHeaderless<TData, TValue>(props: DataTableProps<TData, 
   );
 }
 
-export function DataTableHeaders<TData, TValue>(props: DataTableProps<TData, TValue>) {
+export function DataTableHeaders<TData>(props: DataTableProps<TData>) {
   return (
     <DataTableGrid gridTemplateColumns={props.gridTemplateColumns()} class="shrink-0">
       <DataTableHead>
@@ -52,7 +52,7 @@ export function DataTableHeaders<TData, TValue>(props: DataTableProps<TData, TVa
   );
 }
 
-export function DataTableBody<TData, TValue>(props: DataTableProps<TData, TValue>) {
+export function DataTableBody<TData>(props: DataTableProps<TData>) {
   return (
     <DataTableGrid gridTemplateColumns={props.gridTemplateColumns()}>
       <For each={props.table.getRowModel().rows}>{(row) => <DataRow row={row} />}</For>

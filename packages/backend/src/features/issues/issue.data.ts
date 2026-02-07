@@ -20,6 +20,7 @@ export async function listIssuesInTeam(input: {
       assignedTo: true,
       labels: true,
       issuePlan: true,
+      team: true,
     },
   });
 }
@@ -42,6 +43,7 @@ export async function listIssuesInPlan(input: {
       assignedTo: true,
       labels: true,
       issuePlan: true,
+      team: true,
     },
   });
 }

@@ -19,8 +19,8 @@ declare module "@tanstack/solid-table" {
   }
 }
 
-type CreateDataTableProps<TData, TValue> = {
-  columns: ColumnDef<TData, TValue>[];
+type CreateDataTableProps<TData> = {
+  columns: ColumnDef<TData, any>[];
   data: Accessor<TData[]>;
   getLinkProps?: (row: Row<TData>) => AnchorProps;
   rowSelection?: RowSelectionResult;
@@ -29,7 +29,7 @@ type CreateDataTableProps<TData, TValue> = {
   getRowId?: (originalRow: TData, index: number) => string;
 };
 
-export function createDataTable<TData, TValue>({
+export function createDataTable<TData>({
   columns,
   data,
   getLinkProps,
@@ -37,7 +37,7 @@ export function createDataTable<TData, TValue>({
   enableRowSelection = false,
   enableMultiRowSelection = true,
   getRowId,
-}: CreateDataTableProps<TData, TValue>) {
+}: CreateDataTableProps<TData>) {
   const table = createSolidTable({
     get data() {
       return data();
