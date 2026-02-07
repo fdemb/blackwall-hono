@@ -61,6 +61,15 @@ async function getTeams(input: { workspaceId: string }) {
 }
 
 /**
+ * Get all teams in a workspace that the user is a member of.
+ * @param input workspace id and user id
+ * @returns list of teams the user belongs to
+ */
+async function getTeamsForUser(input: { workspaceId: string; userId: string }) {
+  return teamData.listUserTeams(input);
+}
+
+/**
  * Get a team by its key. Only team members can access it.
  * @param input workspace id, team key, and user id
  * @returns team data
@@ -116,6 +125,7 @@ export const teamService = {
   addUserToTeam,
   UNCHECKED_addUserToTeam,
   getTeams,
+  getTeamsForUser,
   getTeamByKey,
   listTeamUsers,
   getPreferredTeam,

@@ -41,13 +41,13 @@ const teamRoutes = new Hono<AppEnv>()
     },
   )
   /**
-    * GET / - List all teams in the workspace.
+    * GET / - List teams in the workspace that the current user belongs to.
     */
   .get(
     "/",
     describeRoute({
       tags: ["Teams"],
-      summary: "List teams",
+      summary: "List current user's teams",
       responses: {
         200: {
           description: "List of teams",
@@ -57,7 +57,11 @@ const teamRoutes = new Hono<AppEnv>()
     }),
     async (c) => {
       const workspace = c.get("workspace");
-      const teams = await teamService.getTeams({ workspaceId: workspace.id });
+      const user = c.get("user")!;
+      const teams = await teamService.getTeamsForUser({
+        workspaceId: workspace.id,
+        userId: user.id,
+      });
 
       return c.json({ teams });
     },

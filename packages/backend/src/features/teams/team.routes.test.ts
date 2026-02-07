@@ -1,11 +1,12 @@
 import { describe, it, expect } from "bun:test";
+import { dbSchema } from "@blackwall/database";
 import { useTestContext } from "../../test/context";
 
 describe("Team Routes", () => {
   const getCtx = useTestContext();
 
   describe("GET /teams", () => {
-    it("should return empty array when no teams exist", async () => {
+    it("should return seeded team for current user", async () => {
       const { client, headers } = getCtx();
       const res = await client.api.teams.$get(
         {},
@@ -19,27 +20,13 @@ describe("Team Routes", () => {
       expect(json.teams).toHaveLength(1);
     });
 
-    it("should return list of teams for workspace", async () => {
-      const { client, headers } = getCtx();
-      const res = await client.api.teams.$get(
-        {},
-        {
-          headers: headers(),
-        },
-      );
-
-      expect(res.status).toBe(200);
-      const json = await res.json();
-      expect(json.teams).toHaveLength(1);
-    });
-
-    it("should return multiple teams", async () => {
+    it("should not include teams the user is not a member of", async () => {
       const { client, headers, workspace } = getCtx();
       await client.api.teams.create.$post(
         {
           json: {
-            name: "Team 2",
-            key: "TM2",
+            name: "Unassigned Team 1",
+            key: "UA1",
             workspaceId: workspace.id,
           },
         },
@@ -51,8 +38,8 @@ describe("Team Routes", () => {
       await client.api.teams.create.$post(
         {
           json: {
-            name: "Team 3",
-            key: "TM3",
+            name: "Unassigned Team 2",
+            key: "UA2",
             workspaceId: workspace.id,
           },
         },
@@ -70,7 +57,42 @@ describe("Team Routes", () => {
 
       expect(res.status).toBe(200);
       const json = await res.json();
-      expect(json.teams).toHaveLength(3);
+      expect(json.teams).toHaveLength(1);
+    });
+
+    it("should return teams after user is added as member", async () => {
+      const { client, headers, workspace, testDb, user } = getCtx();
+      const createRes = await client.api.teams.create.$post(
+        {
+          json: {
+            name: "My Extra Team",
+            key: "EXT",
+            workspaceId: workspace.id,
+          },
+        },
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(createRes.status).toBe(200);
+      const created = await createRes.json();
+
+      await testDb.db.insert(dbSchema.userTeam).values({
+        teamId: created.team.id,
+        userId: user.id,
+      });
+
+      const res = await client.api.teams.$get(
+        {},
+        {
+          headers: headers(),
+        },
+      );
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.teams).toHaveLength(2);
     });
   });
 
