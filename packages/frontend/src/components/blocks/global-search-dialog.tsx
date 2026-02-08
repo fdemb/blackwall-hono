@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { debounce } from "@solid-primitives/scheduled";
-import { query, createAsync } from "@solidjs/router";
+import { query, createAsync, A } from "@solidjs/router";
 import SearchIcon from "lucide-solid/icons/search";
 import { createSignal, Match, Switch } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -14,7 +14,7 @@ interface PickerOptionWithType extends PickerOption {
   type: "issue" | "user";
 }
 
-const globalSearchLoader = query(async (searchTerm: string, workspaceSlug: string) => {
+const globalSearchLoader = query(async (searchTerm: string) => {
   if (!searchTerm) {
     return { issues: [], users: [] };
   }
@@ -31,7 +31,7 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
   const [searchTerm, setSearchTerm] = createSignal("");
   const setSearchTermDebounced = debounce(setSearchTerm, 300);
 
-  const searchData = createAsync(() => globalSearchLoader(searchTerm(), props.workspaceSlug));
+  const searchData = createAsync(() => globalSearchLoader(searchTerm()));
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -52,9 +52,7 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
           ({
             id: item.key,
             label: item.summary,
-            linkProps: {
-              href: `/${props.workspaceSlug}/issue/${item.key}`,
-            },
+            href: `/${props.workspaceSlug}/issue/${item.key}`,
             type: "issue",
           }) as PickerOptionWithType,
       ) || [];
@@ -66,7 +64,7 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
             id: item.id,
             label: item.name,
             icon: () => <UserAvatar user={item} size="xs" />,
-            linkProps: {}, // TODO
+            href: `/${props.workspaceSlug}/members/${item.id}`,
             type: "user",
           }) as PickerOptionWithType,
       ) || [];

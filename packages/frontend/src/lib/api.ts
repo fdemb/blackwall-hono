@@ -1,12 +1,11 @@
 import { hc } from "hono/client";
 import type { AppType } from "@blackwall/backend/src/index";
-import { getCurrentWorkspaceSlug } from "./workspace-slug";
 import { toast } from "@/components/custom-ui/toast";
 import { backendUrl } from "./env";
 
 export const apiFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const headers = new Headers(init?.headers);
-  headers.set("x-blackwall-workspace-slug", getCurrentWorkspaceSlug()!);
+  headers.set("x-blackwall-workspace-slug", window.__workspaceSlug!);
 
   const res = await fetch(input, {
     ...init,

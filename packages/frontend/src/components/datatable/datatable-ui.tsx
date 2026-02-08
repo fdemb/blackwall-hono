@@ -12,7 +12,7 @@ function DataTableRoot(props: DataTableRootProps) {
   return (
     <ScrollArea
       class={cn("flex-1 min-h-0", props.class)}
-      contentClass="grid min-w-full min-h-0 flex-1 auto-rows-min"
+      viewportClass="grid min-w-full min-h-0 flex-1 auto-rows-min"
     >
       {props.children}
     </ScrollArea>

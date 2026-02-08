@@ -429,7 +429,7 @@ const SidebarMenuItem: Component<ComponentProps<"li">> = (props) => {
 };
 
 const sidebarMenuButtonVariants = cva(
-  "flex h-7 min-w-0 w-full items-center rounded-sm gap-2 overflow-hidden pr-2 pl-2 text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground aria-[current=page]:bg-sidebar-accent aria-[current=page]:text-sidebar-accent-foreground",
+  "flex h-7 min-w-0 w-full items-center squircle-sm gap-2 overflow-hidden pr-2 pl-2 text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground aria-[current=page]:bg-sidebar-accent aria-[current=page]:text-sidebar-accent-foreground",
   {
     variants: {
       variant: {
@@ -606,7 +606,7 @@ const SidebarMenuSubButton = <T extends ValidComponent = "a">(
       data-sidebar="menu-sub-button"
       data-size={local.size}
       class={cn(
-        "flex h-7 min-w-0 items-center rounded-sm gap-2 overflow-hidden pr-2 pl-5 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
+        "flex h-7 min-w-0 items-center squircle-sm gap-2 overflow-hidden pr-2 pl-5 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
         "aria-[current=page]:bg-sidebar-accent aria-[current=page]:text-sidebar-accent-foreground",
         local.size === "sm" && "text-sm",
         local.size === "md" && "text-base",

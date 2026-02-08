@@ -18,7 +18,7 @@ import type { IssueStatus, SerializedIssueSprint } from "@blackwall/database/sch
 import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/dnd";
 import { issueMappings } from "@/lib/mappings";
 import { api } from "@/lib/api";
-import { createAsync, useParams, A, action, useAction, useNavigate } from "@solidjs/router";
+import { createAsync, useParams, A, action, useAction } from "@solidjs/router";
 import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import CircleDotDashedIcon from "lucide-solid/icons/circle-dot-dashed";
@@ -81,11 +81,16 @@ export default function BoardPage() {
       {} as Record<IssueStatus, IssueForBoard[]>,
     );
   });
-  const activeSprint = createMemo(() =>
-    (sprints() ?? []).find((sprint) => sprint.status === "active") ?? teamData().activeSprint ?? null,
+
+  const activeSprint = createMemo(
+    () =>
+      (sprints() ?? []).find((sprint) => sprint.status === "active") ??
+      teamData().activeSprint ??
+      null,
   );
-  const firstPlannedSprint = createMemo(() =>
-    (sprints() ?? []).find((sprint) => sprint.status === "planned") ?? null,
+
+  const firstPlannedSprint = createMemo(
+    () => (sprints() ?? []).find((sprint) => sprint.status === "planned") ?? null,
   );
 
   async function handleDrop() {
@@ -183,7 +188,7 @@ function DragOverlay(props: { issues: IssueForBoard[] }) {
             width: `${dragState.initialRect!.width}px`,
           }}
         >
-          <div class="p-4 ring-2 ring-primary rounded-md shadow-xl bg-card scale-105 opacity-95">
+          <div class="p-4 ring-2 ring-primary squircle-md shadow-xl bg-card scale-105 opacity-95">
             <div class="w-full flex flex-col">
               <div class="pb-2">
                 <p class="font-medium text-lg">{issue().summary}</p>
@@ -265,7 +270,7 @@ function BoardList(props: BoardListProps) {
       </div>
       <div
         ref={(el) => setColumnRef(props.statusId, el)}
-        class="bg-surface rounded-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5"
+        class="bg-surface squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5"
         classList={{
           "ring-border dark:ring-white/10": !isDropTarget(),
           "ring-primary/50 bg-primary/5": isDropTarget(),
@@ -326,20 +331,17 @@ function BoardItem(props: BoardItemProps) {
   });
 
   return (
-    <div
+    <A
       ref={setRef}
       data-issue-key={props.issue.key}
-      class="p-4 ring-1 ring-border rounded-md relative shadow-sm bg-card select-none cursor-grab active:cursor-grabbing"
+      class="p-4 ring-1 ring-border squircle-md relative shadow-sm bg-card select-none"
       classList={{
-        invisible: isDragged(),
+        "opacity-50": isDragged(),
       }}
       style={{ "touch-action": "none" }}
+      draggable={false}
+      href={`/${params.workspaceSlug}/issue/${props.issue.key}`}
     >
-      <A
-        href={`/${params.workspaceSlug}/issue/${props.issue.key}`}
-        draggable={false}
-        class="absolute inset-0"
-      />
       <div class="w-full flex flex-col">
         <div class="pb-2">
           <p class="font-medium text-lg">{props.issue.summary}</p>
@@ -364,13 +366,11 @@ function BoardItem(props: BoardItemProps) {
           </Show>
         </div>
       </div>
-    </div>
+    </A>
   );
 }
 
-function SprintSection(props: {
-  sprint: SerializedIssueSprint | null;
-}) {
+function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
   const params = useParams();
 
   return (
@@ -398,7 +398,9 @@ function SprintSection(props: {
 
                 <div class="flex flex-row items-center justify-between">
                   <p class="text-xs text-muted-foreground">End date</p>
-                  <p class="text-sm font-medium">{new Date(sprint().endDate).toLocaleDateString()}</p>
+                  <p class="text-sm font-medium">
+                    {new Date(sprint().endDate).toLocaleDateString()}
+                  </p>
                 </div>
 
                 <Show when={sprint().goal}>

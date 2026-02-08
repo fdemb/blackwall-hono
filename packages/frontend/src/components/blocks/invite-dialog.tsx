@@ -9,12 +9,10 @@ import { api } from "@/lib/api";
 import { useDialogContext } from "@kobalte/core/dialog";
 import * as z from "zod";
 import { useAppForm } from "../../context/form-context";
-import { useWorkspaceData } from "../../context/workspace-context";
 import { Button } from "../ui/button";
 import { TanStackTextField } from "../ui/text-field";
 
 export function InviteDialogContent() {
-  const workspaceData = useWorkspaceData();
   const ctx = useDialogContext();
   const form = useAppForm(() => ({
     defaultValues: {
@@ -26,7 +24,7 @@ export function InviteDialogContent() {
       }),
     },
     onSubmit: async ({ value }) => {
-      const res = await api.api.invitations.$post({
+      await api.api.invitations.$post({
         json: { email: value.email },
       });
 

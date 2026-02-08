@@ -16,6 +16,7 @@ import {
   workspaceMemberResponseSchema,
 } from "./workspace.zod";
 import { HTTPException } from "hono/http-exception";
+import { teamService } from "../teams/team.service";
 
 const workspaceRoutes = new Hono<AppEnv>()
   .use("*", authMiddleware)
@@ -40,9 +41,10 @@ const workspaceRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ workspaces });
-    })
+    },
+  )
   /**
-   * POST /create - Create a new workspace.
+   * POST /create - Create a new workspace and adjacent team. Adds current user to the new workspace and team.
    */
   .post(
     "/create",
@@ -59,6 +61,16 @@ const workspaceRoutes = new Hono<AppEnv>()
     validator("json", createWorkspaceSchema),
     async (c) => {
       const workspace = await workspaceService.createWorkspace(c.req.valid("json"));
+      await workspaceService.UNCHECKED_addUserToWorkspace({
+        userId: c.get("user")!.id,
+        workspaceId: workspace.id,
+      });
+
+      const team = await teamService.createTeamBasedOnWorkspace({ workspace });
+      await teamService.UNCHECKED_addUserToTeam({
+        userId: c.get("user")!.id,
+        teamId: team.id,
+      });
 
       return c.json({ workspace });
     },
@@ -84,7 +96,8 @@ const workspaceRoutes = new Hono<AppEnv>()
       const workspace = await workspaceService.getPreferredWorkspaceForUser({ user });
 
       return c.json({ workspace });
-    })
+    },
+  )
 
   /**
    * GET /:slug - Get a workspace by its slug.
@@ -108,7 +121,8 @@ const workspaceRoutes = new Hono<AppEnv>()
       const workspace = await workspaceService.getWorkspaceBySlug(slug, user.id);
 
       return c.json({ workspace: workspace });
-    })
+    },
+  )
 
   /**
    * PATCH /:workspaceId - Update a workspace's settings.
@@ -169,7 +183,8 @@ const workspaceRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ members });
-    })
+    },
+  )
 
   /**
    * GET /:slug/members/:userId - Get a specific member of a workspace.
@@ -203,6 +218,7 @@ const workspaceRoutes = new Hono<AppEnv>()
       }
 
       return c.json({ member });
-    });
+    },
+  );
 
 export { workspaceRoutes };

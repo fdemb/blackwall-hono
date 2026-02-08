@@ -1,9 +1,8 @@
 import { api } from "@/lib/api";
-import { setCurrentWorkspaceSlug } from "@/lib/workspace-slug";
 import { query, redirect } from "@solidjs/router";
 
 export const workspaceLoader = query(async (workspaceSlug: string) => {
-  setCurrentWorkspaceSlug(workspaceSlug);
+  window.__workspaceSlug = workspaceSlug;
   const result = await api.api.workspaces[":slug"].$get({
     param: {
       slug: workspaceSlug,

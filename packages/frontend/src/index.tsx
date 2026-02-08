@@ -29,7 +29,7 @@ import { teamSettingsLoader } from "./routes/authorized/[workspaceSlug]/settings
 import { Toaster } from "./components/custom-ui/toast";
 
 const HomePage = lazy(() => import("./routes/authorized/index"));
-const SomePage = lazy(() => import("./routes/authorized/[workspaceSlug]/index"));
+const NavigateToMyIssues = lazy(() => import("./routes/authorized/[workspaceSlug]/index"));
 const IssueDetailPage = lazy(() => import("./routes/authorized/[workspaceSlug]/issue/[key]"));
 const MyIssuesPage = lazy(() => import("./routes/authorized/[workspaceSlug]/my-issues"));
 const ActiveIssuesPage = lazy(
@@ -121,7 +121,7 @@ const AppRouter = () => (
         preload={({ params }) => workspaceLoader(params.workspaceSlug!)}
       >
         <Route path="/" component={MainLayout}>
-          <Route path="/" component={SomePage} />
+          <Route path="/" component={NavigateToMyIssues} />
           <Route
             path="/issue/:key"
             component={IssueDetailPage}
@@ -169,7 +169,9 @@ const AppRouter = () => (
             <Route
               path="/sprints/:sprintId/complete"
               component={CompleteSprintPage}
-              preload={({ params }) => sprintCompleteContextLoader(params.teamKey!, params.sprintId!)}
+              preload={({ params }) =>
+                sprintCompleteContextLoader(params.teamKey!, params.sprintId!)
+              }
             />
             <Route
               path="/sprints/:sprintId/edit"
