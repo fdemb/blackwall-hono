@@ -1,4 +1,4 @@
-import { flexRender, type Row, type Table as TableType } from "@tanstack/solid-table";
+import { flexRender, type Row } from "@tanstack/solid-table";
 import {
   DataTableGrid,
   DataTableCell,
@@ -8,11 +8,15 @@ import {
   DataTableRow,
   DataTableLinkRow,
 } from "./datatable-ui";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { ScrollContainer } from "../custom-ui/scroll-area";
 import type { createDataTable } from "./create-datatable";
+import { useIssueDrag } from "../issues/dragged-issue";
+import type { SerializedIssue } from "@blackwall/database";
 
-type DataTableProps<TData> = ReturnType<typeof createDataTable<TData>>;
+interface DataTableProps<TData> extends ReturnType<typeof createDataTable<TData>> {
+  issueDrag?: boolean;
+}
 
 export function DataTable<TData>(props: DataTableProps<TData>) {
   return (
@@ -30,7 +34,12 @@ export function DataTableHeaderless<TData>(props: DataTableProps<TData>) {
   return (
     <DataTableRoot>
       <ScrollContainer>
-        <DataTableBody {...props} />
+        <Show when={props.issueDrag}>
+          <DraggableIssueDataTableBody {...props} />
+        </Show>
+        <Show when={!props.issueDrag}>
+          <DataTableBody {...props} />
+        </Show>
       </ScrollContainer>
     </DataTableRoot>
   );
@@ -60,8 +69,19 @@ export function DataTableBody<TData>(props: DataTableProps<TData>) {
   );
 }
 
+export function DraggableIssueDataTableBody<TData>(props: DataTableProps<TData>) {
+  return (
+    <DataTableGrid gridTemplateColumns={props.gridTemplateColumns()}>
+      <For each={props.table.getRowModel().rows}>
+        {(row) => <DraggableIssueDataRow row={row} />}
+      </For>
+    </DataTableGrid>
+  );
+}
+
 type DataRowProps<TData> = {
   row: Row<TData>;
+  ref?: (el: HTMLAnchorElement | HTMLDivElement) => void;
 };
 
 function DataRow<TData>(props: DataRowProps<TData>) {
@@ -70,6 +90,9 @@ function DataRow<TData>(props: DataRowProps<TData>) {
       <DataTableLinkRow
         {...props.row.linkProps}
         data-state={props.row.getIsSelected() ? "selected" : undefined}
+        draggable={false}
+        class="touch-none"
+        ref={(el) => props.ref?.(el)}
       >
         <For each={props.row.getVisibleCells()}>
           {(cell) => (
@@ -83,7 +106,7 @@ function DataRow<TData>(props: DataRowProps<TData>) {
   }
 
   return (
-    <DataTableRow data-state={props.row.getIsSelected() ? "selected" : undefined}>
+    <DataTableRow data-state={props.row.getIsSelected() ? "selected" : undefined} ref={(el) => props.ref?.(el)}>
       <For each={props.row.getVisibleCells()}>
         {(cell) => (
           <DataTableCell class={cell.column.columnDef.meta?.cellClass}>
@@ -93,4 +116,10 @@ function DataRow<TData>(props: DataRowProps<TData>) {
       </For>
     </DataTableRow>
   );
+}
+
+function DraggableIssueDataRow<TData>(props: DataRowProps<TData>) {
+  const { setDragTrigger } = useIssueDrag(props.row.original as SerializedIssue);
+
+  return <DataRow {...props} ref={(el) => setDragTrigger(el)} />;
 }

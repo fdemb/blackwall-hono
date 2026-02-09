@@ -20,7 +20,6 @@ const tailwindConfig = {
         card: "#faf8fd",
         "card-foreground": "#2d2a3e",
         primary: "#e85c5c",
-        "primary-darker": "#d14a4a",
         "primary-foreground": "#ffffff",
         secondary: "#ede8f4",
         "secondary-foreground": "#2d2a3e",

@@ -1,5 +1,14 @@
-import { A, type AnchorProps } from "@solidjs/router";
+import { A, useNavigate, type AnchorProps } from "@solidjs/router";
 
 export const FastLink = (props: AnchorProps) => {
-  return <A {...props} />;
+  const navigate = useNavigate();
+  return (
+    <A
+      {...props}
+      onPointerDown={(e) => {
+        e.preventDefault();
+        navigate(props.href!);
+      }}
+    />
+  );
 };

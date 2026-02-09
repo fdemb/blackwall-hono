@@ -19,13 +19,16 @@ import { createMemo, Show } from "solid-js";
 import { backlogLoader } from "./backlog.data";
 import { useTeamData } from "../../[teamKey]";
 import { sprintsLoader } from "../sprints/index.data";
+import { IssueDraggingProvider } from "@/components/issues/dragged-issue";
 
 export default function BacklogPage() {
   const params = useParams();
   const teamData = useTeamData();
   const issues = createAsync(() => backlogLoader(params.teamKey!));
   const sprints = createAsync(() => sprintsLoader(params.teamKey!));
-  const openSprints = createMemo(() => (sprints() ?? []).filter((sprint) => sprint.status !== "completed"));
+  const openSprints = createMemo(() =>
+    (sprints() ?? []).filter((sprint) => sprint.status !== "completed"),
+  );
 
   const rowSelection = createRowSelection();
 
@@ -38,7 +41,7 @@ export default function BacklogPage() {
   });
 
   return (
-    <>
+    <IssueDraggingProvider>
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem>
@@ -62,9 +65,10 @@ export default function BacklogPage() {
           issues={issues()!}
           workspaceSlug={params.workspaceSlug!}
           rowSelection={rowSelection}
+          issueDrag={true}
         />
       </Show>
-    </>
+    </IssueDraggingProvider>
   );
 }
 
@@ -77,8 +81,8 @@ function IssueEmpty() {
         </EmptyMedia>
         <EmptyTitle>Backlog is empty</EmptyTitle>
         <EmptyDescription>
-          Add issues to the backlog to sprint future work. Backlog items can be moved to active sprints
-          when ready.
+          Add issues to the backlog to sprint future work. Backlog items can be moved to active
+          sprints when ready.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

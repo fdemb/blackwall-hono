@@ -33,9 +33,9 @@ import { CreateDialog } from "./create-dialog";
 import { LogoNoBg } from "./logos";
 import { UserMenu } from "./user-menu";
 // import { WorkspacePicker } from "./workspace-picker";
-import { A } from "@solidjs/router";
 import { WorkspacePicker } from "./workspace-picker";
 import { GlobalSearchDialog } from "./global-search-dialog";
+import { FastLink } from "../custom-ui/fast-link";
 
 type LinkNavItem = {
   title: string;
@@ -173,7 +173,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                       <SidebarMenuItem>
                         <Show when={item.type === "link" ? item : false}>
                           {(item) => (
-                            <SidebarMenuButton as={A} href={item().href}>
+                            <SidebarMenuButton as={FastLink} href={item().href}>
                               <Show when={item().icon}>
                                 <Dynamic component={item().icon} />
                               </Show>
@@ -203,7 +203,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                                       {(child) => (
                                         <SidebarMenuSubItem>
                                           <SidebarMenuSubButton
-                                            as={A}
+                                            as={FastLink}
                                             href={child.href}
                                             onClick={() => setOpenMobile(false)}
                                           >

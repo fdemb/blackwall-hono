@@ -199,7 +199,7 @@ export function createBoardDnD() {
         },
         {
           filterTaps: true,
-          delay: 150,
+          delay: 500,
           pointer: {
             touch: true,
           },

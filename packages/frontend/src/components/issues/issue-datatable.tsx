@@ -22,6 +22,7 @@ export type IssueDataTableProps = {
   issues: IssueForDataTable[];
   workspaceSlug: string;
   rowSelection?: RowSelectionResult;
+  issueDrag?: boolean;
 };
 
 export function IssueDataTable(props: IssueDataTableProps) {
@@ -117,5 +118,5 @@ export function IssueDataTable(props: IssueDataTableProps) {
     getRowId: (row) => row.id,
   });
 
-  return <DataTableHeaderless {...datatableProps} />;
+  return <DataTableHeaderless {...datatableProps} issueDrag={props.issueDrag} />;
 }

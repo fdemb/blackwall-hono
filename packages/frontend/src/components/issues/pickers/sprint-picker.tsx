@@ -30,7 +30,7 @@ const updateSprint = action(async (issueKey: string, sprintId: string | null) =>
 });
 
 type SprintPickerPopoverProps = {
-  sprintId: string | null;
+  sprintId?: string | null;
   openSprints: SerializedIssueSprint[];
   issueKey?: string;
   onChange?: (id: string | null) => Promise<void> | void;
@@ -90,7 +90,9 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
 
   const handleChange = async (id: string | null) => {
     const nextSprint = props.openSprints.find((sprint) => sprint.id === id);
-    const shouldConfirm = Boolean(nextSprint && nextSprint.status === "active" && props.sprintId !== id);
+    const shouldConfirm = Boolean(
+      nextSprint && nextSprint.status === "active" && props.sprintId !== id,
+    );
 
     if (shouldConfirm) {
       setPendingSprintId(id);
