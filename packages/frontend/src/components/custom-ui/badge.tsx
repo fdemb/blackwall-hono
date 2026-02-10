@@ -13,7 +13,7 @@ export const badgeVariants = cva(
       },
       color: {
         normal:
-          "bg-gradient-to-b from-background to-surface text-foreground ring-1 ring-foreground/10",
+          "bg-background text-foreground ring-1 ring-foreground/10",
         red: "bg-theme-red text-background ring-1 ring-foreground/10 ring-inset",
         blue: "bg-theme-blue text-background ring-1 ring-foreground/10 ring-inset",
         green: "bg-theme-green text-background ring-1 ring-foreground/10 ring-inset",

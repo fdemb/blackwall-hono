@@ -46,7 +46,7 @@ export function StatusPickerPopover(props: StatusPickerPopoverProps) {
 
   return (
     <Popover placement="bottom-start" gutter={8}>
-      <Popover.Trigger class="rounded-full hover:[&>span]:from-accent hover:[&>span]:to-accent">
+      <Popover.Trigger class="rounded-full hover:[&>span]:bg-accent">
         {props.trigger ?? <IssueStatusBadge status={props.status} />}
       </Popover.Trigger>
 

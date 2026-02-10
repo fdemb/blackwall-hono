@@ -25,7 +25,7 @@ import { Sheet, SheetContent } from "./sheet";
 import { Skeleton } from "./skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
-const MOBILE_BREAKPOINT = 768;
+const DEFAULT_MOBILE_BREAKPOINT = 768;
 const SIDEBAR_WIDTH = "15rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
@@ -52,11 +52,11 @@ function useSidebar() {
   return context;
 }
 
-export function useIsMobile(fallback = false) {
+export function useIsMobile(breakpoint = DEFAULT_MOBILE_BREAKPOINT, fallback = false) {
   const [isMobile, setIsMobile] = createSignal(fallback);
 
   createEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
     const onChange = (e: MediaQueryListEvent | MediaQueryList) => {
       setIsMobile(e.matches);
     };
@@ -73,10 +73,12 @@ type SidebarProviderProps = Omit<ComponentProps<"div">, "style"> & {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   style?: JSX.CSSProperties;
+  keybind?: string | false;
+  mobileBreakpoint?: number;
 };
 
 const SidebarProvider: Component<SidebarProviderProps> = (rawProps) => {
-  const props = mergeProps({ defaultOpen: true }, rawProps);
+  const props = mergeProps({ defaultOpen: true, keybind: SIDEBAR_KEYBOARD_SHORTCUT as string | false, mobileBreakpoint: DEFAULT_MOBILE_BREAKPOINT }, rawProps);
   const [local, others] = splitProps(props, [
     "defaultOpen",
     "open",
@@ -84,9 +86,11 @@ const SidebarProvider: Component<SidebarProviderProps> = (rawProps) => {
     "class",
     "style",
     "children",
+    "keybind",
+    "mobileBreakpoint",
   ]);
 
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(local.mobileBreakpoint);
   const [openMobile, setOpenMobile] = createSignal(false);
 
   // This is the internal state of the sidebar.
@@ -107,8 +111,13 @@ const SidebarProvider: Component<SidebarProviderProps> = (rawProps) => {
 
   // Adds a keyboard shortcut to toggle the sidebar.
   createEffect(() => {
+    if (local.keybind === false) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
+      const target = event.target as HTMLElement;
+      if (target.isContentEditable || target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+
+      if (event.key === local.keybind && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         toggleSidebar();
       }
@@ -208,7 +217,7 @@ const Sidebar: Component<SidebarProps> = (rawProps) => {
       <Match when={!isMobile()}>
         <div
           class={cn(
-            "group peer shrink-0 hidden fixed md:flex w-(--sidebar-width) h-full flex-col bg-sidebar text-sidebar-foreground overflow-hidden duration-400 ease-out-expo",
+            "group peer shrink-0 fixed flex w-(--sidebar-width) top-0 bottom-0 flex-col bg-sidebar text-sidebar-foreground overflow-hidden duration-400 ease-out-expo",
             "data-[collapsible=offcanvas]:border-0",
             "data-[collapsible=icon]:w-(--sidebar-width-icon)",
             local.side === "left"
@@ -226,11 +235,11 @@ const Sidebar: Component<SidebarProps> = (rawProps) => {
           {local.children}
         </div>
         <div
-          class="transition-width hidden md:block duration-400 ease-out-expo"
+          class="transition-width block duration-400 ease-out-expo"
           style={
             state() === "collapsed"
               ? {
-                  width: 0,
+                  width: "0",
                 }
               : {
                   width: SIDEBAR_WIDTH,

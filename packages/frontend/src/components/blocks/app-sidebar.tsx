@@ -173,7 +173,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                       <SidebarMenuItem>
                         <Show when={item.type === "link" ? item : false}>
                           {(item) => (
-                            <SidebarMenuButton as={FastLink} href={item().href}>
+                            <SidebarMenuButton as={FastLink} href={item().href} onClick={() => setOpenMobile(false)}>
                               <Show when={item().icon}>
                                 <Dynamic component={item().icon} />
                               </Show>

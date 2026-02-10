@@ -14,7 +14,7 @@ export function PageHeader(props: ComponentProps<"header">) {
       )}
       {...rest}
     >
-      <SidebarTrigger side="left" class="md:hidden">
+      <SidebarTrigger side="left" class="lg:hidden">
         <PanelLeftIcon class="size-4" />
       </SidebarTrigger>
 

@@ -26,7 +26,7 @@ export function PriorityPickerPopover(props: {
 
   return (
     <Popover placement="bottom-start" gutter={8}>
-      <Popover.Trigger class="rounded-full [&>span]:hover:from-accent [&>span]:hover:to-accent [&>span]:hover:transition-colors">
+      <Popover.Trigger class="rounded-full [&>span]:hover:bg-accent">
         <IssuePriorityBadge priority={props.priority} />
       </Popover.Trigger>
 

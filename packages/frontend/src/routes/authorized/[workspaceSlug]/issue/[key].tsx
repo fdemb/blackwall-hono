@@ -26,7 +26,7 @@ function IssueMainView(props: {
 }) {
   return (
     <ScrollContainer>
-      <main class="min-w-0 px-6 sm:px-12 pb-8 pt-16 flex flex-col max-w-[980px] mx-auto">
+      <main class="min-w-0 px-6 lg:px-12 pb-8 pt-16 flex flex-col max-w-[980px] mx-auto">
         <IssueSummary issue={props.issue} />
         <IssueDescription issue={props.issue} />
 
@@ -80,7 +80,7 @@ export default function IssueDetailPage() {
       </PageHeader>
 
       <div class="flex flex-row min-h-0 flex-1 overflow-hidden">
-        <SidebarProvider>
+        <SidebarProvider keybind="r" mobileBreakpoint={640}>
           <Show when={issueData()}>
             {(data) => (
               <IssueMainView

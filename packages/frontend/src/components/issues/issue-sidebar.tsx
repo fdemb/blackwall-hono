@@ -1,3 +1,4 @@
+import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import type { SerializedIssueSprint, SerializedLabel, SerializedUser } from "@blackwall/database/schema";
 import type { InferDbType } from "@blackwall/database/types";
@@ -42,53 +43,55 @@ export function IssueSidebar(props: {
   teamKey: string;
 }) {
   return (
-    <Sidebar side="right">
-      <SidebarContent class="p-0">
-        <IssueSidebarItem label="Status" orientation="col">
-          <StatusPickerPopover status={props.issue.status} issueKey={props.issue.key} />
-        </IssueSidebarItem>
+    <Sidebar side="right" class="top-10">
+      <SidebarContent class="p-0 overflow-hidden">
+        <ScrollContainer>
+          <IssueSidebarItem label="Status" orientation="col">
+            <StatusPickerPopover status={props.issue.status} issueKey={props.issue.key} />
+          </IssueSidebarItem>
 
-        <IssueSidebarItem label="Priority" orientation="col">
-          <PriorityPickerPopover
-            priority={props.issue.priority}
-            issueKey={props.issue.key}
-            workspaceSlug={props.workspaceSlug}
-          />
-        </IssueSidebarItem>
+          <IssueSidebarItem label="Priority" orientation="col">
+            <PriorityPickerPopover
+              priority={props.issue.priority}
+              issueKey={props.issue.key}
+              workspaceSlug={props.workspaceSlug}
+            />
+          </IssueSidebarItem>
 
-        <IssueSidebarItem label="Estimate" orientation="col">
-          <EstimationPickerPopover
-            estimationPoints={props.issue.estimationPoints}
-            issueKey={props.issue.key}
-            workspaceSlug={props.workspaceSlug}
-          />
-        </IssueSidebarItem>
+          <IssueSidebarItem label="Estimate" orientation="col">
+            <EstimationPickerPopover
+              estimationPoints={props.issue.estimationPoints}
+              issueKey={props.issue.key}
+              workspaceSlug={props.workspaceSlug}
+            />
+          </IssueSidebarItem>
 
-        <IssueSidebarItem label="Time Logged" orientation="col">
-          <TimeEntryPickerPopover issueKey={props.issue.key} workspaceSlug={props.workspaceSlug} />
-        </IssueSidebarItem>
+          <IssueSidebarItem label="Time Logged" orientation="col">
+            <TimeEntryPickerPopover issueKey={props.issue.key} workspaceSlug={props.workspaceSlug} />
+          </IssueSidebarItem>
 
-        <IssueSidebarItem label="Assigned to" orientation="col">
-          <AssigneePickerPopover
-            assignedToId={props.issue.assignedToId}
-            issueKey={props.issue.key}
-            workspaceSlug={props.workspaceSlug}
-            teamKey={props.teamKey}
-            assignableUsers={props.assignableUsers}
-          />
-        </IssueSidebarItem>
+          <IssueSidebarItem label="Assigned to" orientation="col">
+            <AssigneePickerPopover
+              assignedToId={props.issue.assignedToId}
+              issueKey={props.issue.key}
+              workspaceSlug={props.workspaceSlug}
+              teamKey={props.teamKey}
+              assignableUsers={props.assignableUsers}
+            />
+          </IssueSidebarItem>
 
-        <IssueSidebarItem label="Labels" orientation="col">
-          <IssueLabelsPicker labels={props.labels} issueKey={props.issue.key} />
-        </IssueSidebarItem>
+          <IssueSidebarItem label="Labels" orientation="col">
+            <IssueLabelsPicker labels={props.labels} issueKey={props.issue.key} />
+          </IssueSidebarItem>
 
-        <IssueSidebarItem label="Sprint" orientation="col">
-          <SprintPickerPopover
-            sprintId={props.issue.sprintId}
-            openSprints={props.openSprints}
-            issueKey={props.issue.key}
-          />
-        </IssueSidebarItem>
+          <IssueSidebarItem label="Sprint" orientation="col">
+            <SprintPickerPopover
+              sprintId={props.issue.sprintId}
+              openSprints={props.openSprints}
+              issueKey={props.issue.key}
+            />
+          </IssueSidebarItem>
+        </ScrollContainer>
       </SidebarContent>
     </Sidebar>
   );

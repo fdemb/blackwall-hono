@@ -265,7 +265,7 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
             workspaceSlug={props.workspaceSlug}
             placeholder="Add a comment..."
             variant="plain"
-            class="min-h-24 p-4 squircle-lg bg-accent border"
+            class="min-h-24 p-4 squircle-lg bg-muted border"
           />
         )}
       </form.AppField>
@@ -340,7 +340,7 @@ export function CommentMenu(props: CommentMenuProps) {
 
 export function IssueCommentItem(props: IssueCommentItemProps) {
   return (
-    <div class="p-4 squircle-lg bg-accent border flex flex-col gap-3.5">
+    <div class="p-4 squircle-lg bg-muted border flex flex-col gap-3.5">
       <div class="flex flex-row gap-1 items-center">
         <UserAvatar user={props.comment.author as unknown as SerializedUser} size="xs" />
         <p class="font-medium">{props.comment.author.name}</p>
