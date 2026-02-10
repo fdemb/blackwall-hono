@@ -24,7 +24,7 @@ const signupAction = action(async (value: SignupFormData) => {
   });
 
   const json = await res.json();
-  return redirect(`/${json.workspace.slug}`);
+  throw redirect(`/${json.workspace.slug}`);
 });
 
 const useSignupForm = () => {

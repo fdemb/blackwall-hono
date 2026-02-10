@@ -8,39 +8,29 @@ import type {
 import { useDialogContext } from "@kobalte/core/dialog";
 import { Popover } from "@kobalte/core/popover";
 import type { JSONContent } from "@tiptap/core";
-import PlusIcon from "lucide-solid/icons/plus";
 import XIcon from "lucide-solid/icons/x";
-import { createEffect, createSignal, mergeProps, on, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, mergeProps, on } from "solid-js";
 import * as z from "zod";
-import { useKeybinds } from "../../context/keybind.context";
 import { useWorkspaceData } from "../../context/workspace-context";
 import { TeamAvatar } from "../custom-ui/avatar";
 import { PickerPopover } from "../custom-ui/picker-popover";
 import { TiptapEditor } from "../tiptap/tiptap-editor";
 import { Button } from "../ui/button";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogFooter,
   DialogSingleLineHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
-import { Kbd, KbdGroup } from "../ui/kbd";
 import { TanStackErrorMessages, TextField } from "../ui/text-field";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { action, createAsync, query, redirect, useAction } from "@solidjs/router";
 import { api, apiFetch } from "@/lib/api";
 import type { CreateIssue } from "@blackwall/backend/src/features/issues/issue.zod";
+import type { CreateDialogDefaults } from "@/context/create-dialog.context";
 
-type CreateDialogProps = {
-  status?: IssueStatus;
-  teamKey?: string;
-  assignedToId?: string;
-  sprintId?: string | null;
-  global?: boolean;
-  buttonSize?: "default" | "xxs" | "xs" | "sm" | "lg";
+type CreateDialogContentProps = {
+  defaults?: CreateDialogDefaults;
 };
 
 const getTeamUsers = query(async (teamKey: string) => {
@@ -66,7 +56,7 @@ const createIssueAction = action(
 
     const { issue: createdIssue } = await res.json();
 
-    redirect(`/${workspaceSlug}/issue/${createdIssue.key}`);
+    throw redirect(`/${workspaceSlug}/issue/${createdIssue.key}`);
   },
 );
 
@@ -81,34 +71,7 @@ const uploadAttachmentAction = action(async (formData: FormData) => {
   return attachment;
 });
 
-function CreateDialog(props: CreateDialogProps) {
-  return (
-    <Dialog>
-      <Tooltip>
-        <TooltipTrigger as="div" class="w-full">
-          <DialogTrigger as={Button} size={props.buttonSize ?? "sm"} class="w-full">
-            <PlusIcon class="size-4" strokeWidth={2.75} />
-            Create
-          </DialogTrigger>
-        </TooltipTrigger>
-        <Show when={props.global}>
-          <TooltipContent>
-            <span class="mr-2">Create a new issue</span>
-            <KbdGroup>
-              <Kbd>C</Kbd>
-              then
-              <Kbd>R</Kbd>
-            </KbdGroup>
-          </TooltipContent>
-        </Show>
-      </Tooltip>
-
-      <CreateDialogContent {...props} />
-    </Dialog>
-  );
-}
-
-function CreateDialogContent(props: CreateDialogProps) {
+function CreateDialogContent(props: CreateDialogContentProps) {
   const workspaceData = useWorkspaceData();
   const teams = () => workspaceData().teams;
   const merged = mergeProps(
@@ -116,11 +79,10 @@ function CreateDialogContent(props: CreateDialogProps) {
       status: "to_do" as IssueStatus,
       teamKey: teams().length > 0 ? teams()[0].key : "",
     },
-    props,
+    () => props.defaults ?? {},
   );
 
-  const { addKeybind, removeKeybind } = useKeybinds();
-  const { isOpen, close, toggle } = useDialogContext();
+  const { isOpen, close } = useDialogContext();
   const [summaryInputElement, setSummaryInputElement] = createSignal<HTMLInputElement | null>(null);
   const assignableUsers = createAsync(() => getTeamUsers(merged.teamKey));
   const _action = useAction(createIssueAction);
@@ -141,7 +103,7 @@ function CreateDialogContent(props: CreateDialogProps) {
       description: undefined as unknown as JSONContent,
       status: merged.status,
       assignedToId: merged.assignedToId ?? null,
-      sprintId: props.sprintId ?? null,
+      sprintId: merged.sprintId ?? null,
     },
     onSubmit: async ({ value }) => {
       await _action(value, workspaceData().workspace.slug, merged.teamKey);
@@ -165,25 +127,20 @@ function CreateDialogContent(props: CreateDialogProps) {
     },
   }));
 
-  onMount(() => {
-    if (props.global) {
-      addKeybind("c r", () => {
-        if (isOpen()) return;
-        toggle();
-      });
-    }
-
-    onCleanup(() => {
-      removeKeybind("c r");
-    });
-  });
-
   createEffect(
     on([isOpen, summaryInputElement], ([open, summaryInputElement]) => {
-      if (open && summaryInputElement) {
-        requestAnimationFrame(() => {
-          summaryInputElement.focus();
-        });
+      if (open) {
+        // Apply current defaults when dialog opens
+        form.setFieldValue("teamKey", merged.teamKey);
+        form.setFieldValue("status", merged.status);
+        form.setFieldValue("assignedToId", merged.assignedToId ?? null);
+        form.setFieldValue("sprintId", merged.sprintId ?? null);
+
+        if (summaryInputElement) {
+          requestAnimationFrame(() => {
+            summaryInputElement.focus();
+          });
+        }
 
         return;
       }
@@ -332,4 +289,5 @@ function TeamPicker(props: { teams: SerializedTeam[]; value: string }) {
   );
 }
 
-export { CreateDialog, CreateDialogContent };
+export { CreateDialogContent };
+export type { CreateDialogContentProps };

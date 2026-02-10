@@ -1,11 +1,9 @@
-import { CreateDialogContent } from "@/components/blocks/create-dialog";
 import { PageHeader } from "@/components/blocks/page-header";
 import { TeamAvatar, UserAvatar } from "@/components/custom-ui/avatar";
 import { Badge } from "@/components/custom-ui/badge";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Empty,
   EmptyContent,
@@ -15,6 +13,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import type { IssueStatus, SerializedIssueSprint } from "@blackwall/database/schema";
+import { useCreateDialog } from "@/context/create-dialog.context";
 import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/dnd";
 import { issueMappings } from "@/lib/mappings";
 import { api } from "@/lib/api";
@@ -233,6 +232,7 @@ function BoardList(props: BoardListProps) {
   const params = useParams();
   const teamData = useTeamData();
   const { dragState, setColumnRef } = useBoardDnD();
+  const { open } = useCreateDialog();
 
   const isDropTarget = () => dragState.isDragging && dragState.overColumnId === props.statusId;
 
@@ -253,24 +253,23 @@ function BoardList(props: BoardListProps) {
           {props.issues.length}
         </Badge>
 
-        <Dialog>
-          <DialogTrigger
-            as={Button}
-            variant="secondary"
-            class="size-5! p-0! items-center! justify-center! ml-auto hidden group-hover:flex"
-          >
-            <PlusIcon class="size-4 shrink-0" />
-          </DialogTrigger>
-          <CreateDialogContent
-            status={props.statusId}
-            teamKey={params.teamKey}
-            sprintId={teamData().activeSprintId}
-          />
-        </Dialog>
+        <Button
+          variant="secondary"
+          class="size-5! p-0! items-center! justify-center! ml-auto hidden group-hover:flex"
+          onClick={() =>
+            open({
+              status: props.statusId,
+              teamKey: params.teamKey,
+              sprintId: teamData().activeSprintId,
+            })
+          }
+        >
+          <PlusIcon class="size-4 shrink-0" />
+        </Button>
       </div>
       <div
         ref={(el) => setColumnRef(props.statusId, el)}
-        class="bg-surface squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5"
+        class="bg-card squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5"
         classList={{
           "ring-border dark:ring-white/10": !isDropTarget(),
           "ring-primary/50 bg-primary/5": isDropTarget(),
@@ -334,7 +333,7 @@ function BoardItem(props: BoardItemProps) {
     <A
       ref={setRef}
       data-issue-key={props.issue.key}
-      class="p-4 ring-1 ring-border squircle-md relative shadow-sm bg-card select-none"
+      class="p-4 border squircle-md relative shadow-sm bg-surface select-none"
       classList={{
         "opacity-50": isDragged(),
       }}

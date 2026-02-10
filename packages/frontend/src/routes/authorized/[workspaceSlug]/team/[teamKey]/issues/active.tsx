@@ -1,4 +1,3 @@
-import { CreateDialog } from "@/components/blocks/create-dialog";
 import { PageHeader } from "@/components/blocks/page-header";
 import {
   Empty,
@@ -9,11 +8,14 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import AlertCircleIcon from "lucide-solid/icons/alert-circle";
+import PlusIcon from "lucide-solid/icons/plus";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { createRowSelection } from "@/components/datatable/row-selection-feature";
 import { IssueDataTable, type IssueForDataTable } from "@/components/issues/issue-datatable";
 import { IssueSelectionMenu } from "@/components/issues/issue-selection-menu";
+import { Button } from "@/components/ui/button";
+import { useCreateDialog } from "@/context/create-dialog.context";
 import { createAsync, useParams } from "@solidjs/router";
 import { createMemo, Show } from "solid-js";
 import { activeIssuesLoader } from "./active.data";
@@ -69,6 +71,8 @@ export default function ActiveIssuesPage() {
 }
 
 function IssueEmpty() {
+  const { open } = useCreateDialog();
+
   return (
     <Empty>
       <EmptyHeader>
@@ -83,7 +87,10 @@ function IssueEmpty() {
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
-          <CreateDialog status="to_do" buttonSize="default" />
+          <Button onClick={() => open({ status: "to_do" })}>
+            <PlusIcon class="size-4" strokeWidth={2.75} />
+            Create
+          </Button>
         </div>
       </EmptyContent>
     </Empty>

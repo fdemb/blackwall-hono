@@ -14,6 +14,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useWorkspaceData } from "@/context/workspace-context";
+import { useCreateDialog } from "@/context/create-dialog.context";
 import AlertCircleIcon from "lucide-solid/icons/alert-circle";
 import ChevronRightIcon from "lucide-solid/icons/chevron-right";
 import Users2Icon from "lucide-solid/icons/users-2";
@@ -21,20 +22,21 @@ import ListTodoIcon from "lucide-solid/icons/list-todo";
 import CircleDashedIcon from "lucide-solid/icons/circle-dashed";
 import KanbanIcon from "lucide-solid/icons/kanban-square";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
+import PlusIcon from "lucide-solid/icons/plus";
 import type { Component, ComponentProps } from "solid-js";
 import { For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
 import { TeamAvatar } from "../custom-ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { CreateDialog } from "./create-dialog";
-// import { GlobalSearchDialog } from "./global-search-dialog";
+import { Button } from "../ui/button";
 import { LogoNoBg } from "./logos";
 import { UserMenu } from "./user-menu";
-// import { WorkspacePicker } from "./workspace-picker";
 import { WorkspacePicker } from "./workspace-picker";
 import { GlobalSearchDialog } from "./global-search-dialog";
 import { FastLink } from "../custom-ui/fast-link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Kbd, KbdGroup } from "../ui/kbd";
 
 type LinkNavItem = {
   title: string;
@@ -140,6 +142,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const workspaceData = useWorkspaceData();
   const groups = createNavItems();
   const [collapsibleStateStore, setCollapsibleStateStore] = useLocalStorageCollapsibleState();
+  const { open } = useCreateDialog();
 
 
   return (
@@ -152,7 +155,22 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
         </div>
 
         <div class="flex flex-row gap-2">
-          <CreateDialog global />
+          <Tooltip>
+            <TooltipTrigger as="div" class="w-full">
+              <Button size="sm" class="w-full" onClick={() => open()}>
+                <PlusIcon class="size-4" strokeWidth={2.75} />
+                Create
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <span class="mr-2">Create a new issue</span>
+              <KbdGroup>
+                <Kbd>C</Kbd>
+                then
+                <Kbd>R</Kbd>
+              </KbdGroup>
+            </TooltipContent>
+          </Tooltip>
 
           <GlobalSearchDialog workspaceSlug={workspaceData().workspace.slug} />
         </div>

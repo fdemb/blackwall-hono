@@ -1,4 +1,3 @@
-import { CreateDialog } from "@/components/blocks/create-dialog";
 import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { createRowSelection } from "@/components/datatable/row-selection-feature";
@@ -12,8 +11,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
+import { useCreateDialog } from "@/context/create-dialog.context";
+import { useSessionData } from "@/context/session-context";
 import { createAsync, useParams } from "@solidjs/router";
 import CircleDotIcon from "lucide-solid/icons/circle-dot";
+import PlusIcon from "lucide-solid/icons/plus";
 import { createMemo, Show } from "solid-js";
 import { myIssuesLoader } from "./my-issues.data";
 
@@ -63,6 +66,9 @@ export default function MyIssuesPage() {
 }
 
 function IssueEmpty() {
+  const { open } = useCreateDialog();
+  const session = useSessionData();
+
   return (
     <Empty>
       <EmptyHeader>
@@ -77,7 +83,10 @@ function IssueEmpty() {
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
-          <CreateDialog buttonSize="default" />
+          <Button onClick={() => open({ assignedToId: session().user.id })}>
+            <PlusIcon class="size-4" strokeWidth={2.75} />
+            Create
+          </Button>
         </div>
       </EmptyContent>
     </Empty>

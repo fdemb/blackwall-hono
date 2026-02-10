@@ -53,7 +53,7 @@
 [data-theme="dark"] {
   --background: #131419;
   --foreground: #E6E6E6;
-  --card: #16171c;
+  --card: #121216;
   --card-foreground: #E6E6E6;
   --popover: #16171c;
   --popover-foreground: #E6E6E6;
@@ -68,7 +68,7 @@
   --accent-foreground: #ddd8e4;
   --destructive: #ff8787;
   --destructive-foreground: #191624;
-  --border: #ffffff10;
+  --border: #ffffff12;
   --input: #202126;
   --ring: #f82659;
   --placeholder: #68627d;
