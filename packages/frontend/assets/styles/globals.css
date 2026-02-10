@@ -8,46 +8,46 @@
 :root {
   --radius: 0.625rem;
 
-  --background: #f8f5fc;
-  --foreground: #2d2a3e;
-  --card: #faf8fd;
-  --card-foreground: #2d2a3e;
-  --popover: #f8f5fc;
-  --popover-foreground: #2d2a3e;
+  --background: #f5f5f7;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --card-foreground: #1a1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a2e;
   --primary: #D20033;
   --primary-foreground: #ffffff;
-  --secondary: #ede8f4;
-  --secondary-foreground: #2d2a3e;
-  --muted: #e4dff0;
-  --surface: #f0ebf7;
-  --muted-foreground: #68627d;
-  --accent: #ede8f4;
-  --accent-foreground: #2d2a3e;
-  --destructive: #e85c5c;
+  --secondary: #e8e8ed;
+  --secondary-foreground: #1a1a2e;
+  --muted: #e0e0e6;
+  --surface: #ebebf0;
+  --muted-foreground: #6b6b7b;
+  --accent: #e8e8ed;
+  --accent-foreground: #1a1a2e;
+  --destructive: #e04040;
   --destructive-foreground: #ffffff;
-  --border: #e0dbe8;
-  --input: #f8f5fc;
-  --ring: #d98a5c;
-  --placeholder: #9892ad;
+  --border: #d8d8de;
+  --input: #f5f5f7;
+  --ring: #D20033;
+  --placeholder: #9090a0;
 
-  --theme-red: #e56767;
-  --theme-orange: #d98a5c;
-  --theme-yellow: #d9a54d;
-  --theme-green: #4db08a;
-  --theme-teal: #3a9aa3;
-  --theme-blue: #4a8ae6;
-  --theme-violet: #6b75d4;
-  --theme-purple: #9a6aa8;
-  --theme-pink: #d47a9e;
+  --theme-red: #e85a2e;
+  --theme-orange: #d98028;
+  --theme-yellow: #d9a518;
+  --theme-green: #45b860;
+  --theme-teal: #38ad88;
+  --theme-blue: #1890f0;
+  --theme-violet: #7870c0;
+  --theme-purple: #a86090;
+  --theme-pink: #e06070;
 
-  --sidebar: #f0ebf7;
-  --sidebar-foreground: #38324d;
-  --sidebar-primary: #e85c5c;
+  --sidebar: #ebebf0;
+  --sidebar-foreground: #1a1a2e;
+  --sidebar-primary: #D20033;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e4dff0;
-  --sidebar-accent-foreground: #2d2a3e;
-  --sidebar-border: #2d2a3e12;
-  --sidebar-ring: #e85c5c;
+  --sidebar-accent: #e0e0e6;
+  --sidebar-accent-foreground: #1a1a2e;
+  --sidebar-border: #1a1a2e12;
+  --sidebar-ring: #D20033;
 }
 
 [data-theme="dark"] {
@@ -78,7 +78,7 @@
   --theme-yellow: #f0b820;
   --theme-green: #50cc6c;
   --theme-teal: #40c098;
-  --theme-blue: #68a0e0;
+  --theme-blue: #28a0f8;
   --theme-violet: #8880d0;
   --theme-purple: #b870a0;
   --theme-pink: #f07080;
