@@ -235,7 +235,7 @@ const Sidebar: Component<SidebarProps> = (rawProps) => {
           {local.children}
         </div>
         <div
-          class="transition-width block duration-400 ease-out-expo"
+          class="transition-width block shrink-0 duration-400 ease-out-expo"
           style={
             state() === "collapsed"
               ? {
@@ -468,14 +468,20 @@ const SidebarMenuButton = <T extends ValidComponent = "button">(
   rawProps: PolymorphicProps<T, SidebarMenuButtonProps<T>>,
 ) => {
   const props = mergeProps({ isActive: false, variant: "default", size: "default" }, rawProps);
-  const [local, others] = splitProps(props as SidebarMenuButtonProps, [
+  const [local, others] = splitProps(props as SidebarMenuButtonProps & { onClick?: () => void }, [
     "isActive",
     "tooltip",
     "variant",
     "size",
     "class",
+    "onClick",
   ]);
-  const { isMobile, state } = useSidebar();
+  const { isMobile, state, setOpenMobile } = useSidebar();
+
+  const handleClick = () => {
+    if (isMobile()) setOpenMobile(false);
+    local.onClick?.();
+  };
 
   const button = (
     <Polymorphic<SidebarMenuButtonProps>
@@ -487,6 +493,7 @@ const SidebarMenuButton = <T extends ValidComponent = "button">(
         sidebarMenuButtonVariants({ variant: local.variant, size: local.size }),
         local.class,
       )}
+      onClick={handleClick}
       {...others}
     />
   );
@@ -607,7 +614,13 @@ const SidebarMenuSubButton = <T extends ValidComponent = "a">(
   rawProps: PolymorphicProps<T, SidebarMenuSubButtonProps<T>>,
 ) => {
   const props = mergeProps({ size: "md" }, rawProps);
-  const [local, others] = splitProps(props as SidebarMenuSubButtonProps, ["size", "class"]);
+  const [local, others] = splitProps(props as SidebarMenuSubButtonProps & { onClick?: () => void }, ["size", "class", "onClick"]);
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleClick = () => {
+    if (isMobile()) setOpenMobile(false);
+    local.onClick?.();
+  };
 
   return (
     <Polymorphic<SidebarMenuSubButtonProps>
@@ -622,6 +635,7 @@ const SidebarMenuSubButton = <T extends ValidComponent = "a">(
         "group-data-[collapsible=icon]:hidden",
         local.class,
       )}
+      onClick={handleClick}
       {...others}
     />
   );

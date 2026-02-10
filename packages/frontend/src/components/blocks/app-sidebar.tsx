@@ -12,7 +12,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { useWorkspaceData } from "@/context/workspace-context";
 import AlertCircleIcon from "lucide-solid/icons/alert-circle";
@@ -141,7 +140,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const workspaceData = useWorkspaceData();
   const groups = createNavItems();
   const [collapsibleStateStore, setCollapsibleStateStore] = useLocalStorageCollapsibleState();
-  const { setOpenMobile } = useSidebar();
+
 
   return (
     <Sidebar {...props}>
@@ -173,7 +172,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                       <SidebarMenuItem>
                         <Show when={item.type === "link" ? item : false}>
                           {(item) => (
-                            <SidebarMenuButton as={FastLink} href={item().href} onClick={() => setOpenMobile(false)}>
+                            <SidebarMenuButton as={FastLink} href={item().href}>
                               <Show when={item().icon}>
                                 <Dynamic component={item().icon} />
                               </Show>
@@ -205,7 +204,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                                           <SidebarMenuSubButton
                                             as={FastLink}
                                             href={child.href}
-                                            onClick={() => setOpenMobile(false)}
+
                                           >
                                             <Show when={child.icon}>
                                               <Dynamic component={child.icon} />

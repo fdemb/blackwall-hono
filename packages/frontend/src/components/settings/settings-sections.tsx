@@ -21,7 +21,7 @@ export const SettingsPage: ParentComponent<SettingsPageProps> = (props) => {
     <div
       class="flex flex-col gap-6 w-full pt-12"
       classList={{
-        "max-w-3xl mx-auto": merged.fullWidth === false,
+        "max-w-3xl mx-auto px-4": merged.fullWidth === false,
       }}
     >
       <h1 class="text-2xl font-medium px-6">{merged.title}</h1>

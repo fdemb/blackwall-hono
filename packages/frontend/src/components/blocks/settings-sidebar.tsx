@@ -20,6 +20,7 @@ import { FastLink } from "../custom-ui/fast-link";
 export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
   const workspaceData = useWorkspaceData();
 
+
   return (
     <Sidebar {...props}>
       <SidebarHeader class="flex flex-col gap-2">
@@ -51,6 +52,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   as={FastLink}
                   href={`/${workspaceData().workspace.slug}/settings/general`}
+
                 >
                   General
                 </SidebarMenuButton>
@@ -60,6 +62,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   as={FastLink}
                   href={`/${workspaceData().workspace.slug}/settings/profile`}
+
                 >
                   Profile
                 </SidebarMenuButton>
@@ -69,6 +72,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   as={FastLink}
                   href={`/${workspaceData().workspace.slug}/settings/workspace`}
+
                 >
                   Workspace
                 </SidebarMenuButton>
@@ -78,6 +82,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   as={FastLink}
                   href={`/${workspaceData().workspace.slug}/settings/teams`}
+
                 >
                   Team management
                 </SidebarMenuButton>
