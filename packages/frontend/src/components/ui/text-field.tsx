@@ -169,16 +169,20 @@ type TanStackTextFieldProps = {
   onBlur?: Solid.JSX.EventHandler<HTMLInputElement | HTMLTextAreaElement, FocusEvent>;
 };
 
-function parseError(error: any) {
+function parseError(error: any): string {
   if (typeof error === "string") {
     return error;
   }
 
-  if ("message" in error) {
+  if (Array.isArray(error)) {
+    return error.map(parseError).join(", ");
+  }
+
+  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") {
     return error.message;
   }
 
-  return String(error);
+  return "Validation error";
 }
 
 function TanStackTextField(props: TanStackTextFieldProps) {

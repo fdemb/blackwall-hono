@@ -130,7 +130,6 @@ function CreateDialogContent(props: CreateDialogContentProps) {
   createEffect(
     on([isOpen, summaryInputElement], ([open, summaryInputElement]) => {
       if (open) {
-        // Apply current defaults when dialog opens
         form.setFieldValue("teamKey", merged.teamKey);
         form.setFieldValue("status", merged.status);
         form.setFieldValue("assignedToId", merged.assignedToId ?? null);

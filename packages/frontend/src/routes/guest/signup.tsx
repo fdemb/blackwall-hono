@@ -41,15 +41,6 @@ const useSignupForm = () => {
       await _action(value);
       formApi.reset();
     },
-    validators: {
-      onSubmit: z.object({
-        name: z.string().min(2).max(100),
-        email: z.email(),
-        password: z.string().min(8),
-        workspaceDisplayName: z.string().min(3).max(64),
-        workspaceUrlSlug: z.string().min(3).max(64),
-      }),
-    },
   }));
 
   return form;
@@ -63,13 +54,20 @@ export default function SignupPage() {
     <AuthCard title="Sign up">
       <Switch>
         <Match when={step() === "account"}>
-          <AccountForm form={form} onContinue={() => setStep("workspace")} />
+          <AccountForm
+            form={form}
+            onContinue={() => {
+              setStep("workspace");
+            }}
+          />
         </Match>
         <Match when={step() === "workspace"}>
           <WorkspaceForm
             form={form}
             onBack={() => setStep("account")}
-            onContinue={() => form.handleSubmit()}
+            onContinue={() => {
+              form.handleSubmit();
+            }}
           />
         </Match>
       </Switch>
@@ -92,7 +90,12 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
       }}
     >
       <div class="flex flex-col gap-6">
-        <props.form.AppField name="email">
+        <props.form.AppField
+          name="email"
+          validators={{
+            onBlur: z.email(),
+          }}
+        >
           {() => (
             <TanStackTextField
               label="Email address"
@@ -105,7 +108,12 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
           )}
         </props.form.AppField>
 
-        <props.form.AppField name="password">
+        <props.form.AppField
+          name="password"
+          validators={{
+            onBlur: z.string().min(8),
+          }}
+        >
           {() => (
             <TanStackTextField
               label="Password"
@@ -117,7 +125,12 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
           )}
         </props.form.AppField>
 
-        <props.form.AppField name="name">
+        <props.form.AppField
+          name="name"
+          validators={{
+            onBlur: z.string().min(2).max(100),
+          }}
+        >
           {() => (
             <TanStackTextField
               label="Full Name"
@@ -162,7 +175,12 @@ function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onConti
       }}
     >
       <div class="flex flex-col gap-6">
-        <props.form.AppField name="workspaceDisplayName">
+        <props.form.AppField
+          name="workspaceDisplayName"
+          validators={{
+            onBlur: z.string().min(3).max(64),
+          }}
+        >
           {() => (
             <TanStackTextField
               label="Workspace Name"
@@ -174,7 +192,12 @@ function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onConti
           )}
         </props.form.AppField>
 
-        <props.form.AppField name="workspaceUrlSlug">
+        <props.form.AppField
+          name="workspaceUrlSlug"
+          validators={{
+            onBlur: z.string().min(3).max(64),
+          }}
+        >
           {() => (
             <TanStackTextField
               label="Workspace URL"

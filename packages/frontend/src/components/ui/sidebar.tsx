@@ -78,7 +78,14 @@ type SidebarProviderProps = Omit<ComponentProps<"div">, "style"> & {
 };
 
 const SidebarProvider: Component<SidebarProviderProps> = (rawProps) => {
-  const props = mergeProps({ defaultOpen: true, keybind: SIDEBAR_KEYBOARD_SHORTCUT as string | false, mobileBreakpoint: DEFAULT_MOBILE_BREAKPOINT }, rawProps);
+  const props = mergeProps(
+    {
+      defaultOpen: true,
+      keybind: SIDEBAR_KEYBOARD_SHORTCUT as string | false,
+      mobileBreakpoint: DEFAULT_MOBILE_BREAKPOINT,
+    },
+    rawProps,
+  );
   const [local, others] = splitProps(props, [
     "defaultOpen",
     "open",
@@ -115,7 +122,8 @@ const SidebarProvider: Component<SidebarProviderProps> = (rawProps) => {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
-      if (target.isContentEditable || target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+      if (target.isContentEditable || target.tagName === "INPUT" || target.tagName === "TEXTAREA")
+        return;
 
       if (event.key === local.keybind && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
@@ -462,12 +470,16 @@ type SidebarMenuButtonProps<T extends ValidComponent = "button"> = ComponentProp
   VariantProps<typeof sidebarMenuButtonVariants> & {
     isActive?: boolean;
     tooltip?: string;
+    close?: boolean;
   };
 
 const SidebarMenuButton = <T extends ValidComponent = "button">(
   rawProps: PolymorphicProps<T, SidebarMenuButtonProps<T>>,
 ) => {
-  const props = mergeProps({ isActive: false, variant: "default", size: "default" }, rawProps);
+  const props = mergeProps(
+    { isActive: false, variant: "default", size: "default", close: true },
+    rawProps,
+  );
   const [local, others] = splitProps(props as SidebarMenuButtonProps & { onClick?: () => void }, [
     "isActive",
     "tooltip",
@@ -475,11 +487,12 @@ const SidebarMenuButton = <T extends ValidComponent = "button">(
     "size",
     "class",
     "onClick",
+    "close",
   ]);
   const { isMobile, state, setOpenMobile } = useSidebar();
 
   const handleClick = () => {
-    if (isMobile()) setOpenMobile(false);
+    if (isMobile() && local.close) setOpenMobile(false);
     local.onClick?.();
   };
 
@@ -614,7 +627,10 @@ const SidebarMenuSubButton = <T extends ValidComponent = "a">(
   rawProps: PolymorphicProps<T, SidebarMenuSubButtonProps<T>>,
 ) => {
   const props = mergeProps({ size: "md" }, rawProps);
-  const [local, others] = splitProps(props as SidebarMenuSubButtonProps & { onClick?: () => void }, ["size", "class", "onClick"]);
+  const [local, others] = splitProps(
+    props as SidebarMenuSubButtonProps & { onClick?: () => void },
+    ["size", "class", "onClick"],
+  );
   const { isMobile, setOpenMobile } = useSidebar();
 
   const handleClick = () => {

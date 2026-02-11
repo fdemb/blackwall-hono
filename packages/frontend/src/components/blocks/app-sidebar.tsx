@@ -213,7 +213,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                                 open={collapsibleStateStore[item().id]}
                                 onOpenChange={(open) => setCollapsibleStateStore(item().id, open)}
                               >
-                                <CollapsibleTrigger as={SidebarMenuButton}>
+                                <CollapsibleTrigger as={SidebarMenuButton} close={false}>
                                   <Show when={item().icon}>
                                     <Dynamic component={item().icon} />
                                   </Show>
