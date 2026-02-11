@@ -58,6 +58,12 @@ export const createTeamSettingsSchema = z.object({
 
 export type CreateTeamSettings = z.infer<typeof createTeamSettingsSchema>;
 
+export const updatePreferredThemeSchema = z.object({
+  theme: z.enum(["system", "light", "dark"]),
+});
+
+export type UpdatePreferredTheme = z.infer<typeof updatePreferredThemeSchema>;
+
 export const userProfileSchema = z.object({
   id: z.string(),
   name: z.string(),

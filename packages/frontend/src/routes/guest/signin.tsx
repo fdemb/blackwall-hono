@@ -1,6 +1,5 @@
 import { AuthCard } from "@/components/blocks/auth";
 import { toast } from "@/components/custom-ui/toast";
-import { useTheme } from "@/components/settings/use-theme";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
@@ -23,7 +22,6 @@ const signinAction = action(async (email: string, password: string) => {
 });
 
 export default function SignInPage() {
-  const { setThemeToUserPreference } = useTheme();
   const _action = useAction(signinAction);
 
   const form = useAppForm(() => ({

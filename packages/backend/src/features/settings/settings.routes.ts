@@ -8,6 +8,7 @@ import { settingsService } from "./settings.service";
 import {
   updateProfileNameSchema,
   changePasswordSchema,
+  updatePreferredThemeSchema,
   updateWorkspaceSettingsSchema,
   teamKeyParamSchema,
   updateTeamSchema,
@@ -131,6 +132,24 @@ const settingsRoutes = new Hono<AppEnv>()
 
     return c.json({ profile });
   })
+  /**
+   * PATCH /profile/theme - Update the current user's preferred theme.
+   */
+  .patch(
+    "/profile/theme",
+    validator("json", updatePreferredThemeSchema),
+    async (c) => {
+      const user = c.get("user")!;
+      const { theme } = c.req.valid("json");
+
+      await settingsService.updatePreferredTheme({
+        userId: user.id,
+        theme,
+      });
+
+      return c.json({ theme });
+    },
+  )
   /**
    * POST /profile/password - Change the current user's password.
    */

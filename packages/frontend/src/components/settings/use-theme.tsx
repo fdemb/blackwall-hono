@@ -1,5 +1,5 @@
 import type { PickerOption } from "@/components/custom-ui/picker";
-// import { getPreferredTheme, updatePreferredTheme } from "@/server/auth/api";
+import { api } from "@/lib/api";
 import MonitorIcon from "lucide-solid/icons/monitor";
 import MoonIcon from "lucide-solid/icons/moon";
 import SunIcon from "lucide-solid/icons/sun";
@@ -36,6 +36,12 @@ function getCurrentThemeId(): ThemeId {
   return (document.documentElement.getAttribute("data-theme") as ThemeId) ?? "system";
 }
 
+export function applyTheme(themeId: ThemeId) {
+  if (typeof window !== "undefined" && window.__applyTheme) {
+    window.__applyTheme(themeId);
+  }
+}
+
 export const useTheme = () => {
   const [currentThemeId, setCurrentThemeId] = createSignal<ThemeId>("system");
 
@@ -45,29 +51,21 @@ export const useTheme = () => {
 
   const currentTheme = () => themes.find((t) => t.id === currentThemeId()) ?? themes[0];
 
-  const setTheme = (themeId: ThemeId) => {
+  const setTheme = async (themeId: ThemeId) => {
     const theme = themes.find((t) => t.id === themeId);
-    // if (theme) {
-    //   updatePreferredTheme({
-    //     data: { theme: themeId },
-    //   }).then(() => {
-    //     setCurrentThemeId(themeId);
-    //     window._setTheme(themeId);
-    //   });
-    // }
-  };
-
-  const setThemeToUserPreference = () => {
-    // getPreferredTheme().then((theme) => {
-    //   setCurrentThemeId(theme);
-    //   window._setTheme(theme);
-    // });
+    if (theme) {
+      setCurrentThemeId(themeId);
+      applyTheme(themeId);
+      await api.api.settings["profile"]["theme"].$patch({
+        json: { theme: themeId },
+      });
+    }
   };
 
   return {
     currentTheme: currentTheme as () => PickerOption<ThemeId>,
     setTheme,
     themes,
-    setThemeToUserPreference,
+    applyTheme,
   };
 };

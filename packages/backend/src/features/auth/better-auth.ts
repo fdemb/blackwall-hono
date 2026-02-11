@@ -57,6 +57,11 @@ export const auth = betterAuth({
         fieldName: "last_team_id",
         input: false,
       },
+      preferredTheme: {
+        type: "string",
+        fieldName: "preferred_theme",
+        input: false,
+      },
     },
   },
 });

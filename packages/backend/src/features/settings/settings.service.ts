@@ -65,9 +65,20 @@ async function changePassword(input: {
   });
 }
 
+/**
+ * Update a user's preferred theme.
+ */
+async function updatePreferredTheme(input: { userId: string; theme: string }) {
+  return settingsData.updateUserTheme({
+    userId: input.userId,
+    theme: input.theme,
+  });
+}
+
 export const settingsService = {
   getProfile,
   updateProfileName,
   updateProfileAvatar,
   changePassword,
+  updatePreferredTheme,
 };

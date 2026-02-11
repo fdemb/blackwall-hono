@@ -37,8 +37,22 @@ export async function updateUserAvatar(input: { userId: string; image: string | 
   return user;
 }
 
+export async function updateUserTheme(input: { userId: string; theme: string }) {
+  const [user] = await db
+    .update(dbSchema.user)
+    .set({
+      preferredTheme: input.theme as "system" | "light" | "dark",
+      updatedAt: new Date(),
+    })
+    .where(eq(dbSchema.user.id, input.userId))
+    .returning();
+
+  return user;
+}
+
 export const settingsData = {
   getUserById,
   updateUserName,
   updateUserAvatar,
+  updateUserTheme,
 };
