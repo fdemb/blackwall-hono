@@ -1,6 +1,6 @@
 import { Badge } from "@/components/custom-ui/badge";
 import { createDataTable } from "@/components/datatable/create-datatable";
-import { DataTableHeaderless } from "@/components/datatable/datatable";
+import { BaseIssueDataTable } from "@/components/datatable/datatable";
 import type { RowSelectionResult } from "@/components/datatable/row-selection-feature";
 import { createSelectionColumn } from "@/components/datatable/selection-column";
 import { StatusPickerPopover } from "@/components/issues/pickers/status-picker";
@@ -118,5 +118,5 @@ export function IssueDataTable(props: IssueDataTableProps) {
     getRowId: (row) => row.id,
   });
 
-  return <DataTableHeaderless {...datatableProps} issueDrag={props.issueDrag} />;
+  return <BaseIssueDataTable {...datatableProps} issueDrag={props.issueDrag} />;
 }

@@ -2,6 +2,7 @@ import { createContext, createEffect, createSignal, onCleanup, useContext } from
 import { createStore, produce } from "solid-js/store";
 import type { IssueStatus } from "@blackwall/database/schema";
 import { DragGesture } from "@use-gesture/vanilla";
+import { createAutoScroller } from "./auto-scroll";
 
 export type DragState = {
   isDragging: boolean;
@@ -28,6 +29,11 @@ export const ORDER_GAP = 65536;
 export function createBoardDnD() {
   const [dragState, setDragState] = createStore<DragState>(initialDragState);
   const columnRefs = new Map<IssueStatus, HTMLElement>();
+  const autoScroller = createAutoScroller();
+
+  function setScrollContainerRef(el: HTMLElement) {
+    autoScroller.setContainer(el);
+  }
 
   function setColumnRef(id: IssueStatus, el: HTMLElement) {
     columnRefs.set(id, el);
@@ -129,6 +135,7 @@ export function createBoardDnD() {
   }
 
   function resetDrag() {
+    autoScroller.stop();
     setDragState(
       produce((draft) => {
         draft.isDragging = false;
@@ -180,6 +187,8 @@ export function createBoardDnD() {
           }
 
           if (active) {
+            autoScroller.updateCursor(x);
+            autoScroller.start();
             const dropTarget = calculateDropTarget(x, y);
             setDragState(
               produce((draft) => {
@@ -194,6 +203,7 @@ export function createBoardDnD() {
           }
 
           if (last && !tap) {
+            autoScroller.stop();
             callbacks.onDrop();
           }
         },
@@ -216,6 +226,7 @@ export function createBoardDnD() {
     dragState,
     setDragState,
     setColumnRef,
+    setScrollContainerRef,
     calculateDropTarget,
     calculateNewOrder,
     useDraggable,

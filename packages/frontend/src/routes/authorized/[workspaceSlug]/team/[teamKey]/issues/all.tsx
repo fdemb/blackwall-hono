@@ -7,7 +7,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import CircleDashedIcon from "lucide-solid/icons/circle-dashed";
+import ListIcon from "lucide-solid/icons/list";
 import PlusIcon from "lucide-solid/icons/plus";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
@@ -16,31 +16,18 @@ import { IssueDataTable, type IssueForDataTable } from "@/components/issues/issu
 import { IssueSelectionMenu } from "@/components/issues/issue-selection-menu";
 import { Button } from "@/components/ui/button";
 import { useCreateDialog } from "@/context/create-dialog.context";
-import { action, createAsync, useAction, useParams } from "@solidjs/router";
-import { api } from "@/lib/api";
-import type { BulkUpdateIssues } from "@blackwall/backend/src/features/issues/issue.zod";
-import { toast } from "@/components/custom-ui/toast";
-import { createMemo, Show, type ParentComponent } from "solid-js";
-import { backlogLoader } from "./backlog.data";
+import { createAsync, useParams } from "@solidjs/router";
+import { createMemo, Show } from "solid-js";
+import { allIssuesLoader } from "./all.data";
 import { useTeamData } from "../../[teamKey]";
 import { sprintsLoader } from "../sprints/index.data";
-import { IssueDraggingProvider, useIssueDragCtx } from "@/context/issue-dragging-context";
 
-const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
-  await api.api.issues.bulk.$patch({ json: input });
-  const count = input.issueIds.length;
-  toast.success(count > 1 ? `${count} issues moved to sprint` : "Issue moved to sprint");
-});
-
-export default function BacklogPage() {
+export default function AllIssuesPage() {
   const params = useParams();
   const teamData = useTeamData();
-  const issues = createAsync(() => backlogLoader(params.teamKey!));
+  const issues = createAsync(() => allIssuesLoader(params.teamKey!));
   const sprints = createAsync(() => sprintsLoader(params.teamKey!));
-  const moveToSprint = useAction(moveToSprintAction);
-  const openSprints = createMemo(() =>
-    (sprints() ?? []).filter((sprint) => sprint.status !== "completed"),
-  );
+  const openSprints = createMemo(() => (sprints() ?? []).filter((sprint) => sprint.status !== "completed"));
 
   const rowSelection = createRowSelection();
 
@@ -53,11 +40,7 @@ export default function BacklogPage() {
   });
 
   return (
-    <IssueDraggingProvider
-      sprints={openSprints()}
-      selectedIssues={selectedIssues}
-      onDrop={(issues, sprint) => moveToSprint({ issueIds: issues.map((i) => i.id), updates: { sprintId: sprint.id } })}
-    >
+    <>
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem>
@@ -66,27 +49,24 @@ export default function BacklogPage() {
               {teamData().name}
             </div>
           </BreadcrumbsItem>
-          <BreadcrumbsItem>Backlog</BreadcrumbsItem>
+          <BreadcrumbsItem>All Issues</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
-      <HideWhileDragging>
-        <IssueSelectionMenu
-          selectedIssues={selectedIssues()}
-          onClearSelection={rowSelection.clearSelection}
-          openSprints={openSprints()}
-        />
-      </HideWhileDragging>
+      <IssueSelectionMenu
+        selectedIssues={selectedIssues()}
+        onClearSelection={rowSelection.clearSelection}
+        openSprints={openSprints()}
+      />
 
       <Show when={issues() && issues()!.length > 0} fallback={<IssueEmpty />}>
         <IssueDataTable
           issues={issues()!}
           workspaceSlug={params.workspaceSlug!}
           rowSelection={rowSelection}
-          issueDrag={true}
         />
       </Show>
-    </IssueDraggingProvider>
+    </>
   );
 }
 
@@ -97,17 +77,16 @@ function IssueEmpty() {
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <CircleDashedIcon />
+          <ListIcon />
         </EmptyMedia>
-        <EmptyTitle>Backlog is empty</EmptyTitle>
+        <EmptyTitle>No issues</EmptyTitle>
         <EmptyDescription>
-          Add issues to the backlog to sprint future work. Backlog items can be moved to active
-          sprints when ready.
+          There are no issues in this team. You can create a new issue to get started.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
-          <Button onClick={() => open()}>
+          <Button onClick={() => open({ status: "to_do" })}>
             <PlusIcon class="size-4" strokeWidth={2.75} />
             Create
           </Button>
@@ -116,8 +95,3 @@ function IssueEmpty() {
     </Empty>
   );
 }
-
-const HideWhileDragging: ParentComponent = (props) => {
-  const { dragState } = useIssueDragCtx();
-  return <div class={dragState.isDragging ? "hidden" : "contents"}>{props.children}</div>;
-};

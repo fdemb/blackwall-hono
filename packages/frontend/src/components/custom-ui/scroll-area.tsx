@@ -21,12 +21,13 @@ type ScrollAreaProps = {
   class?: string;
   rootClass?: string;
   viewportClass?: string;
+  viewportRef?: HTMLDivElement | ((el: HTMLDivElement) => void);
 };
 
 export function ScrollArea(props: ScrollAreaProps) {
   return (
     <ScrollAreaPrimitive.Root class={props.rootClass}>
-      <ScrollAreaPrimitive.Viewport class={props.viewportClass}>
+      <ScrollAreaPrimitive.Viewport class={props.viewportClass} ref={props.viewportRef}>
         {props.children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollAreaPrimitive.Scrollbar class="m-1 flex w-1 justify-center rounded bg-transparent opacity-0 transition-opacity pointer-events-none data-[hovering]:opacity-100 data-[hovering]:delay-0 data-[hovering]:pointer-events-auto data-[scrolling]:opacity-100 data-[scrolling]:duration-0 data-[scrolling]:pointer-events-auto">

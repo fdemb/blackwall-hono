@@ -11,7 +11,7 @@ import {
 import { For, Show } from "solid-js";
 import { ScrollContainer } from "../custom-ui/scroll-area";
 import type { createDataTable } from "./create-datatable";
-import { useIssueDrag } from "../issues/dragged-issue";
+import { useIssueDnD } from "@/lib/issue-dnd";
 import type { SerializedIssue } from "@blackwall/database";
 
 interface DataTableProps<TData> extends ReturnType<typeof createDataTable<TData>> {
@@ -30,7 +30,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
   );
 }
 
-export function DataTableHeaderless<TData>(props: DataTableProps<TData>) {
+export function BaseIssueDataTable<TData>(props: DataTableProps<TData>) {
   return (
     <DataTableRoot>
       <ScrollContainer>
@@ -106,7 +106,10 @@ function DataRow<TData>(props: DataRowProps<TData>) {
   }
 
   return (
-    <DataTableRow data-state={props.row.getIsSelected() ? "selected" : undefined} ref={(el) => props.ref?.(el)}>
+    <DataTableRow
+      data-state={props.row.getIsSelected() ? "selected" : undefined}
+      ref={(el) => props.ref?.(el)}
+    >
       <For each={props.row.getVisibleCells()}>
         {(cell) => (
           <DataTableCell class={cell.column.columnDef.meta?.cellClass}>
@@ -119,7 +122,8 @@ function DataRow<TData>(props: DataRowProps<TData>) {
 }
 
 function DraggableIssueDataRow<TData>(props: DataRowProps<TData>) {
-  const { setDragTrigger } = useIssueDrag(props.row.original as SerializedIssue);
+  const { useDraggable } = useIssueDnD();
+  const setRef = useDraggable(props.row.original as SerializedIssue);
 
-  return <DataRow {...props} ref={(el) => setDragTrigger(el)} />;
+  return <DataRow {...props} ref={(el) => setRef(el)} />;
 }

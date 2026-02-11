@@ -114,14 +114,14 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           <XIcon class="size-4" />
         </Button>
 
-        <span class="text-sm text-muted-foreground">{props.selectedIssues.length} selected</span>
+        <span class="text-sm text-muted-foreground whitespace-nowrap">{props.selectedIssues.length} selected</span>
 
         <div class="h-4 w-px bg-border" />
 
         <Popover placement="top" gutter={8}>
           <Popover.Trigger as={Button} variant="outline" size="xs">
             <CircleDotIcon class="size-4" />
-            Change status
+            Status
           </Popover.Trigger>
           <PickerPopover
             value={null}
@@ -133,7 +133,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
         <Popover placement="top" gutter={8}>
           <Popover.Trigger as={Button} variant="outline" size="xs">
             <CircleDotIcon class="size-4" />
-            Change priority
+            Priority
           </Popover.Trigger>
           <PickerPopover
             value={null}
@@ -150,7 +150,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
             <>
               <Popover.Trigger as={Button} variant="outline" size="xs" scaleEffect={false}>
                 <LandPlotIcon class="size-4" />
-                Move to sprint
+                Sprint
               </Popover.Trigger>
             </>
           }
@@ -160,7 +160,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           <Popover placement="top" gutter={8}>
             <Popover.Trigger as={Button} variant="outline" size="xs">
               <UserIcon class="size-4" />
-              Assign to user
+              Assignee
             </Popover.Trigger>
             <PickerPopover
               value={null}

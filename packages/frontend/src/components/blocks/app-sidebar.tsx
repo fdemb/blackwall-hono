@@ -21,6 +21,7 @@ import Users2Icon from "lucide-solid/icons/users-2";
 import ListTodoIcon from "lucide-solid/icons/list-todo";
 import CircleDashedIcon from "lucide-solid/icons/circle-dashed";
 import KanbanIcon from "lucide-solid/icons/kanban-square";
+import ListIcon from "lucide-solid/icons/list";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import PlusIcon from "lucide-solid/icons/plus";
 import type { Component, ComponentProps } from "solid-js";
@@ -96,10 +97,16 @@ function createNavItems(): () => NavGroup[] {
             icon: CircleDashedIcon,
           },
           {
-            title: "Issues",
+            title: "Active Issues",
             type: "link",
             href: `/${workspaceData().workspace.slug}/team/${team.key}/issues/active`,
             icon: AlertCircleIcon,
+          },
+          {
+            title: "All Issues",
+            type: "link",
+            href: `/${workspaceData().workspace.slug}/team/${team.key}/issues/all`,
+            icon: ListIcon,
           },
           {
             title: "Board",
@@ -143,7 +150,6 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const groups = createNavItems();
   const [collapsibleStateStore, setCollapsibleStateStore] = useLocalStorageCollapsibleState();
   const { open } = useCreateDialog();
-
 
   return (
     <Sidebar {...props}>
@@ -219,11 +225,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
                                     <For each={item().children}>
                                       {(child) => (
                                         <SidebarMenuSubItem>
-                                          <SidebarMenuSubButton
-                                            as={FastLink}
-                                            href={child.href}
-
-                                          >
+                                          <SidebarMenuSubButton as={FastLink} href={child.href}>
                                             <Show when={child.icon}>
                                               <Dynamic component={child.icon} />
                                             </Show>

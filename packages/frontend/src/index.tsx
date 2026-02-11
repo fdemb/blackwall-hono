@@ -14,6 +14,7 @@ import { teamLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey].d
 import { invitationLoader } from "./routes/either/invite/[token].data";
 import { backlogLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/backlog.data";
 import { activeIssuesLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/active.data";
+import { allIssuesLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/all.data";
 import { boardLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/board.data";
 import { issueLoader } from "./routes/authorized/[workspaceSlug]/issue/[key].data";
 import { myIssuesLoader } from "./routes/authorized/[workspaceSlug]/my-issues.data";
@@ -34,6 +35,9 @@ const IssueDetailPage = lazy(() => import("./routes/authorized/[workspaceSlug]/i
 const MyIssuesPage = lazy(() => import("./routes/authorized/[workspaceSlug]/my-issues"));
 const ActiveIssuesPage = lazy(
   () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/active"),
+);
+const AllIssuesPage = lazy(
+  () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/all"),
 );
 const BacklogPage = lazy(
   () => import("./routes/authorized/[workspaceSlug]/team/[teamKey]/issues/backlog"),
@@ -149,6 +153,11 @@ const AppRouter = () => (
               path="/issues/active"
               component={ActiveIssuesPage}
               preload={({ params }) => activeIssuesLoader(params.teamKey!)}
+            />
+            <Route
+              path="/issues/all"
+              component={AllIssuesPage}
+              preload={({ params }) => allIssuesLoader(params.teamKey!)}
             />
             <Route
               path="/issues/backlog"

@@ -2,19 +2,11 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { TeamAvatar, UserAvatar } from "@/components/custom-ui/avatar";
 import { Badge } from "@/components/custom-ui/badge";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
-import { ScrollContainer } from "@/components/custom-ui/scroll-area";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import type { IssueStatus, SerializedIssueSprint } from "@blackwall/database/schema";
+import { ScrollArea, ScrollContainer } from "@/components/custom-ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import type { IssueStatus } from "@blackwall/database/schema";
 import { useCreateDialog } from "@/context/create-dialog.context";
-import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/dnd";
+import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/board-dnd";
 import { issueMappings } from "@/lib/mappings";
 import { api } from "@/lib/api";
 import { createAsync, useParams, A, action, useAction } from "@solidjs/router";
@@ -22,17 +14,15 @@ import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import CircleDotDashedIcon from "lucide-solid/icons/circle-dot-dashed";
 import PlusIcon from "lucide-solid/icons/plus";
-import PlayIcon from "lucide-solid/icons/play";
 import { createMemo, For, Index, Show, type Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { boardLoader } from "./board.data";
 import { useTeamData } from "../../[teamKey]";
 import type { InferDbType } from "@blackwall/database/types";
-import LandPlotIcon from "lucide-solid/icons/land-plot";
-import ChevronDownIcon from "lucide-solid/icons/chevron-down";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { sprintsLoader } from "../sprints/index.data";
 import { toast } from "@/components/custom-ui/toast";
+import { SprintSection } from "./_components/sprint-section";
+import { BoardEmpty } from "./_components/board-empty";
 
 type IssueForBoard = InferDbType<
   "issue",
@@ -41,6 +31,12 @@ type IssueForBoard = InferDbType<
     labels: true;
   }
 >;
+
+const columns = [
+  { name: "To do", id: "to_do", icon: CircleIcon },
+  { name: "In progress", id: "in_progress", icon: CircleDotDashedIcon },
+  { name: "Done", id: "done", icon: CircleCheckIcon },
+] as const;
 
 const moveIssue = action(async (issueKey: string, status: IssueStatus, order: number) => {
   await api.api.issues[":issueKey"].$patch({
@@ -139,34 +135,55 @@ export default function BoardPage() {
       >
         <ScrollContainer>
           <div class="p-4">
-            <div class="flex flex-row gap-4 min-h-96 w-full relative">
-              <BoardList
-                statusName="To do"
-                statusId="to_do"
-                issues={data().to_do ?? []}
-                statusIcon={CircleIcon}
-              />
-              <BoardList
-                statusName="In progress"
-                statusId="in_progress"
-                issues={data().in_progress ?? []}
-                statusIcon={CircleDotDashedIcon}
-              />
-              <BoardList
-                statusName="Done"
-                statusId="done"
-                issues={data().done ?? []}
-                statusIcon={CircleCheckIcon}
-              />
+            <ScrollArea viewportRef={(el) => dnd.setScrollContainerRef(el)}>
+              <div class="flex flex-row gap-4 min-h-96 relative">
+                <For each={columns}>
+                  {(col) => (
+                    <BoardList
+                      statusName={col.name}
+                      statusId={col.id}
+                      issues={data()[col.id] ?? []}
+                      statusIcon={col.icon}
+                    />
+                  )}
+                </For>
 
-              <Show when={dragState.isDragging && dragState.initialRect}>
-                <DragOverlay issues={loaderData() ?? []} />
-              </Show>
-            </div>
+                <Show when={dragState.isDragging && dragState.initialRect}>
+                  <DragOverlay issues={loaderData() ?? []} />
+                </Show>
+              </div>
+            </ScrollArea>
           </div>
         </ScrollContainer>
       </Show>
     </BoardDnDContext.Provider>
+  );
+}
+
+function BoardCard(props: { issue: IssueForBoard }) {
+  return (
+    <div class="w-full flex flex-col">
+      <div class="pb-2">
+        <p class="font-medium text-lg">{props.issue.summary}</p>
+      </div>
+      <Show when={props.issue.labels.length}>
+        <div class="flex flex-wrap gap-2 items-center pb-2">
+          <Index each={props.issue.labels}>
+            {(label) => (
+              <Badge color={label().colorKey} size="sm">
+                {label().name}
+              </Badge>
+            )}
+          </Index>
+        </div>
+      </Show>
+      <div class="flex flex-row gap-2 items-center justify-end w-full grow pt-2">
+        <p class="font-normal text-muted-foreground">{props.issue.key}</p>
+        <Show when={props.issue.assignedTo}>
+          <UserAvatar user={props.issue.assignedTo} size="sm" />
+        </Show>
+      </div>
+    </div>
   );
 }
 
@@ -188,28 +205,7 @@ function DragOverlay(props: { issues: IssueForBoard[] }) {
           }}
         >
           <div class="p-4 ring-2 ring-primary squircle-md shadow-xl bg-card scale-105 opacity-95">
-            <div class="w-full flex flex-col">
-              <div class="pb-2">
-                <p class="font-medium text-lg">{issue().summary}</p>
-              </div>
-              <Show when={issue().labels.length}>
-                <div class="flex flex-wrap gap-2 items-center pb-2">
-                  <Index each={issue().labels}>
-                    {(label) => (
-                      <Badge color={label().colorKey} size="sm">
-                        {label().name}
-                      </Badge>
-                    )}
-                  </Index>
-                </div>
-              </Show>
-              <div class="flex flex-row gap-2 items-center justify-end w-full grow pt-2">
-                <p class="font-normal text-muted-foreground">{issue().key}</p>
-                <Show when={issue().assignedTo}>
-                  <UserAvatar user={issue().assignedTo} size="sm" />
-                </Show>
-              </div>
-            </div>
+            <BoardCard issue={issue()} />
           </div>
         </div>
       )}
@@ -224,8 +220,13 @@ type BoardListProps = {
     class?: string;
   }>;
   issues: Array<IssueForBoard>;
-  activeSprint?: SerializedIssueSprint;
 };
+
+/** Returns the visual index adjusted for the dragged item occupying a slot in the same column. */
+function adjustedDropIndex(visualIndex: number, draggedIndex: number): number {
+  if (draggedIndex === -1) return visualIndex;
+  return visualIndex > draggedIndex ? visualIndex - 1 : visualIndex;
+}
 
 function BoardList(props: BoardListProps) {
   const mappedStatus = () => issueMappings.status[props.statusId];
@@ -245,7 +246,7 @@ function BoardList(props: BoardListProps) {
   });
 
   return (
-    <div class="flex flex-col w-full max-w-80 group">
+    <div class="flex flex-col min-w-80 group">
       <div class={`pb-2 text-sm flex flex-row items-center ${mappedStatus().textClass}`}>
         <Dynamic class="size-4 mr-1" component={props.statusIcon} />
         <p>{props.statusName}</p>
@@ -285,8 +286,7 @@ function BoardList(props: BoardListProps) {
                 <Show
                   when={
                     isDropTarget() &&
-                    dragState.overIndex ===
-                      index() - (draggedIndex() !== -1 && index() > draggedIndex() ? 1 : 0) &&
+                    dragState.overIndex === adjustedDropIndex(index(), draggedIndex()) &&
                     issue.key !== dragState.draggedIssueKey
                   }
                 >
@@ -341,148 +341,7 @@ function BoardItem(props: BoardItemProps) {
       draggable={false}
       href={`/${params.workspaceSlug}/issue/${props.issue.key}`}
     >
-      <div class="w-full flex flex-col">
-        <div class="pb-2">
-          <p class="font-medium text-lg">{props.issue.summary}</p>
-        </div>
-
-        <Show when={props.issue.labels.length}>
-          <div class="flex flex-wrap gap-2 items-center pb-2">
-            <Index each={props.issue.labels}>
-              {(label) => (
-                <Badge color={label().colorKey} size="sm">
-                  {label().name}
-                </Badge>
-              )}
-            </Index>
-          </div>
-        </Show>
-
-        <div class="flex flex-row gap-2 items-center justify-end w-full grow pt-2">
-          <p class="font-normal text-muted-foreground">{props.issue.key}</p>
-          <Show when={props.issue.assignedTo}>
-            <UserAvatar user={props.issue.assignedTo} size="sm" />
-          </Show>
-        </div>
-      </div>
+      <BoardCard issue={props.issue} />
     </A>
-  );
-}
-
-function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
-  const params = useParams();
-
-  return (
-    <section class="flex flex-row gap-2 items-center">
-      <Show when={props.sprint}>
-        {(sprint) => (
-          <Popover>
-            <PopoverTrigger as={Button} variant="ghost" size="xxs" class="gap-1.5 font-semibold">
-              <LandPlotIcon class="size-4 shrink-0" />
-              {sprint().name}
-              <ChevronDownIcon class="size-3.5 text-muted-foreground" />
-            </PopoverTrigger>
-            <PopoverContent class="w-72 p-0">
-              <div class="font-semibold text-accent-foreground flex flex-row items-center gap-1.5 px-4 py-3 border-b">
-                <LandPlotIcon class="size-4 shrink-0" />
-                {sprint().name}
-              </div>
-              <div class="px-4 py-3 flex flex-col gap-3">
-                <div class="flex flex-row items-center justify-between">
-                  <p class="text-xs text-muted-foreground">Start date</p>
-                  <p class="text-sm font-medium">
-                    {new Date(sprint().startDate).toLocaleDateString()}
-                  </p>
-                </div>
-
-                <div class="flex flex-row items-center justify-between">
-                  <p class="text-xs text-muted-foreground">End date</p>
-                  <p class="text-sm font-medium">
-                    {new Date(sprint().endDate).toLocaleDateString()}
-                  </p>
-                </div>
-
-                <Show when={sprint().goal}>
-                  <div>
-                    <p class="text-xs text-muted-foreground mb-1">Goal</p>
-                    <p class="text-sm">{sprint().goal}</p>
-                  </div>
-                </Show>
-              </div>
-              <div class="px-4 py-3 border-t flex flex-row gap-2">
-                <A
-                  href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}`}
-                  class={buttonVariants({
-                    variant: "outline",
-                    size: "xs",
-                    class: "flex-1",
-                  })}
-                >
-                  Details
-                </A>
-                <A
-                  href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}/edit`}
-                  class={buttonVariants({
-                    variant: "outline",
-                    size: "xs",
-                    class: "flex-1",
-                  })}
-                >
-                  Edit
-                </A>
-                <A
-                  href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}/complete`}
-                  class={buttonVariants({
-                    variant: "outline",
-                    size: "xs",
-                    class: "flex-1",
-                  })}
-                >
-                  Complete
-                </A>
-              </div>
-            </PopoverContent>
-          </Popover>
-        )}
-      </Show>
-    </section>
-  );
-}
-
-function BoardEmpty(props: {
-  plannedSprint: SerializedIssueSprint | null;
-  onStartPlannedSprint: (sprintId: string) => Promise<void>;
-}) {
-  const params = useParams();
-  return (
-    <Empty class="min-h-[calc(100dvh-16rem)] w-full flex items-center justify-center">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <LandPlotIcon />
-        </EmptyMedia>
-        <EmptyTitle>No active sprint</EmptyTitle>
-        <EmptyDescription>
-          Start a planned sprint or create a new one to use the board.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <div class="flex flex-row gap-3">
-          <Show when={props.plannedSprint}>
-            {(plannedSprint) => (
-              <Button onClick={() => props.onStartPlannedSprint(plannedSprint().id)}>
-                <PlayIcon class="size-4" />
-                Start {plannedSprint().name}
-              </Button>
-            )}
-          </Show>
-          <A
-            href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
-            class={buttonVariants({ variant: props.plannedSprint ? "secondary" : "default" })}
-          >
-            Create sprint
-          </A>
-        </div>
-      </EmptyContent>
-    </Empty>
   );
 }

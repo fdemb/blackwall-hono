@@ -9,7 +9,15 @@
     "dev:backend": "bun run --filter backend* dev",
     "dev:frontend": "bun run --filter frontend* dev",
     "build": "bun run --filter blackwall build",
-    "db:seed": "bun run --filter @blackwall/database db:seed"
+    "db:seed": "bun run --filter @blackwall/database db:seed",
+    "typecheck": "bun run --filter '*' typecheck",
+    "typecheck:frontend": "bun run --filter frontend typecheck",
+    "typecheck:backend": "bun run --filter @blackwall/backend typecheck",
+    "typecheck:shared": "bun run --filter @blackwall/shared typecheck",
+    "typecheck:database": "bun run --filter @blackwall/database typecheck",
+    "typecheck:queue": "bun run --filter @blackwall/queue typecheck",
+    "typecheck:email": "bun run --filter @blackwall/email typecheck",
+    "typecheck:blackwall": "bun run --filter blackwall typecheck"
   },
   "patchedDependencies": {
     "tinykeys@3.0.0": "patches/tinykeys@3.0.0.patch"
