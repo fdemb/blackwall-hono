@@ -236,6 +236,40 @@ async function softDeleteIssuesBulk(input: {
   });
 }
 
+/**
+ * Move issues to a status column and set their order.
+ * Assigns sequential order values to the issues in the provided key order.
+ * @param input workspace id, user id, issue keys in desired order, and target status
+ */
+async function moveIssues(input: {
+  workspaceId: string;
+  userId: string;
+  issueKeys: string[];
+  status: IssueStatus;
+}) {
+  // Validate user has access by checking at least the first issue's team
+  const firstIssue = await issueData.getIssueByKey({
+    workspaceId: input.workspaceId,
+    issueKey: input.issueKeys[0],
+  });
+
+  if (!firstIssue || !firstIssue.team) {
+    throw new NotFoundError("Issue not found");
+  }
+
+  await getTeamForUserOrThrow({
+    workspaceId: input.workspaceId,
+    teamKey: firstIssue.team.key,
+    userId: input.userId,
+  });
+
+  await issueData.moveIssues({
+    workspaceId: input.workspaceId,
+    issueKeys: input.issueKeys,
+    status: input.status,
+  });
+}
+
 export const issueService = {
   getIssueByKey,
   listIssuesForTeam,
@@ -245,4 +279,5 @@ export const issueService = {
   deleteIssue,
   updateIssuesBulk,
   softDeleteIssuesBulk,
+  moveIssues,
 };

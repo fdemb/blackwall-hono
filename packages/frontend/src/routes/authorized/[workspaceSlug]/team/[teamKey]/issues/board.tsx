@@ -9,7 +9,15 @@ import { useCreateDialog } from "@/context/create-dialog.context";
 import { BoardDnDContext, createBoardDnD, useBoardDnD } from "@/lib/board-dnd";
 import { issueMappings } from "@/lib/mappings";
 import { api } from "@/lib/api";
-import { createAsync, useParams, A, action, useAction } from "@solidjs/router";
+import {
+  createAsync,
+  useParams,
+  A,
+  action,
+  reload,
+  useAction,
+  useSubmission,
+} from "@solidjs/router";
 import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import CircleDotDashedIcon from "lucide-solid/icons/circle-dot-dashed";
@@ -38,11 +46,12 @@ const columns = [
   { name: "Done", id: "done", icon: CircleCheckIcon },
 ] as const;
 
-const moveIssue = action(async (issueKey: string, status: IssueStatus, order: number) => {
-  await api.api.issues[":issueKey"].$patch({
-    param: { issueKey },
-    json: { status, order },
+const moveIssue = action(async (issueKeys: string[], status: IssueStatus) => {
+  await api.api.issues.move.$patch({
+    json: { issueKeys, status },
   });
+
+  throw reload({ revalidate: ["boardIssues"] });
 });
 
 const startSprintAction = action(async (teamKey: string, sprintId: string) => {
@@ -59,13 +68,29 @@ export default function BoardPage() {
   const sprints = createAsync(() => sprintsLoader(params.teamKey!));
   const _moveIssue = useAction(moveIssue);
   const _startSprint = useAction(startSprintAction);
+  const moveSubmission = useSubmission(moveIssue);
 
   const dnd = createBoardDnD();
-  const { dragState, calculateNewOrder, resetDrag } = dnd;
+  const { dragState, resetDrag } = dnd;
+
+  const ORDER_GAP = 65536;
+
+  const optimisticIssues = createMemo(() => {
+    const issues = loaderData() ?? [];
+    if (!moveSubmission.pending) return issues;
+
+    const [issueKeys, newStatus] = moveSubmission.input;
+    return issues.map((issue) => {
+      const newIndex = issueKeys.indexOf(issue.key);
+      if (newIndex !== -1) {
+        return { ...issue, status: newStatus, order: (newIndex + 1) * ORDER_GAP };
+      }
+      return issue;
+    });
+  });
 
   const data = createMemo(() => {
-    const issues = loaderData() ?? [];
-    return issues.reduce(
+    const grouped = optimisticIssues().reduce(
       (acc, issue) => {
         if (!acc[issue.status]) {
           acc[issue.status] = [];
@@ -75,6 +100,12 @@ export default function BoardPage() {
       },
       {} as Record<IssueStatus, IssueForBoard[]>,
     );
+
+    for (const status in grouped) {
+      grouped[status as IssueStatus].sort((a, b) => a.order - b.order);
+    }
+
+    return grouped;
   });
 
   const activeSprint = createMemo(
@@ -96,11 +127,18 @@ export default function BoardPage() {
 
     const issueKey = dragState.draggedIssueKey;
     const newStatus = dragState.overColumnId;
-    const newOrder = calculateNewOrder(data()[newStatus] ?? [], dragState.overIndex, issueKey);
+    const targetIndex = dragState.overIndex;
+
+    const currentColumnIssues = (data()[newStatus] ?? []).filter((i) => i.key !== issueKey);
+    const newColumnOrder = [
+      ...currentColumnIssues.slice(0, targetIndex).map((i) => i.key),
+      issueKey,
+      ...currentColumnIssues.slice(targetIndex).map((i) => i.key),
+    ];
 
     resetDrag();
 
-    await _moveIssue(issueKey, newStatus, newOrder);
+    await _moveIssue(newColumnOrder, newStatus);
   }
 
   return (

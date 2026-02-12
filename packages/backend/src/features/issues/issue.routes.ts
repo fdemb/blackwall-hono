@@ -13,6 +13,7 @@ import {
   updateIssueSchema,
   bulkUpdateIssuesSchema,
   bulkDeleteIssuesSchema,
+  moveIssuesSchema,
   issueListSchema,
   issueResponseSchema,
 } from "./issue.zod";
@@ -167,6 +168,36 @@ const issueRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ issues: updated });
+    })
+  /**
+   * PATCH /move - Move issues to a status column and set their order.
+   */
+  .patch(
+    "/move",
+    describeRoute({
+      tags: ["Issues"],
+      summary: "Move issues to a column",
+      responses: {
+        200: {
+          description: "Issues moved",
+          content: { "application/json": { schema: resolver(z.object({ success: z.boolean() })) } },
+        },
+      },
+    }),
+    validator("json", moveIssuesSchema),
+    async (c) => {
+      const workspace = c.get("workspace");
+      const user = c.get("user")!;
+      const { issueKeys, status } = c.req.valid("json");
+
+      await issueService.moveIssues({
+        workspaceId: workspace.id,
+        userId: user.id,
+        issueKeys,
+        status,
+      });
+
+      return c.json({ success: true });
     })
   /**
    * PATCH /:issueKey - Update an existing issue.

@@ -293,6 +293,24 @@ export async function softDeleteIssuesBulk(input: {
   return result;
 }
 
+const ORDER_GAP = 65536;
+
+export async function moveIssues(input: {
+  workspaceId: string;
+  issueKeys: string[];
+  status: IssueStatus;
+}) {
+  await db.transaction(async (tx) => {
+    for (let i = 0; i < input.issueKeys.length; i++) {
+      const order = (i + 1) * ORDER_GAP;
+      await tx
+        .update(dbSchema.issue)
+        .set({ order, status: input.status })
+        .where(eq(dbSchema.issue.key, input.issueKeys[i]));
+    }
+  });
+}
+
 export async function softDeleteIssue(input: { issueId: string }) {
   await db
     .update(dbSchema.issue)
@@ -312,4 +330,5 @@ export const issueData = {
   getIssuesByIds,
   updateIssuesBulk,
   softDeleteIssuesBulk,
+  moveIssues,
 };

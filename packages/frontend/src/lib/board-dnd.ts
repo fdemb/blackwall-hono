@@ -24,8 +24,6 @@ export const initialDragState: DragState = {
   overIndex: -1,
 };
 
-export const ORDER_GAP = 65536;
-
 export function createBoardDnD() {
   const [dragState, setDragState] = createStore<DragState>(initialDragState);
   const columnRefs = new Map<IssueStatus, HTMLElement>();
@@ -106,32 +104,6 @@ export function createBoardDnD() {
     }
 
     return { columnId: closestColumn, index: targetIndex };
-  }
-
-  function calculateNewOrder(
-    columnIssues: { key: string; order: number }[],
-    targetIndex: number,
-    draggedIssueKey: string | null,
-  ): number {
-    const issues = columnIssues.filter((issue) => issue.key !== draggedIssueKey);
-
-    if (issues.length === 0) {
-      return ORDER_GAP;
-    }
-
-    if (targetIndex <= 0) {
-      const firstOrder = issues[0]?.order ?? ORDER_GAP;
-      return Math.floor(firstOrder / 2);
-    }
-
-    if (targetIndex >= issues.length) {
-      const lastOrder = issues[issues.length - 1]?.order ?? 0;
-      return lastOrder + ORDER_GAP;
-    }
-
-    const prevOrder = issues[targetIndex - 1]?.order ?? 0;
-    const nextOrder = issues[targetIndex]?.order ?? prevOrder + ORDER_GAP * 2;
-    return Math.floor((prevOrder + nextOrder) / 2);
   }
 
   function resetDrag() {
@@ -228,7 +200,6 @@ export function createBoardDnD() {
     setColumnRef,
     setScrollContainerRef,
     calculateDropTarget,
-    calculateNewOrder,
     useDraggable,
     resetDrag,
   };

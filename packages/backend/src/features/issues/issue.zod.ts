@@ -64,6 +64,13 @@ export const bulkDeleteIssuesSchema = z.object({
 
 export type BulkDeleteIssues = z.infer<typeof bulkDeleteIssuesSchema>;
 
+export const moveIssuesSchema = z.object({
+  issueKeys: z.array(z.string()).min(1),
+  status: z.enum(issueStatusValues),
+});
+
+export type MoveIssues = z.infer<typeof moveIssuesSchema>;
+
 // Response Schemas
 export const issueSchema = z.object({
   id: z.string(),
