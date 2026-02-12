@@ -1,7 +1,7 @@
 import type { SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
 import { createSignal } from "solid-js";
-import { action, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import { toast } from "../custom-ui/toast";
 import { IssueEditButtons } from "./issue-edit-buttons";
 
@@ -10,6 +10,8 @@ const changeSummaryAction = action(async (issueKey: string, summary: string) => 
     param: { issueKey },
     json: { summary },
   });
+
+  throw reload({ revalidate: [] });
 });
 
 export function IssueSummary(props: { issue: SerializedIssue }) {

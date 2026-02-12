@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { action, useAction } from "@solidjs/router";
-import { revalidate } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import { Popover } from "@kobalte/core/popover";
 import { createSignal, For } from "solid-js";
 
@@ -12,7 +11,8 @@ const updateEstimation = action(async (issueKey: string, points: number | null) 
     param: { issueKey },
     json: { estimationPoints: points },
   });
-  await revalidate("issue");
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 export function EstimationPickerPopover(props: {

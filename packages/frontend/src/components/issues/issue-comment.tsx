@@ -7,7 +7,7 @@ import { api, apiFetch } from "@/lib/api";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { AlertDialog } from "@/components/ui/alert-dialog";
-import { action, json, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -90,6 +90,8 @@ const deleteCommentAction = action(async (issueKey: string, commentId: string) =
     param: { issueKey, commentId },
   });
   toast.success("Comment deleted");
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 export function CommentMenu(props: CommentMenuProps) {
@@ -148,7 +150,7 @@ const createCommentAction = action(async (issueKey: string, content: JSONContent
     json: { content },
   });
 
-  throw json({ ok: true }, { revalidate: "issueShow" });
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 export function IssueCommentForm(props: IssueCommentFormProps) {

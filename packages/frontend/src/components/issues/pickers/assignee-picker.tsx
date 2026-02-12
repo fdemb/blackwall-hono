@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Popover } from "@kobalte/core/popover";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import { createMemo, createSignal, Show } from "solid-js";
-import { action, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 
 const updateAssignee = action(async (issueKey: string, assignedToId: string | null) => {
@@ -14,7 +14,8 @@ const updateAssignee = action(async (issueKey: string, assignedToId: string | nu
     param: { issueKey: issueKey },
     json: { assignedToId: assignedToId },
   });
-  return;
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 type AssigneePickerPopoverProps =

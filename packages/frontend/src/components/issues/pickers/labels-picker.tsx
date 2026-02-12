@@ -7,7 +7,7 @@ import { useWorkspaceData } from "@/context/workspace-context";
 import { Popover } from "@kobalte/core/popover";
 import PlusIcon from "lucide-solid/icons/plus";
 import { createResource, createSignal, Index } from "solid-js";
-import { action, useAction, revalidate } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import type { SerializedLabel } from "@blackwall/database/schema";
 
 const createAndAddLabel = action(async (name: string, issueKey: string) => {
@@ -19,7 +19,8 @@ const createAndAddLabel = action(async (name: string, issueKey: string) => {
     param: { issueKey },
     json: { labelId: label.id },
   });
-  await revalidate("issue");
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 const addLabel = action(async (labelId: string, issueKey: string) => {
@@ -27,14 +28,16 @@ const addLabel = action(async (labelId: string, issueKey: string) => {
     param: { issueKey },
     json: { labelId },
   });
-  await revalidate("issue");
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 const removeLabel = action(async (labelId: string, issueKey: string) => {
   await api.api.issues[`:issueKey`].labels[`:labelId`].$delete({
     param: { issueKey, labelId },
   });
-  await revalidate("issue");
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 export function IssueLabelsPicker(props: { labels: SerializedLabel[]; issueKey: string }) {

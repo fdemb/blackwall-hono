@@ -9,13 +9,15 @@ import XIcon from "lucide-solid/icons/x";
 import { createEffect, createSignal, Show } from "solid-js";
 import { Button } from "../ui/button";
 import { IssueEditButtons } from "./issue-edit-buttons";
-import { action, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 
 const changeDescriptionAction = action(async (issueKey: string, description: JSONContent) => {
   await api.api.issues[":issueKey"].$patch({
     param: { issueKey },
     json: { description },
   });
+
+  throw reload({ revalidate: [] });
 });
 
 export function IssueDescription(props: { issue: SerializedIssue }) {

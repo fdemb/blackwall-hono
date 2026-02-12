@@ -5,7 +5,7 @@ import { Popover } from "@kobalte/core/popover";
 import { IssuePriorityBadge } from "../issue-badges";
 import { api } from "@/lib/api";
 import { toast } from "@/components/custom-ui/toast";
-import { action, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 
 const updatePriorityAction = action(async (issueKey: string, priority: IssuePriority) => {
   await api.api.issues[`:issueKey`].$patch({
@@ -14,6 +14,7 @@ const updatePriorityAction = action(async (issueKey: string, priority: IssuePrio
   });
 
   toast.success("Priority updated successfully");
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 export function PriorityPickerPopover(props: {

@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TextField } from "@/components/ui/text-field";
 import { api } from "@/lib/api";
-import { query, createAsync, revalidate, action, useAction } from "@solidjs/router";
+import { query, createAsync, action, reload, useAction } from "@solidjs/router";
 import { formatRelative } from "date-fns";
 import ClockIcon from "lucide-solid/icons/clock";
 import EllipsisIcon from "lucide-solid/icons/ellipsis";
@@ -110,18 +110,16 @@ const logTimeEntry = action(async (issueKey: string, duration: number, descripti
     param: { issueKey },
     json: { duration, description },
   });
-  await revalidate("timeEntryTotal");
-  await revalidate("timeEntriesList");
-  await revalidate("issue");
+
+  throw reload({ revalidate: ["timeEntryTotal", "timeEntriesList", "issueShow"] });
 });
 
 const deleteTimeEntry = action(async (issueKey: string, timeEntryId: string) => {
   await api.api["time-entries"].issues[`:issueKey`]["time-entries"][`:timeEntryId`].$delete({
     param: { issueKey, timeEntryId },
   });
-  await revalidate("timeEntryTotal");
-  await revalidate("timeEntriesList");
-  await revalidate("issue");
+
+  throw reload({ revalidate: ["timeEntryTotal", "timeEntriesList", "issueShow"] });
 });
 
 export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug: string }) {

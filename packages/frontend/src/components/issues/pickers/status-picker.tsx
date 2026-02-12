@@ -2,7 +2,7 @@ import { PickerPopover } from "@/components/custom-ui/picker-popover";
 import type { IssueStatus } from "@blackwall/database/schema";
 import { issueMappings, mappingToOptionArray } from "@/lib/mappings";
 import { Popover } from "@kobalte/core/popover";
-import { action, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 import { IssueStatusBadge } from "../issue-badges";
 import type { JSX } from "solid-js";
@@ -12,6 +12,8 @@ const updateStatus = action(async (issueKey: string, status: IssueStatus) => {
     param: { issueKey },
     json: { status },
   });
+
+  throw reload({ revalidate: ["issueShow"] });
 });
 
 type StatusPickerPopoverProps =

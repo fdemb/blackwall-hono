@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { revalidate, action, useAction } from "@solidjs/router";
+import { action, reload, useAction } from "@solidjs/router";
 import { Popover } from "@kobalte/core/popover";
 import AlertCircleIcon from "lucide-solid/icons/alert-circle";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
@@ -25,8 +25,8 @@ const updateSprint = action(async (issueKey: string, sprintId: string | null) =>
     param: { issueKey },
     json: { sprintId },
   });
-  await revalidate("issue");
-  await revalidate("board");
+
+  throw reload({ revalidate: ["issueShow", "board"] });
 });
 
 type SprintPickerPopoverProps = {
