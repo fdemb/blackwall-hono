@@ -16,7 +16,7 @@ export const validateFields = (
   return errors;
 };
 
-export const action = async <T extends unknown>(
+export const actionWrapper = async <T extends unknown>(
   promise: Promise<T>,
   formApi?: FormApi<any, any, any, any, any, any, any, any, any, any, any, any>,
 ): Promise<T> => {

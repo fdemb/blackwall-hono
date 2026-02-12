@@ -1,9 +1,7 @@
-import { cn } from "@/lib/utils";
 import { Editor, type Content, type JSONContent } from "@tiptap/core";
 import { Image } from "@tiptap/extension-image";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { StarterKit } from "@tiptap/starter-kit";
-import { renderToHTMLString } from "@tiptap/static-renderer";
 import { cva, type VariantProps } from "class-variance-authority";
 import CodeIcon from "lucide-solid/icons/code";
 import Heading1Icon from "lucide-solid/icons/heading-1";
@@ -12,17 +10,15 @@ import ImageIcon from "lucide-solid/icons/image";
 import ListIcon from "lucide-solid/icons/list";
 import ListOrderedIcon from "lucide-solid/icons/list-ordered";
 import QuoteIcon from "lucide-solid/icons/quote";
-import { createEffect, createMemo, createSignal, mergeProps, on, onCleanup } from "solid-js";
+import { createEffect, createSignal, mergeProps, on, onCleanup } from "solid-js";
 import { SlashCommand, type SlashCommandItem } from "./extensions/slash-command";
 import { createSuggestionRenderer } from "./suggestion-renderer";
 import { backendUrl } from "@/lib/env";
 
 export type TiptapProps = {
   initialContent?: Content;
-  content?: JSONContent;
-  onChange?: (content: JSONContent) => void;
-  onBlur?: (content: JSONContent) => void;
   onAttachmentUpload?: (file: File) => Promise<{ id: string } | null>;
+  editorRef?: (editor: Editor) => void;
   workspaceSlug?: string;
   placeholder?: string;
   class?: string;
@@ -53,27 +49,6 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
 
   const [element, setElement] = createSignal<HTMLDivElement | null>(null);
   const [editor, setEditor] = createSignal<Editor | null>(null);
-  const emptyParagraph = () =>
-    `<p data-placeholder="${merged.placeholder}" class="is-empty is-editor-empty"></p>`;
-
-  const html = createMemo(() => {
-    if (!merged.content && !merged.initialContent) return emptyParagraph();
-
-    if (!merged.content && merged.initialContent && typeof merged.initialContent === "string") {
-      return merged.initialContent;
-    }
-
-    const result = renderToHTMLString({
-      content: merged.content || (merged.initialContent as JSONContent),
-      extensions: [StarterKit, Image, Placeholder.configure({ placeholder: merged.placeholder })],
-    });
-
-    if (result === "") {
-      return emptyParagraph();
-    }
-
-    return result;
-  });
 
   const triggerFileUpload = (editor: Editor, range: { from: number; to: number }) => {
     const input = document.createElement("input");
@@ -165,72 +140,57 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
   createEffect(
     on(element, (element) => {
       const suggestionRenderer = createSuggestionRenderer();
-
-      setEditor(
-        () =>
-          new Editor({
-            element: element,
-            extensions: [
-              StarterKit.configure({
-                trailingNode: false,
-              }),
-              Image,
-              Placeholder.configure({ placeholder: merged.placeholder }),
-              SlashCommand.configure({
-                suggestion: {
-                  items: ({ query }) => getSlashCommandItems(query),
-                  render: () => suggestionRenderer,
-                },
-              }),
-            ],
-            content: merged.initialContent,
-            editable: merged.editable,
-            editorProps: {
-              attributes: {
-                class: tiptapVariants({
-                  variant: merged.variant,
-                  class: merged.class,
-                }),
-              },
+      const editorInstance = new Editor({
+        element: element,
+        extensions: [
+          StarterKit.configure({
+            trailingNode: false,
+          }),
+          Image,
+          Placeholder.configure({ placeholder: merged.placeholder }),
+          SlashCommand.configure({
+            suggestion: {
+              items: ({ query }) => getSlashCommandItems(query),
+              render: () => suggestionRenderer,
             },
           }),
-      );
-
-      editor()?.on("blur", ({ editor }) => {
-        if (merged.onBlur) {
-          merged.onBlur(editor.getJSON());
-        }
+        ],
+        content: merged.initialContent,
+        enableContentCheck: true,
+        editable: merged.editable,
+        editorProps: {
+          attributes: {
+            class: tiptapVariants({
+              variant: merged.variant,
+              class: merged.class,
+            }),
+          },
+        },
       });
 
-      editor()?.on("update", ({ editor, transaction }) => {
-        if (merged.onChange && transaction.steps.length > 0) {
-          merged.onChange(editor.getJSON());
-        }
-      });
+      setEditor(editorInstance);
+      merged.editorRef?.(editorInstance);
     }),
   );
 
-  onCleanup(() => {
-    editor()?.destroy();
+  createEffect(() => {
+    editor()?.setEditable(merged.editable);
   });
 
+  // makes initial content reactive
   createEffect(() => {
-    if (merged.content) {
-      const selection = editor()?.state.selection;
-
+    if (merged.initialContent) {
       editor()
         ?.chain()
-        .setContent(merged.content)
-        .setTextSelection({
-          from: selection?.from ?? 0,
-          to: selection?.from ?? 0,
+        .setContent(merged.initialContent, {
+          emitUpdate: false,
         })
         .run();
     }
   });
 
-  createEffect(() => {
-    editor()?.setEditable(merged.editable);
+  onCleanup(() => {
+    editor()?.destroy();
   });
 
   return (

@@ -1,7 +1,6 @@
 import { PageHeader } from "@/components/blocks/page-header";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
-import { FastLink } from "@/components/custom-ui/fast-link";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
 import { IssueActivityLog } from "@/components/issues/issue-activity-log";
 import { IssueDescription } from "@/components/issues/issue-description";
@@ -11,8 +10,7 @@ import { IssueSummary } from "@/components/issues/issue-summary";
 import { Separator } from "@/components/ui/separator";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useWorkspaceData } from "@/context/workspace-context";
-import type { SerializedTeam, SerializedUser } from "@blackwall/database/schema";
-import type { InferDbType } from "@blackwall/database/types";
+import type { SerializedTeam } from "@blackwall/database/schema";
 import { createAsync, useParams } from "@solidjs/router";
 import PanelRightIcon from "lucide-solid/icons/panel-right";
 import { Show } from "solid-js";

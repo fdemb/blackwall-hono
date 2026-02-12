@@ -1,65 +1,69 @@
 import type { SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
-import { action } from "@/lib/form.utils";
-import CheckIcon from "lucide-solid/icons/check";
-import XIcon from "lucide-solid/icons/x";
-import { createSignal, Show } from "solid-js";
-import { Button } from "../ui/button";
+import { createSignal } from "solid-js";
+import { action, useAction } from "@solidjs/router";
+import { toast } from "../custom-ui/toast";
+import { IssueEditButtons } from "./issue-edit-buttons";
+
+const changeSummaryAction = action(async (issueKey: string, summary: string) => {
+  await api.api.issues[":issueKey"].$patch({
+    param: { issueKey },
+    json: { summary },
+  });
+});
 
 export function IssueSummary(props: { issue: SerializedIssue }) {
+  let h1Ref!: HTMLHeadingElement;
+  const _changeSummaryAction = useAction(changeSummaryAction);
   const [isEditing, setIsEditing] = createSignal(false);
   const [summary, setSummary] = createSignal(props.issue.summary);
 
-  async function save() {
-    if (summary() === props.issue.summary) {
-      setIsEditing(false);
-      return;
+  async function handleSave() {
+    if (summary() !== props.issue.summary) {
+      await _changeSummaryAction(props.issue.key, summary());
+      toast.success("Summary updated");
     }
 
-    await action(
-      api.api.issues[":issueKey"]
-        .$patch({
-          param: { issueKey: props.issue.key },
-          json: { summary: summary() },
-        })
-        .then((res) => res.json()),
-    );
-
     setIsEditing(false);
+    h1Ref.blur();
+  }
+
+  function handleCancel(e: Event) {
+    setIsEditing(false);
+    h1Ref.innerText = props.issue.summary;
+    h1Ref.blur();
+  }
+
+  function handleInput(e: InputEvent) {
+    const target = e.currentTarget as HTMLInputElement;
+    setSummary(target.textContent);
+    if (!isEditing()) {
+      setIsEditing(true);
+    }
+  }
+
+  function handlePaste(e: ClipboardEvent) {
+    e.preventDefault();
+    const target = e.currentTarget as HTMLInputElement;
+    const text = e.clipboardData?.getData("text/plain") ?? "";
+    target.textContent = text;
+    setSummary(text);
   }
 
   return (
     <div class="relative">
       <h1
+        ref={h1Ref}
         contentEditable={true}
-        onPointerDown={() => {
-          setIsEditing(true);
-        }}
         class="w-full text-xl sm:text-2xl font-medium outline-none"
-        onInput={(e) => {
-          setSummary(e.target.textContent);
-        }}
-        onPaste={(e) => {
-          e.preventDefault();
-          const text = e.clipboardData?.getData("text/plain") ?? "";
-          e.target.textContent = text;
-          setSummary(text);
-        }}
-        onBlur={save}
+        onInput={handleInput}
+        onPaste={handlePaste}
+        spellcheck="false"
       >
         {props.issue.summary}
       </h1>
 
-      <Show when={isEditing()}>
-        <div class="flex flex-row gap-2 absolute -bottom-11 left-0 z-100 bg-muted p-1 border rounded-md">
-          <Button size="iconXs" variant="default" onClick={save}>
-            <CheckIcon class="size-4" />
-          </Button>
-          <Button size="iconXs" variant="outline" onClick={() => setIsEditing(false)}>
-            <XIcon class="size-4" />
-          </Button>
-        </div>
-      </Show>
+      <IssueEditButtons isEditing={isEditing()} onSave={handleSave} onCancel={handleCancel} />
     </div>
   );
 }

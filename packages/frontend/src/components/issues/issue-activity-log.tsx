@@ -1,37 +1,10 @@
 import { UserAvatar } from "@/components/custom-ui/avatar";
-import { TiptapEditor } from "@/components/tiptap/tiptap-editor";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useAppForm } from "@/context/form-context";
 import type { IssueChangeEventType, SerializedUser } from "@blackwall/database/schema";
 import type { InferDbType } from "@blackwall/database/types";
-import { action } from "@/lib/form.utils";
-import { api, apiFetch } from "@/lib/api";
 import { issueMappings } from "@/lib/mappings";
-import { revalidate } from "@solidjs/router";
-import type { JSONContent } from "@tiptap/core";
 import { formatRelative } from "date-fns";
-import EllipsisIcon from "lucide-solid/icons/ellipsis";
-import SendHorizontalIcon from "lucide-solid/icons/send-horizontal";
-import TrashIcon from "lucide-solid/icons/trash-2";
-import { createMemo, createSignal, Index, Match, Show, Switch } from "solid-js";
-import * as z from "zod";
+import { createMemo, Index, Match, Show, Switch } from "solid-js";
+import { IssueComment, IssueCommentForm } from "./issue-comment";
 
 const IMPORTANT_EVENT_TYPES: IssueChangeEventType[] = [
   "issue_created",
@@ -77,23 +50,6 @@ export type TimelineItem = CommentTimelineItem | EventTimelineItem;
 export type IssueActivityLogProps = {
   issue: IssueWithCommentsAndEvents;
   assignableUsers: SerializedUser[];
-  workspaceSlug: string;
-};
-
-export type IssueCommentFormProps = {
-  issue: IssueWithCommentsAndEvents;
-  workspaceSlug: string;
-};
-
-export type IssueCommentItemProps = {
-  comment: Comment;
-  issueKey: string;
-  workspaceSlug: string;
-};
-
-export type CommentMenuProps = {
-  comment: Comment;
-  issueKey: string;
   workspaceSlug: string;
 };
 
@@ -187,7 +143,7 @@ export function IssueActivityLog(props: IssueActivityLogProps) {
           return (
             <Switch>
               <Match when={item().type === "comment"}>
-                <IssueCommentItem
+                <IssueComment
                   comment={(item() as CommentTimelineItem).data}
                   issueKey={props.issue.key}
                   workspaceSlug={props.workspaceSlug}
@@ -205,158 +161,6 @@ export function IssueActivityLog(props: IssueActivityLogProps) {
       </Index>
 
       <IssueCommentForm issue={props.issue} workspaceSlug={props.workspaceSlug} />
-    </div>
-  );
-}
-
-export function IssueCommentForm(props: IssueCommentFormProps) {
-  const handleUpload = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await apiFetch(
-      api.api.issues[":issueKey"].attachments.$url({
-        param: { issueKey: props.issue.key },
-      }),
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
-    const { attachment } = await res.json();
-    return attachment;
-  };
-
-  const form = useAppForm(() => ({
-    defaultValues: {
-      content: { type: "doc" } as JSONContent,
-    },
-    validators: {
-      onSubmit: z.object({
-        content: z.any(), // TODO: Add proper validation
-      }),
-    },
-    onSubmit: async (data) => {
-      await api.api.issues[":issueKey"].comments.$post({
-        param: { issueKey: props.issue.key },
-        json: { content: data.value.content },
-      });
-
-      await revalidate("issue");
-      form.reset();
-    },
-  }));
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        form.handleSubmit();
-      }}
-      class="relative"
-    >
-      <form.AppField name="content">
-        {(field) => (
-          <TiptapEditor
-            content={field().state.value}
-            onChange={(content) => field().handleChange(content)}
-            onAttachmentUpload={handleUpload}
-            workspaceSlug={props.workspaceSlug}
-            placeholder="Add a comment..."
-            variant="plain"
-            class="min-h-24 p-4 squircle-lg bg-muted border"
-          />
-        )}
-      </form.AppField>
-
-      <form.Subscribe>
-        {(state) => (
-          <Button
-            type="submit"
-            size="sm"
-            disabled={!state().canSubmit || !state().isTouched}
-            class="absolute bottom-4 right-4 px-1.5! aspect-square"
-          >
-            <SendHorizontalIcon class="size-4" />
-          </Button>
-        )}
-      </form.Subscribe>
-    </form>
-  );
-}
-
-export function CommentMenu(props: CommentMenuProps) {
-  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal(false);
-
-  const handleDelete = async () => {
-    await action(
-      api.api.issues[":issueKey"].comments[":commentId"]
-        .$delete({
-          param: { issueKey: props.issueKey, commentId: props.comment.id },
-        })
-        .then((res) => res.json()),
-    );
-
-    await revalidate("issue");
-  };
-
-  return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger as={Button} variant="ghost" size="iconXs" class="ml-auto">
-          <EllipsisIcon class="size-4" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem variant="destructive" onSelect={() => setDeleteDialogOpen(true)}>
-            <TrashIcon class="size-4" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <AlertDialog open={deleteDialogOpen()} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogMedia class="bg-destructive/50">
-              <TrashIcon class="size-4" />
-            </AlertDialogMedia>
-            <AlertDialogTitle>Delete comment?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the comment.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
-            <AlertDialogAction size="xs" variant="destructive" action={handleDelete}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  );
-}
-
-export function IssueCommentItem(props: IssueCommentItemProps) {
-  return (
-    <div class="p-4 squircle-lg bg-muted border flex flex-col gap-3.5">
-      <div class="flex flex-row gap-1 items-center">
-        <UserAvatar user={props.comment.author as unknown as SerializedUser} size="xs" />
-        <p class="font-medium">{props.comment.author.name}</p>
-        <p class="text-muted-foreground ml-1">
-          {formatRelative(props.comment.createdAt, new Date())}
-        </p>
-        <CommentMenu
-          comment={props.comment}
-          issueKey={props.issueKey}
-          workspaceSlug={props.workspaceSlug}
-        />
-      </div>
-
-      <Show when={props.comment.content}>
-        {(content) => <TiptapEditor content={content()} editable={false} variant="plain" />}
-      </Show>
     </div>
   );
 }

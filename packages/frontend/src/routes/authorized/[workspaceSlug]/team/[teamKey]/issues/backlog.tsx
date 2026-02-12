@@ -20,11 +20,12 @@ import { action, createAsync, useAction, useParams } from "@solidjs/router";
 import { api } from "@/lib/api";
 import type { BulkUpdateIssues } from "@blackwall/backend/src/features/issues/issue.zod";
 import { toast } from "@/components/custom-ui/toast";
-import { createMemo, Show, type ParentComponent } from "solid-js";
+import { createMemo, Show } from "solid-js";
 import { backlogLoader } from "./backlog.data";
 import { useTeamData } from "../../[teamKey]";
 import { sprintsLoader } from "../sprints/index.data";
-import { IssueDraggingProvider, useIssueDragCtx } from "@/context/issue-dragging-context";
+import { IssueDraggingProvider } from "@/context/issue-dragging-context";
+import { HideWhileDragging } from "@/components/issues/hide-while-dragging";
 
 const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
   await api.api.issues.bulk.$patch({ json: input });
@@ -116,8 +117,3 @@ function IssueEmpty() {
     </Empty>
   );
 }
-
-const HideWhileDragging: ParentComponent = (props) => {
-  const { dragState } = useIssueDragCtx();
-  return <div class={dragState.isDragging ? "hidden" : "contents"}>{props.children}</div>;
-};

@@ -7,7 +7,7 @@ import type {
 } from "@blackwall/database/schema";
 import { useDialogContext } from "@kobalte/core/dialog";
 import { Popover } from "@kobalte/core/popover";
-import type { JSONContent } from "@tiptap/core";
+import type { Editor, JSONContent } from "@tiptap/core";
 import XIcon from "lucide-solid/icons/x";
 import { createEffect, createSignal, mergeProps, on } from "solid-js";
 import * as z from "zod";
@@ -24,7 +24,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { TanStackErrorMessages, TextField } from "../ui/text-field";
-import { action, createAsync, query, redirect, useAction } from "@solidjs/router";
+import { action, createAsync, json, query, redirect, useAction } from "@solidjs/router";
 import { api, apiFetch } from "@/lib/api";
 import type { CreateIssue } from "@blackwall/backend/src/features/issues/issue.zod";
 import type { CreateDialogDefaults } from "@/context/create-dialog.context";
@@ -56,7 +56,9 @@ const createIssueAction = action(
 
     const { issue: createdIssue } = await res.json();
 
-    throw redirect(`/${workspaceSlug}/issue/${createdIssue.key}`);
+    throw redirect(`/${workspaceSlug}/issue/${createdIssue.key}`, {
+      revalidate: [],
+    });
   },
 );
 
@@ -68,7 +70,7 @@ const uploadAttachmentAction = action(async (formData: FormData) => {
 
   const { attachment } = (await res.json()) as { attachment: SerializedIssueAttachment };
 
-  return attachment;
+  return json(attachment, { revalidate: [] });
 });
 
 function CreateDialogContent(props: CreateDialogContentProps) {
@@ -87,6 +89,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
   const assignableUsers = createAsync(() => getTeamUsers(merged.teamKey));
   const _action = useAction(createIssueAction);
   const _uploadAttachmentAction = useAction(uploadAttachmentAction);
+  const [editor, setEditor] = createSignal<Editor | null>(null);
 
   const handleUpload = async (file: File) => {
     const formData = new FormData();
@@ -154,6 +157,22 @@ function CreateDialogContent(props: CreateDialogContentProps) {
     }),
   );
 
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!editor()) {
+      return;
+    }
+
+    // Imperatively set the value of the description field just before submitting the form.
+    // This way, we avoid serializing the editor content to JSON for each change.
+    // This is very beneficial for performance.
+    form.setFieldValue("description", editor()!.getJSON());
+
+    await form.handleSubmit();
+  };
+
   return (
     <DialogContent
       class="p-0 gap-0 max-h-screen overflow-auto"
@@ -169,13 +188,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
         </DialogClose>
       </DialogSingleLineHeader>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <div class="px-4 py-2 flex flex-col">
           <form.AppField name="summary">
             {(field) => (
@@ -210,8 +223,8 @@ function CreateDialogContent(props: CreateDialogContentProps) {
                 class="pb-2"
               >
                 <TiptapEditor
+                  editorRef={setEditor}
                   initialContent={field().state.value}
-                  onChange={(content) => field().handleChange(content)}
                   onAttachmentUpload={handleUpload}
                   workspaceSlug={workspaceData().workspace.slug}
                   variant="plain"

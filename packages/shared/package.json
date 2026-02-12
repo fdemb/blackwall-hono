@@ -6,6 +6,16 @@
   "scripts": {
     "typecheck": "bun run --bun tsc --noEmit"
   },
+  "dependencies": {
+    "@tiptap/core": "^3.14.0",
+    "@tiptap/extension-image": "^3.14.0",
+    "@tiptap/extension-placeholder": "^3.14.0",
+    "@tiptap/pm": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
+    "@tiptap/static-renderer": "^3.14.0",
+    "@tiptap/suggestion": "^3.14.0",
+    "zod": "4"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

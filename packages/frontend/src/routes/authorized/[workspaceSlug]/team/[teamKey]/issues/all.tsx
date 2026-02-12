@@ -16,17 +16,29 @@ import { IssueDataTable, type IssueForDataTable } from "@/components/issues/issu
 import { IssueSelectionMenu } from "@/components/issues/issue-selection-menu";
 import { Button } from "@/components/ui/button";
 import { useCreateDialog } from "@/context/create-dialog.context";
-import { createAsync, useParams } from "@solidjs/router";
+import { action, createAsync, useAction, useParams } from "@solidjs/router";
 import { createMemo, Show } from "solid-js";
 import { allIssuesLoader } from "./all.data";
 import { useTeamData } from "../../[teamKey]";
 import { sprintsLoader } from "../sprints/index.data";
+import { IssueDraggingProvider } from "@/context/issue-dragging-context";
+import { api } from "@/lib/api";
+import type { BulkUpdateIssues } from "@blackwall/backend/src/features/issues/issue.zod";
+import { toast } from "@/components/custom-ui/toast";
+import { HideWhileDragging } from "@/components/issues/hide-while-dragging";
+
+const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
+  await api.api.issues.bulk.$patch({ json: input });
+  const count = input.issueIds.length;
+  toast.success(count > 1 ? `${count} issues moved to sprint` : "Issue moved to sprint");
+});
 
 export default function AllIssuesPage() {
   const params = useParams();
   const teamData = useTeamData();
   const issues = createAsync(() => allIssuesLoader(params.teamKey!));
   const sprints = createAsync(() => sprintsLoader(params.teamKey!));
+  const moveToSprint = useAction(moveToSprintAction);
   const openSprints = createMemo(() => (sprints() ?? []).filter((sprint) => sprint.status !== "completed"));
 
   const rowSelection = createRowSelection();
@@ -40,7 +52,11 @@ export default function AllIssuesPage() {
   });
 
   return (
-    <>
+    <IssueDraggingProvider
+      sprints={openSprints()}
+      selectedIssues={selectedIssues}
+      onDrop={(issues, sprint) => moveToSprint({ issueIds: issues.map((i) => i.id), updates: { sprintId: sprint.id } })}
+    >
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem>
@@ -53,20 +69,23 @@ export default function AllIssuesPage() {
         </Breadcrumbs>
       </PageHeader>
 
-      <IssueSelectionMenu
-        selectedIssues={selectedIssues()}
-        onClearSelection={rowSelection.clearSelection}
-        openSprints={openSprints()}
-      />
+      <HideWhileDragging>
+        <IssueSelectionMenu
+          selectedIssues={selectedIssues()}
+          onClearSelection={rowSelection.clearSelection}
+          openSprints={openSprints()}
+        />
+      </HideWhileDragging>
 
       <Show when={issues() && issues()!.length > 0} fallback={<IssueEmpty />}>
         <IssueDataTable
           issues={issues()!}
           workspaceSlug={params.workspaceSlug!}
           rowSelection={rowSelection}
+          issueDrag={true}
         />
       </Show>
-    </>
+    </IssueDraggingProvider>
   );
 }
 

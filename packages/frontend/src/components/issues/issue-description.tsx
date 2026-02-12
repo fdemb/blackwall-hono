@@ -2,17 +2,35 @@ import { TiptapEditor } from "@/components/tiptap/tiptap-editor";
 import { useWorkspaceData } from "@/context/workspace-context";
 import type { SerializedIssue } from "@blackwall/database/schema";
 import { api, apiFetch } from "@/lib/api";
-import { action } from "@/lib/form.utils";
-import type { JSONContent } from "@tiptap/core";
+import { actionWrapper } from "@/lib/form.utils";
+import type { Editor, JSONContent } from "@tiptap/core";
 import CheckIcon from "lucide-solid/icons/check";
 import XIcon from "lucide-solid/icons/x";
-import { createSignal, Show } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import { Button } from "../ui/button";
+import { IssueEditButtons } from "./issue-edit-buttons";
+import { action, useAction } from "@solidjs/router";
+
+const changeDescriptionAction = action(async (issueKey: string, description: JSONContent) => {
+  await api.api.issues[":issueKey"].$patch({
+    param: { issueKey },
+    json: { description },
+  });
+});
 
 export function IssueDescription(props: { issue: SerializedIssue }) {
   const workspaceData = useWorkspaceData();
-  const [description, setDescription] = createSignal<JSONContent>(props.issue.description);
+  const _changeDescriptionAction = useAction(changeDescriptionAction);
+  const [editor, setEditor] = createSignal<Editor | null>(null);
   const [isEditing, setIsEditing] = createSignal(false);
+
+  createEffect(() => {
+    editor()?.on("update", ({ transaction }) => {
+      if (!isEditing()) {
+        setIsEditing(true);
+      }
+    });
+  });
 
   const handleUpload = async (file: File) => {
     const formData = new FormData();
@@ -31,55 +49,33 @@ export function IssueDescription(props: { issue: SerializedIssue }) {
     return attachment;
   };
 
-  const save = async () => {
-    if (JSON.stringify(description()) === JSON.stringify(props.issue.description)) {
-      setIsEditing(false);
+  const handleSave = async () => {
+    if (!editor()) {
       return;
     }
 
-    await action(
-      api.api.issues[":issueKey"]
-        .$patch({
-          param: { issueKey: props.issue.key },
-          json: { description: description() },
-        })
-        .then((res) => res.json()),
-    );
+    await _changeDescriptionAction(props.issue.key, editor()!.getJSON());
     setIsEditing(false);
+    editor()?.chain().blur().run();
   };
 
-  const cancel = () => {
-    setDescription(props.issue.description);
+  const handleCancel = () => {
+    editor()?.chain().setContent(props.issue.description).run();
     setIsEditing(false);
+    editor()?.chain().blur().run();
   };
 
   return (
     <div class="pt-6 relative">
       <TiptapEditor
-        content={description()}
-        onChange={(content) => {
-          setDescription(content);
-        }}
+        editorRef={setEditor}
+        initialContent={props.issue.description}
         onAttachmentUpload={handleUpload}
         workspaceSlug={workspaceData().workspace.slug}
-        onBlur={save}
         variant="plain"
-        editable={isEditing()}
-        onPointerDown={() => {
-          setIsEditing(true);
-        }}
       />
 
-      <Show when={isEditing()}>
-        <div class="flex flex-row gap-2 absolute -bottom-11 left-0 z-100 bg-muted p-1 border rounded-md">
-          <Button size="iconXs" variant="default" onClick={save}>
-            <CheckIcon class="size-4" />
-          </Button>
-          <Button size="iconXs" variant="outline" onClick={cancel}>
-            <XIcon class="size-4" />
-          </Button>
-        </div>
-      </Show>
+      <IssueEditButtons isEditing={isEditing()} onSave={handleSave} onCancel={handleCancel} />
     </div>
   );
 }
