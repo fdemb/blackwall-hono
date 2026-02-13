@@ -3,17 +3,42 @@ import { getSession } from "./_layout.data";
 import { createAsync } from "@solidjs/router";
 import { SessionContext } from "@/context/session-context";
 import { applyTheme } from "@/components/settings/use-theme";
+import { getLocale, isLocale, localStorageKey, setLocale } from "@/paraglide/runtime.js";
 
 const AuthorizedLayout: ParentComponent = (props) => {
   const session = createAsync(() => getSession());
 
   createEffect(() => {
     const data = session();
-    if (data?.user) {
-      const theme = data.user.preferredTheme as "system" | "light" | "dark" | undefined;
-      if (theme) {
-        applyTheme(theme);
+    if (!data?.user) {
+      return;
+    }
+
+    const theme = data.user.preferredTheme as "system" | "light" | "dark" | undefined;
+    if (theme) {
+      applyTheme(theme);
+    }
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const preferredLocale = (data.user as { preferredLocale?: string | null }).preferredLocale;
+
+    if (preferredLocale && isLocale(preferredLocale)) {
+      try {
+        if (getLocale() !== preferredLocale) {
+          void setLocale(preferredLocale);
+        }
+      } catch {
+        void setLocale(preferredLocale);
       }
+      return;
+    }
+
+    if (window.localStorage.getItem(localStorageKey) !== null) {
+      window.localStorage.removeItem(localStorageKey);
+      window.location.reload();
     }
   });
 

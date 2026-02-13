@@ -50,9 +50,23 @@ export async function updateUserTheme(input: { userId: string; theme: string }) 
   return user;
 }
 
+export async function updateUserLocale(input: { userId: string; locale: "en" | "pl" | null }) {
+  const [user] = await db
+    .update(dbSchema.user)
+    .set({
+      preferredLocale: input.locale,
+      updatedAt: new Date(),
+    })
+    .where(eq(dbSchema.user.id, input.userId))
+    .returning();
+
+  return user;
+}
+
 export const settingsData = {
   getUserById,
   updateUserName,
   updateUserAvatar,
   updateUserTheme,
+  updateUserLocale,
 };

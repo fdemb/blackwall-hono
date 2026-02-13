@@ -49,17 +49,22 @@ export const auth = betterAuth({
     additionalFields: {
       lastWorkspaceId: {
         type: "string",
-        fieldName: "last_workspace_id",
+        fieldName: "lastWorkspaceId",
         input: false,
       },
       lastTeamId: {
         type: "string",
-        fieldName: "last_team_id",
+        fieldName: "lastTeamId",
         input: false,
       },
       preferredTheme: {
         type: "string",
-        fieldName: "preferred_theme",
+        fieldName: "preferredTheme",
+        input: false,
+      },
+      preferredLocale: {
+        type: "string",
+        fieldName: "preferredLocale",
         input: false,
       },
     },

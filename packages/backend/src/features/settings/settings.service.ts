@@ -75,10 +75,21 @@ async function updatePreferredTheme(input: { userId: string; theme: string }) {
   });
 }
 
+/**
+ * Update a user's preferred locale.
+ */
+async function updatePreferredLocale(input: { userId: string; locale: "en" | "pl" | null }) {
+  return settingsData.updateUserLocale({
+    userId: input.userId,
+    locale: input.locale,
+  });
+}
+
 export const settingsService = {
   getProfile,
   updateProfileName,
   updateProfileAvatar,
   changePassword,
   updatePreferredTheme,
+  updatePreferredLocale,
 };

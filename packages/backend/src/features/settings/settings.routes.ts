@@ -9,6 +9,7 @@ import {
   updateProfileNameSchema,
   changePasswordSchema,
   updatePreferredThemeSchema,
+  updatePreferredLocaleSchema,
   updateWorkspaceSettingsSchema,
   teamKeyParamSchema,
   updateTeamSchema,
@@ -148,6 +149,24 @@ const settingsRoutes = new Hono<AppEnv>()
       });
 
       return c.json({ theme });
+    },
+  )
+  /**
+   * PATCH /profile/locale - Update the current user's preferred locale override.
+   */
+  .patch(
+    "/profile/locale",
+    validator("json", updatePreferredLocaleSchema),
+    async (c) => {
+      const user = c.get("user")!;
+      const { locale } = c.req.valid("json");
+
+      await settingsService.updatePreferredLocale({
+        userId: user.id,
+        locale,
+      });
+
+      return c.json({ locale });
     },
   )
   /**

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "my_issues_breadcrumb": "Moje zadania",
+  "my_issues_create_button": "Utwórz",
+  "my_issues_empty_description": "Przypisane do Ciebie zadania pojawią się tutaj. Utwórz nowe zadanie albo poproś członka zespołu o przypisanie zadania do Ciebie.",
+  "my_issues_empty_title": "Brak przypisanych zadań",
+  "settings_locale_option_english": "Angielski",
+  "settings_locale_option_polish": "Polski",
+  "settings_locale_option_system_default": "Domyślny systemowy"
+}

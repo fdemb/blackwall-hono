@@ -7,7 +7,7 @@
     "preview": "bun --env-file=../../.env run --bun vite preview --port 3000",
     "build": "bun --env-file=../../.env run --bun vite build",
     "serve": "bun --env-file=../../.env run --bun vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide --strategy localStorage preferredLanguage baseLocale --emit-ts-declarations && tsc --noEmit",
     "format": "oxfmt",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix"
@@ -55,6 +55,9 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@inlang/paraglide-js": "^2.5.0",
+    "@inlang/plugin-m-function-matcher": "^2.1.4",
+    "@inlang/plugin-message-format": "^4.0.8",
     "typescript": "^5.7.2",
     "vite": "^7.3.0",
     "vite-plugin-solid": "^2.11.10"

@@ -64,12 +64,20 @@ export const updatePreferredThemeSchema = z.object({
 
 export type UpdatePreferredTheme = z.infer<typeof updatePreferredThemeSchema>;
 
+export const updatePreferredLocaleSchema = z.object({
+  locale: z.enum(["en", "pl"]).nullable(),
+});
+
+export type UpdatePreferredLocale = z.infer<typeof updatePreferredLocaleSchema>;
+
 export const userProfileSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string(),
   emailVerified: z.boolean(),
   image: z.string().nullable().optional(),
+  preferredTheme: z.enum(["system", "light", "dark"]).nullable().optional(),
+  preferredLocale: z.enum(["en", "pl"]).nullable().optional(),
   createdAt: z.any(),
   updatedAt: z.any(),
 });
@@ -124,4 +132,3 @@ export const workspaceResponseSchema = z.object({
 export const teamResponseSchema = z.object({
   team: teamSettingsSchema,
 });
-

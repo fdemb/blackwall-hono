@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useCreateDialog } from "@/context/create-dialog.context";
 import { useSessionData } from "@/context/session-context";
+import { m } from "@/paraglide/messages.js";
 import { createAsync, useParams } from "@solidjs/router";
 import CircleDotIcon from "lucide-solid/icons/circle-dot";
 import PlusIcon from "lucide-solid/icons/plus";
@@ -45,7 +46,7 @@ export default function MyIssuesPage() {
     <>
       <PageHeader>
         <Breadcrumbs>
-          <BreadcrumbsItem>My issues</BreadcrumbsItem>
+          <BreadcrumbsItem>{m.my_issues_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
@@ -75,17 +76,14 @@ function IssueEmpty() {
         <EmptyMedia variant="icon">
           <CircleDotIcon />
         </EmptyMedia>
-        <EmptyTitle>No issues assigned to you</EmptyTitle>
-        <EmptyDescription>
-          Issues assigned to you will appear here. Create a new issue or ask a teammate to assign
-          one to you.
-        </EmptyDescription>
+        <EmptyTitle>{m.my_issues_empty_title()}</EmptyTitle>
+        <EmptyDescription>{m.my_issues_empty_description()}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
           <Button onClick={() => open({ assignedToId: session().user.id })}>
             <PlusIcon class="size-4" strokeWidth={2.75} />
-            Create
+            {m.my_issues_create_button()}
           </Button>
         </div>
       </EmptyContent>

@@ -4,6 +4,7 @@ import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
 import { validateFields } from "@/lib/form.utils";
+import { m } from "@/paraglide/messages.js";
 import { A, action, redirect, useAction } from "@solidjs/router";
 import { createSignal, Match, Switch } from "solid-js";
 import * as z from "zod";
@@ -51,7 +52,7 @@ export default function SignupPage() {
   const form = useSignupForm();
 
   return (
-    <AuthCard title="Sign up">
+    <AuthCard title={m.auth_signup_title()}>
       <Switch>
         <Match when={step() === "account"}>
           <AccountForm
@@ -98,10 +99,10 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
         >
           {() => (
             <TanStackTextField
-              label="Email address"
+              label={m.auth_email_address_label()}
               inputClass="p-3 h-auto !text-base"
               type="email"
-              placeholder="john.doe@example.com"
+              placeholder={m.auth_email_placeholder_signup()}
               autofocus
               autocomplete="email"
             />
@@ -116,10 +117,10 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
         >
           {() => (
             <TanStackTextField
-              label="Password"
+              label={m.auth_password_label()}
               inputClass="p-3 h-auto !text-base"
               type="password"
-              placeholder="Tip: use a password generator"
+              placeholder={m.auth_password_placeholder_signup()}
               autocomplete="new-password"
             />
           )}
@@ -133,10 +134,10 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
         >
           {() => (
             <TanStackTextField
-              label="Full Name"
+              label={m.auth_full_name_label()}
               inputClass="p-3 h-auto !text-base"
               type="text"
-              placeholder="John Doe"
+              placeholder={m.auth_full_name_placeholder()}
               autocomplete="name"
             />
           )}
@@ -151,13 +152,13 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
                 class="text-base"
                 disabled={!state().canSubmit || state().isSubmitting}
               >
-                Continue
+                {m.auth_continue()}
               </Button>
             )}
           </props.form.Subscribe>
 
           <A href="/signin" class={buttonVariants({ variant: "link" })}>
-            Back to login
+            {m.auth_back_to_login()}
           </A>
         </div>
       </div>
@@ -183,10 +184,10 @@ function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onConti
         >
           {() => (
             <TanStackTextField
-              label="Workspace Name"
+              label={m.auth_workspace_name_label()}
               inputClass="p-3 w-72 h-auto !text-base"
               type="text"
-              placeholder="Awesome workspace"
+              placeholder={m.auth_workspace_name_placeholder()}
               autofocus
             />
           )}
@@ -200,21 +201,21 @@ function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onConti
         >
           {() => (
             <TanStackTextField
-              label="Workspace URL"
+              label={m.auth_workspace_url_label()}
               inputClass="p-3 w-72 h-auto !text-base"
               type="text"
-              placeholder="URL slug, e.g. awesome-workspace"
+              placeholder={m.auth_workspace_url_placeholder()}
             />
           )}
         </props.form.AppField>
 
         <div class="flex flex-col gap-2">
           <Button type="submit" size="lg" class="text-base">
-            Continue
+            {m.auth_continue()}
           </Button>
 
           <Button type="button" variant="link" onClick={() => props.onBack()}>
-            Back to account details
+            {m.auth_back_to_account_details()}
           </Button>
         </div>
       </div>

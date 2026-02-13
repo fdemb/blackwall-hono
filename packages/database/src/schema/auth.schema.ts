@@ -21,6 +21,9 @@ export const user = sqliteTable(
     preferredTheme: text({
       enum: ["system", "light", "dark"],
     }).default("system"),
+    preferredLocale: text({
+      enum: ["en", "pl"],
+    }),
   },
   (table) => [
     index("user_last_workspace_id_idx").on(table.lastWorkspaceId),

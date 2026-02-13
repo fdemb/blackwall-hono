@@ -4,6 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { authClient } from "@/lib/auth-client";
+import { m } from "@/paraglide/messages.js";
 import { A, action, redirect, useAction } from "@solidjs/router";
 import * as z from "zod";
 
@@ -14,7 +15,7 @@ const signinAction = action(async (email: string, password: string) => {
   });
 
   if (result.error) {
-    toast.error(result.error.message ?? "Something went wrong");
+    toast.error(result.error.message ?? m.auth_toast_error_generic());
     return;
   }
 
@@ -41,7 +42,7 @@ export default function SignInPage() {
   }));
 
   return (
-    <AuthCard title="Sign in">
+    <AuthCard title={m.auth_signin_title()}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -53,10 +54,10 @@ export default function SignInPage() {
           <form.AppField name="email">
             {() => (
               <TanStackTextField
-                label="Email address"
+                label={m.auth_email_address_label()}
                 type="email"
                 autofocus
-                placeholder="Enter your email address..."
+                placeholder={m.auth_email_placeholder_signin()}
                 inputClass="p-3 h-auto !text-base"
               />
             )}
@@ -65,9 +66,9 @@ export default function SignInPage() {
           <form.AppField name="password">
             {() => (
               <TanStackTextField
-                label="Password"
+                label={m.auth_password_label()}
                 type="password"
-                placeholder="Your secure password..."
+                placeholder={m.auth_password_placeholder_signin()}
                 inputClass="p-3 h-auto !text-base"
               />
             )}
@@ -77,11 +78,11 @@ export default function SignInPage() {
             {(state) => (
               <div class="flex flex-col gap-2">
                 <Button type="submit" size="lg" class="text-base" disabled={!state().canSubmit}>
-                  Sign In
+                  {m.auth_signin_submit()}
                 </Button>
 
                 <A href="/signup" class={buttonVariants({ variant: "link" })}>
-                  Sign Up
+                  {m.auth_signup_link()}
                 </A>
               </div>
             )}

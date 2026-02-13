@@ -28,6 +28,7 @@ import { workspaceMembersLoader } from "./routes/authorized/[workspaceSlug]/sett
 import { teamsSettingsLoader } from "./routes/authorized/[workspaceSlug]/settings/teams/index.data";
 import { teamSettingsLoader } from "./routes/authorized/[workspaceSlug]/settings/teams/[teamKey].data";
 import { Toaster } from "./components/custom-ui/toast";
+import { m } from "./paraglide/messages.js";
 
 const HomePage = lazy(() => import("./routes/authorized/index"));
 const NavigateToMyIssues = lazy(() => import("./routes/authorized/[workspaceSlug]/index"));
@@ -103,7 +104,7 @@ const Root: ParentComponent = (props) => {
 
 const AppRouter = () => (
   <Router root={Root}>
-    <Route path="*404" component={() => "Not found"} />
+    <Route path="*404" component={() => m.app_not_found()} />
 
     <Route path="/" component={GuestLayout} preload={() => redirectIfSession()}>
       <Route path="/signin" component={SignInPage} />
