@@ -35,11 +35,6 @@ const AuthorizedLayout: ParentComponent = (props) => {
       }
       return;
     }
-
-    if (window.localStorage.getItem(localStorageKey) !== null) {
-      window.localStorage.removeItem(localStorageKey);
-      window.location.reload();
-    }
   });
 
   return (

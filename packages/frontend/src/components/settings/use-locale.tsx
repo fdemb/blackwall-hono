@@ -13,6 +13,10 @@ function getLocaleLabel(locale: LocaleId): string {
     return m.settings_locale_option_english();
   }
 
+  if (locale === "pl") {
+    return m.settings_locale_option_polish();
+  }
+
   return locale;
 }
 
