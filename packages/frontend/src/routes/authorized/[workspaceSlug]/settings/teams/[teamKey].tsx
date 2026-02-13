@@ -14,6 +14,7 @@ import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { useSessionData } from "@/context/session-context";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { Popover } from "@kobalte/core/popover";
 import { createAsync, revalidate, useNavigate, useParams } from "@solidjs/router";
 import PlusIcon from "lucide-solid/icons/plus";
@@ -31,7 +32,7 @@ export default function TeamDetailPage() {
       {(data) => (
         <>
           <SettingsBackButton href={`/${params.workspaceSlug}/settings/teams`}>
-            Back to team management
+            {m.settings_teams_back_to_management()}
           </SettingsBackButton>
           <SettingsPage title={data().team.name}>
             <SettingsSection>
@@ -40,7 +41,7 @@ export default function TeamDetailPage() {
                 <KeyForm defaultKey={data().team.key} />
               </SettingsCard>
             </SettingsSection>
-            <SettingsSection title="Members">
+            <SettingsSection title={m.settings_teams_members_section_title()}>
               <MembersSection members={data().teamMembers} />
             </SettingsSection>
           </SettingsPage>
@@ -63,7 +64,7 @@ function NameForm(props: NameFormProps) {
     },
     validators: {
       onSubmit: z.object({
-        name: z.string().min(1, "Name is required"),
+        name: z.string().min(1, m.common_name_required()),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -73,10 +74,10 @@ function NameForm(props: NameFormProps) {
           json: { name: value.name },
         });
 
-        toast.success("Team name updated successfully.");
+        toast.success(m.settings_teams_toast_name_updated());
         revalidate("teamSettings");
       } catch {
-        toast.error("Failed to update team name.");
+        toast.error(m.settings_teams_toast_name_update_failed());
       }
     },
   }));
@@ -98,14 +99,14 @@ function NameForm(props: NameFormProps) {
         form.handleSubmit();
       }}
     >
-      <SettingsRow title="Name" description="The name of the team.">
+      <SettingsRow title={m.common_name_label()} description={m.settings_teams_name_description()}>
         <form.AppField name="name">
           {() => (
             <TanStackTextField
               id="name"
               describedBy="name-description"
-              label="Name"
-              placeholder="e.g. Awesome Team"
+              label={m.common_name_label()}
+              placeholder={m.settings_teams_name_placeholder()}
               autocomplete="name"
               labelClass="sr-only"
               onBlur={submitOnBlur}
@@ -131,7 +132,7 @@ function KeyForm(props: KeyFormProps) {
     },
     validators: {
       onSubmit: z.object({
-        key: z.string().min(1, "Key is required").max(5, "Key must be at most 5 characters"),
+        key: z.string().min(1, m.settings_teams_key_required()).max(5, m.settings_teams_key_max()),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -141,13 +142,13 @@ function KeyForm(props: KeyFormProps) {
           json: { key: value.key.toUpperCase() },
         });
 
-        toast.success("Team key updated successfully.");
+        toast.success(m.settings_teams_toast_key_updated());
 
         if (value.key.toUpperCase() !== props.defaultKey) {
           navigate(`/${params.workspaceSlug}/settings/teams/${value.key.toUpperCase()}`);
         }
       } catch {
-        toast.error("Failed to update team key.");
+        toast.error(m.settings_teams_toast_key_update_failed());
       }
     },
   }));
@@ -169,14 +170,14 @@ function KeyForm(props: KeyFormProps) {
         form.handleSubmit();
       }}
     >
-      <SettingsRow title="Key" description="Used to identify the team issues were created in.">
+      <SettingsRow title={m.settings_teams_key_title()} description={m.settings_teams_key_description()}>
         <form.AppField name="key">
           {() => (
             <TanStackTextField
               id="key"
               describedBy="key-description"
-              label="Key"
-              placeholder="e.g. AWSM"
+              label={m.settings_teams_key_title()}
+              placeholder={m.settings_teams_key_placeholder()}
               autocomplete="key"
               labelClass="sr-only"
               onBlur={submitOnBlur}
@@ -217,12 +218,12 @@ function MembersSection(props: MembersSectionProps) {
         json: { userId },
       });
 
-      toast.success("Member added successfully.");
+      toast.success(m.settings_teams_toast_member_added());
       revalidate("teamSettings");
       revalidate("availableUsers");
       setOpen(false);
     } catch {
-      toast.error("Failed to add member.");
+      toast.error(m.settings_teams_toast_member_add_failed());
     }
   };
 
@@ -232,10 +233,10 @@ function MembersSection(props: MembersSectionProps) {
         param: { teamKey: params.teamKey!, userId },
       });
 
-      toast.success("Member removed successfully.");
+      toast.success(m.settings_teams_toast_member_removed());
       revalidate("teamSettings");
     } catch {
-      toast.error("Failed to remove member.");
+      toast.error(m.settings_teams_toast_member_remove_failed());
     }
   };
 
@@ -245,14 +246,16 @@ function MembersSection(props: MembersSectionProps) {
     <SettingsCard variant="column">
       <div class="flex items-center justify-between px-4 pb-2">
         <p class="text-sm text-muted-foreground">
-          {memberCount()} {memberCount() === 1 ? "member" : "members"}
+          {memberCount() === 1
+            ? m.common_member_count_single({ count: String(memberCount()) })
+            : m.common_member_count_multiple({ count: String(memberCount()) })}
         </p>
 
         <div class="flex items-center gap-2">
           <Popover open={open()} onOpenChange={setOpen} placement="bottom-end" gutter={8}>
             <Popover.Trigger as={Button} variant="outline" size="sm">
               <PlusIcon class="size-4" />
-              Add member
+              {m.settings_teams_add_member_button()}
             </Popover.Trigger>
             <PickerPopover
               value={undefined}
@@ -264,7 +267,7 @@ function MembersSection(props: MembersSectionProps) {
               options={availableUsersOptions()}
               emptyText={
                 availableUsersOptions().length === 0
-                  ? "All workspace members are already in this team"
+                  ? m.settings_teams_all_workspace_members_already_added()
                   : undefined
               }
             />
@@ -277,9 +280,9 @@ function MembersSection(props: MembersSectionProps) {
           when={memberCount() > 0}
           fallback={
             <div class="flex flex-col items-center justify-center py-8 text-center">
-              <p class="text-sm text-muted-foreground">No members in this team yet.</p>
+              <p class="text-sm text-muted-foreground">{m.settings_teams_members_empty_title()}</p>
               <p class="text-xs text-muted-foreground mt-1">
-                Add members to collaborate on issues.
+                {m.settings_teams_members_empty_description()}
               </p>
             </div>
           }
@@ -297,7 +300,7 @@ function MembersSection(props: MembersSectionProps) {
                         <span class="text-sm font-medium truncate">{member().name}</span>
                         <Show when={isCurrentUser()}>
                           <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
-                            You
+                            {m.common_you_badge()}
                           </span>
                         </Show>
                       </div>
@@ -312,7 +315,7 @@ function MembersSection(props: MembersSectionProps) {
                       size="icon"
                       class="text-muted-foreground hover:text-destructive"
                       onClick={() => handleRemoveMember(member().id)}
-                      aria-label={`Remove ${member().name} from team`}
+                      aria-label={m.settings_teams_remove_member_aria_label({ name: member().name })}
                     >
                       <XIcon class="size-4" />
                     </Button>

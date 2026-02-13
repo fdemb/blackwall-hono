@@ -6,6 +6,7 @@ import { IssuePriorityBadge } from "../issue-badges";
 import { api } from "@/lib/api";
 import { toast } from "@/components/custom-ui/toast";
 import { action, reload, useAction } from "@solidjs/router";
+import { m } from "@/paraglide/messages.js";
 
 const updatePriorityAction = action(async (issueKey: string, priority: IssuePriority) => {
   await api.api.issues[`:issueKey`].$patch({
@@ -13,7 +14,7 @@ const updatePriorityAction = action(async (issueKey: string, priority: IssuePrio
     json: { priority },
   });
 
-  toast.success("Priority updated successfully");
+  toast.success(m.issue_priority_picker_toast_updated());
   throw reload({ revalidate: ["issueShow"] });
 });
 

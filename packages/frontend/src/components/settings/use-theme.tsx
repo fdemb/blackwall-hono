@@ -1,5 +1,6 @@
 import type { PickerOption } from "@/components/custom-ui/picker";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import MonitorIcon from "lucide-solid/icons/monitor";
 import MoonIcon from "lucide-solid/icons/moon";
 import SunIcon from "lucide-solid/icons/sun";
@@ -8,17 +9,17 @@ import { createSignal, onMount } from "solid-js";
 export const themes = [
   {
     id: "system",
-    label: "System",
+    label: m.settings_theme_option_system(),
     icon: MonitorIcon,
   },
   {
     id: "light",
-    label: "Light",
+    label: m.settings_theme_option_light(),
     icon: SunIcon,
   },
   {
     id: "dark",
-    label: "Dark",
+    label: m.settings_theme_option_dark(),
     icon: MoonIcon,
   },
 ] as const satisfies PickerOption[];

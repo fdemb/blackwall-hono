@@ -9,6 +9,7 @@ import { useLocale } from "@/components/settings/use-locale";
 import { useTheme } from "@/components/settings/use-theme";
 import { Button } from "@/components/ui/button";
 import { useSessionData } from "@/context/session-context";
+import { m } from "@/paraglide/messages.js";
 import { Popover } from "@kobalte/core/popover";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import { Show } from "solid-js";
@@ -18,15 +19,18 @@ export default function GeneralSettingsPage() {
   const session = useSessionData();
 
   return (
-    <SettingsPage title="General settings">
-      <SettingsSection title="UI settings">
+    <SettingsPage title={m.settings_general_page_title()}>
+      <SettingsSection title={m.settings_general_ui_section_title()}>
         <SettingsCard>
-          <SettingsRow title="Theme" description="Customize the appearance of the app.">
+          <SettingsRow
+            title={m.settings_general_theme_title()}
+            description={m.settings_general_theme_description()}
+          >
             <ThemeSelector />
           </SettingsRow>
           <SettingsRow
-            title="Language"
-            description="Select a preferred language, or use your system default."
+            title={m.settings_general_language_title()}
+            description={m.settings_general_language_description()}
           >
             <LocaleSelector
               preferredLocale={(session().user as { preferredLocale?: string | null }).preferredLocale}

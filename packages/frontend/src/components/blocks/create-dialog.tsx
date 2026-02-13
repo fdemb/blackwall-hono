@@ -28,6 +28,7 @@ import { action, createAsync, json, query, redirect, useAction } from "@solidjs/
 import { api, apiFetch } from "@/lib/api";
 import type { CreateIssue } from "@blackwall/backend/src/features/issues/issue.zod";
 import type { CreateDialogDefaults } from "@/context/create-dialog.context";
+import { m } from "@/paraglide/messages.js";
 
 type CreateDialogContentProps = {
   defaults?: CreateDialogDefaults;
@@ -116,13 +117,13 @@ function CreateDialogContent(props: CreateDialogContentProps) {
     },
     validators: {
       onSubmit: z.object({
-        teamKey: z.string().min(1, "Team key is required"),
-        summary: z.string().min(1, "Summary is required"),
+        teamKey: z.string().min(1, m.create_dialog_team_key_required()),
+        summary: z.string().min(1, m.create_dialog_summary_required()),
         status: z.enum(["to_do", "in_progress", "done"], {
-          error: "Status is required and must be one of the following: to_do, in_progress, done",
+          error: m.create_dialog_status_required(),
         }),
         description: z.any().refine((val) => val !== null && val !== undefined, {
-          message: "Description is required",
+          message: m.create_dialog_description_required(),
         }),
         assignedToId: z.string().nullable(),
         sprintId: z.string().nullable(),
@@ -181,7 +182,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
     >
       <DialogSingleLineHeader>
         <DialogTitle class="text-sm font-normal leading-none text-foreground">
-          New issue
+          {m.create_dialog_title()}
         </DialogTitle>
         <DialogClose as={Button} class="p-px! h-auto!" variant="ghost">
           <XIcon class="size-4" />
@@ -206,7 +207,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
                     field().handleChange(target.value);
                   }}
                   onBlur={field().handleBlur}
-                  placeholder="Issue title"
+                  placeholder={m.create_dialog_summary_placeholder()}
                   variant="unstyled"
                   class="text-xl"
                 />
@@ -228,7 +229,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
                   onAttachmentUpload={handleUpload}
                   workspaceSlug={workspaceData().workspace.slug}
                   variant="plain"
-                  placeholder="Describe the issue..."
+                  placeholder={m.create_dialog_description_placeholder()}
                   class="min-h-24"
                 />
                 <TanStackErrorMessages />
@@ -271,7 +272,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
           <form.Subscribe>
             {(state) => (
               <Button type="submit" size="sm" disabled={!state().canSubmit}>
-                Create issue
+                {m.create_dialog_submit()}
               </Button>
             )}
           </form.Subscribe>
@@ -294,7 +295,7 @@ function TeamPicker(props: { teams: SerializedTeam[]; value: string }) {
     <Popover>
       <Popover.Trigger as={Button} variant="outline" size="sm" class="pl-1 pr-2 py-1 h-auto">
         <TeamAvatar team={team} size="5" />
-        <span class="truncate">{team?.name ?? "Select team"}</span>
+        <span class="truncate">{team?.name ?? m.create_dialog_select_team()}</span>
       </Popover.Trigger>
       <PickerPopover options={options()} value={props.value} />
     </Popover>

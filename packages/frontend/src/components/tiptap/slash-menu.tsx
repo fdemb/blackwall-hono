@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Popover } from "@kobalte/core/popover";
+import { m } from "@/paraglide/messages.js";
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import type { SlashCommandItem } from "./extensions/slash-command";
 
@@ -78,7 +79,9 @@ export function SlashMenu(props: SlashMenuProps) {
         >
           <Show
             when={props.items.length > 0}
-            fallback={<div class="text-muted-foreground px-2 py-1.5 text-sm">No results</div>}
+            fallback={
+              <div class="text-muted-foreground px-2 py-1.5 text-sm">{m.common_no_results()}</div>
+            }
           >
             <For each={props.items}>
               {(item, index) => (

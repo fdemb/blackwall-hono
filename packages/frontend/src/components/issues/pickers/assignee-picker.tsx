@@ -8,6 +8,7 @@ import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import { createMemo, createSignal, Show } from "solid-js";
 import { action, reload, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 
 const updateAssignee = action(async (issueKey: string, assignedToId: string | null) => {
   await api.api.issues[":issueKey"].$patch({
@@ -55,7 +56,7 @@ export function AssigneePickerPopover(props: AssigneePickerPopoverProps) {
     return [
       {
         id: null,
-        label: "Unassigned",
+        label: m.issue_picker_unassigned(),
         icon: () => <UserAvatar user={null} size="xs" />,
       },
       ...options,
@@ -86,7 +87,7 @@ export function AssigneePickerPopover(props: AssigneePickerPopoverProps) {
         scaleEffect={false}
       >
         <UserAvatar user={assignedTo()} size={props.small ? "5" : "xs"} />
-        {assignedTo()?.name ?? "No one"}
+        {assignedTo()?.name ?? m.issue_picker_no_one()}
         <Show when={!props.small}>
           <ChevronsUpDownIcon class="size-4" />
         </Show>

@@ -19,6 +19,7 @@ import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import { createMemo, createSignal, Show, type JSX } from "solid-js";
 import type { SerializedIssueSprint } from "@blackwall/database/schema";
+import { m } from "@/paraglide/messages.js";
 
 const updateSprint = action(async (issueKey: string, sprintId: string | null) => {
   await api.api.issues[`:issueKey`].$patch({
@@ -55,7 +56,7 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
     }> = [
       {
         id: null,
-        label: "No sprint",
+        label: m.issue_picker_no_sprint(),
         icon: () => <LandPlotIcon class="size-4 text-muted-foreground" />,
       },
     ];
@@ -127,7 +128,7 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
             {props.trigger ?? (
               <>
                 <LandPlotIcon class="size-4" />
-                {currentSprint()?.name ?? "No sprint"}
+                {currentSprint()?.name ?? m.issue_picker_no_sprint()}
                 <ChevronsUpDownIcon class="size-4" />
               </>
             )}
@@ -151,15 +152,17 @@ export function SprintPickerPopover(props: SprintPickerPopoverProps) {
             <AlertDialogMedia class="bg-muted">
               <AlertCircleIcon class="text-muted-foreground" />
             </AlertDialogMedia>
-            <AlertDialogTitle>Add issue to an active sprint?</AlertDialogTitle>
+            <AlertDialogTitle>{m.issue_picker_add_to_active_sprint_title()}</AlertDialogTitle>
             <AlertDialogDescription>
-              {`"${pendingSprint()?.name ?? "This sprint"}" is currently active. Adding an issue now may impact the current sprint scope.`}
+              {m.issue_picker_add_to_active_sprint_description({
+                sprintName: pendingSprint()?.name ?? m.issue_picker_this_sprint(),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel size="xs">{m.common_cancel()}</AlertDialogCancel>
             <AlertDialogAction size="xs" action={handleConfirm}>
-              Add to sprint
+              {m.issue_picker_add_to_sprint_action()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

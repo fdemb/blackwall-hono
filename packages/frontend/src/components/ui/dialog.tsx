@@ -3,6 +3,7 @@ import XIcon from "lucide-solid/icons/x";
 import * as Solid from "solid-js";
 
 import { cn } from "@/lib/utils";
+import { m } from "@/paraglide/messages.js";
 import type { PolymorphicProps } from "@kobalte/core/polymorphic";
 import type { ComponentProps, ValidComponent } from "solid-js";
 
@@ -78,7 +79,7 @@ function DialogContent<T extends ValidComponent = "div">(
             class="ring-offset-background focus:ring-ring data-[expanded]:bg-accent data-[expanded]:text-muted-foreground absolute top-4 right-4 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon />
-            <span class="sr-only">Close</span>
+            <span class="sr-only">{m.common_close()}</span>
           </DialogPrimitive.CloseButton>
         </Solid.Show>
       </DialogPrimitive.Content>

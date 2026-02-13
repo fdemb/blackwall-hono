@@ -38,6 +38,7 @@ import type {
 import { api } from "@/lib/api";
 import { toast } from "../custom-ui/toast";
 import { SprintPickerPopover } from "./pickers/sprint-picker";
+import { m } from "@/paraglide/messages.js";
 
 type IssueSelectionMenuProps = {
   selectedIssues: IssueForDataTable[];
@@ -53,7 +54,7 @@ const updateIssuesBulkAction = action(async (input: BulkUpdateIssues) => {
 
   const json = await res.json();
 
-  toast.success("Issues updated successfully");
+  toast.success(m.issue_selection_toast_updated());
   return json.issues;
 });
 
@@ -64,7 +65,7 @@ const deleteIssuesBulkAction = action(async (input: BulkDeleteIssues) => {
 
   const json = await res.json();
 
-  toast.success("Issues deleted successfully");
+  toast.success(m.issue_selection_toast_deleted());
 });
 
 export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
@@ -100,7 +101,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
     return [
       {
         id: null,
-        label: "Unassigned",
+        label: m.issue_selection_unassigned(),
         icon: () => <UserAvatar user={null} size="xs" />,
       },
       ...options,
@@ -114,14 +115,16 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           <XIcon class="size-4" />
         </Button>
 
-        <span class="text-sm text-muted-foreground whitespace-nowrap">{props.selectedIssues.length} selected</span>
+        <span class="text-sm text-muted-foreground whitespace-nowrap">
+          {m.issue_selection_selected_count({ count: String(props.selectedIssues.length) })}
+        </span>
 
         <div class="h-4 w-px bg-border" />
 
         <Popover placement="top" gutter={8}>
           <Popover.Trigger as={Button} variant="outline" size="xs">
             <CircleDotIcon class="size-4" />
-            Status
+            {m.common_status()}
           </Popover.Trigger>
           <PickerPopover
             value={null}
@@ -133,7 +136,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
         <Popover placement="top" gutter={8}>
           <Popover.Trigger as={Button} variant="outline" size="xs">
             <CircleDotIcon class="size-4" />
-            Priority
+            {m.common_priority()}
           </Popover.Trigger>
           <PickerPopover
             value={null}
@@ -150,7 +153,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
             <>
               <Popover.Trigger as={Button} variant="outline" size="xs" scaleEffect={false}>
                 <LandPlotIcon class="size-4" />
-                Sprint
+                {m.common_sprint()}
               </Popover.Trigger>
             </>
           }
@@ -160,7 +163,7 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
           <Popover placement="top" gutter={8}>
             <Popover.Trigger as={Button} variant="outline" size="xs">
               <UserIcon class="size-4" />
-              Assignee
+              {m.common_assignee()}
             </Popover.Trigger>
             <PickerPopover
               value={null}
@@ -172,13 +175,13 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger as={Button} variant="outline" size="xs">
-            More
+            {m.common_more()}
             <ChevronDownIcon class="size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem variant="destructive" onSelect={() => setDeleteDialogOpen(true)}>
               <TrashIcon class="size-4" />
-              Delete
+              {m.common_delete()}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -190,15 +193,15 @@ export function IssueSelectionMenu(props: IssueSelectionMenuProps) {
             <AlertDialogMedia class="bg-destructive/50">
               <TrashIcon class="size-4" />
             </AlertDialogMedia>
-            <AlertDialogTitle>Delete {props.selectedIssues.length} issues?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the selected issues.
-            </AlertDialogDescription>
+            <AlertDialogTitle>
+              {m.issue_selection_delete_title({ count: String(props.selectedIssues.length) })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{m.issue_selection_delete_description()}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel size="xs">{m.common_cancel()}</AlertDialogCancel>
             <AlertDialogAction size="xs" variant="destructive" action={handleDelete}>
-              Delete
+              {m.common_delete()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -19,6 +19,7 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import { m } from "@/paraglide/messages.js";
 import { Button } from "./button";
 import { Separator } from "./separator";
 import { Sheet, SheetContent } from "./sheet";
@@ -291,7 +292,7 @@ const SidebarTrigger = <T extends ValidComponent = "button">(props: SidebarTrigg
           "rotate-180": local.side === "left",
         }}
       />
-      <span class="sr-only">Toggle Sidebar</span>
+      <span class="sr-only">{m.sidebar_toggle()}</span>
     </Button>
   );
 };
@@ -303,10 +304,10 @@ const SidebarRail: Component<ComponentProps<"button">> = (props) => {
   return (
     <button
       data-sidebar="rail"
-      aria-label="Toggle Sidebar"
+      aria-label={m.sidebar_toggle()}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      title={m.sidebar_toggle()}
       class={cn(
         "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-in-out-circ after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",

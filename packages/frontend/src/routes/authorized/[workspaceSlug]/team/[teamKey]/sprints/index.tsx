@@ -43,6 +43,7 @@ import MoreHorizontalIcon from "lucide-solid/icons/more-horizontal";
 import PlayIcon from "lucide-solid/icons/play";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import { Button } from "@/components/ui/button";
+import { m } from "@/paraglide/messages.js";
 
 const archiveSprintAction = action(
   async (workspaceSlug: string, teamKey: string, sprintId: string) => {
@@ -50,7 +51,7 @@ const archiveSprintAction = action(
       param: { teamKey, sprintId },
     });
 
-    toast.success("Sprint archived and hidden from default lists");
+    toast.success(m.common_sprint_archived_hidden());
     throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
   },
 );
@@ -60,7 +61,7 @@ const startSprintAction = action(async (teamKey: string, sprintId: string) => {
     param: { teamKey, sprintId },
   });
 
-  toast.success("Sprint started");
+  toast.success(m.common_sprint_started());
 });
 
 export default function SprintsPage() {
@@ -78,7 +79,7 @@ export default function SprintsPage() {
               {teamData().name}
             </div>
           </BreadcrumbsItem>
-          <BreadcrumbsItem>Sprints</BreadcrumbsItem>
+          <BreadcrumbsItem>{m.team_sprints_list_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
@@ -103,18 +104,15 @@ function SprintEmpty(props: { workspaceSlug: string; teamKey: string }) {
         <EmptyMedia variant="icon">
           <LandPlotIcon />
         </EmptyMedia>
-        <EmptyTitle>No sprints yet</EmptyTitle>
-        <EmptyDescription>
-          Sprints help you organize and track work over time. Create your first sprint to get
-          started.
-        </EmptyDescription>
+        <EmptyTitle>{m.team_sprints_list_empty_title()}</EmptyTitle>
+        <EmptyDescription>{m.team_sprints_list_empty_description()}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <A
           href={`/${props.workspaceSlug}/team/${props.teamKey}/sprints/create`}
           class={buttonVariants()}
         >
-          Create sprint
+          {m.team_sprints_create_breadcrumb()}
         </A>
       </EmptyContent>
     </Empty>
@@ -136,30 +134,30 @@ function SprintTable(props: SprintTableProps) {
 
   const columns = [
     columnHelper.accessor("name", {
-      header: "Name",
+      header: m.team_sprints_list_table_header_name(),
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("goal", {
-      header: "Goal",
+      header: m.team_sprints_list_table_header_goal(),
       meta: { expand: true },
       cell: (info) => info.getValue(),
     }),
     columnHelper.display({
       id: "status",
-      header: "Status",
+      header: m.team_sprints_list_table_header_status(),
       cell: (info) => <SprintStatusBadge sprint={info.row.original} />,
     }),
     columnHelper.accessor("startDate", {
-      header: "Start date",
+      header: m.team_sprints_list_table_header_start_date(),
       cell: (info) => formatDateShort(new Date(info.getValue())),
     }) as ColumnDef<SerializedIssueSprint, string>,
     columnHelper.accessor("endDate", {
-      header: "End date",
+      header: m.team_sprints_list_table_header_end_date(),
       cell: (info) => formatDateShort(new Date(info.getValue())),
     }) as ColumnDef<SerializedIssueSprint, string>,
     columnHelper.display({
       id: "actions",
-      header: "Actions",
+      header: m.team_sprints_list_table_header_actions(),
       cell: (info) => {
         const sprint = info.row.original;
         const isActive = sprint.status === "active";
@@ -188,7 +186,9 @@ function SprintTable(props: SprintTableProps) {
                 }}
               >
                 <PlayIcon class="size-3.5" />
-                {startSubmission.pending ? "Starting..." : "Start"}
+                {startSubmission.pending
+                  ? m.team_sprints_list_action_starting()
+                  : m.common_start()}
               </Button>
             </Show>
 
@@ -202,7 +202,7 @@ function SprintTable(props: SprintTableProps) {
                 }}
               >
                 <CircleCheckIcon class="size-3.5" />
-                Complete
+                {m.common_complete()}
               </Button>
             </Show>
 
@@ -223,7 +223,7 @@ function SprintTable(props: SprintTableProps) {
                     e.stopPropagation();
                   }}
                 >
-                  View
+                  {m.common_view()}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   as={A}
@@ -233,7 +233,7 @@ function SprintTable(props: SprintTableProps) {
                   }}
                   disabled={!isPlanned}
                 >
-                  Edit
+                  {m.common_edit()}
                 </DropdownMenuItem>
                 <Show when={!isActive}>
                   <DropdownMenuSeparator />
@@ -244,7 +244,7 @@ function SprintTable(props: SprintTableProps) {
                       setArchiveDialogOpen(true);
                     }}
                   >
-                    Archive
+                    {m.common_archive()}
                   </DropdownMenuItem>
                 </Show>
               </DropdownMenuContent>

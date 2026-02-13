@@ -1,5 +1,6 @@
 import type { SerializedIssue, SerializedIssueSprint } from "@blackwall/database";
 import { createIssueDnD, IssueDnDContext, useIssueDnD } from "@/lib/issue-dnd";
+import { m } from "@/paraglide/messages.js";
 import { For, onCleanup, Show, type Accessor, type Component, type ParentComponent } from "solid-js";
 import { Portal } from "solid-js/web";
 
@@ -19,7 +20,7 @@ const DragOverlay: Component<{ issues: SerializedIssue[]; x: number; y: number }
             <span>{props.issues[0]?.summary}</span>
           </>
         }>
-          <span>{props.issues.length} issues</span>
+          <span>{m.issue_dragging_overlay_count({ count: String(props.issues.length) })}</span>
         </Show>
       </div>
     </Portal>
@@ -39,7 +40,9 @@ const SprintDropZone: Component<{ sprint: SerializedIssueSprint }> = (props) => 
       class="bg-card squircle-md border border-dashed fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center justify-center px-6 py-4 animate-in slide-in-from-bottom-4 fade-in-50 ease-out transition-shadow data-[drop-hover]:ring-2 data-[drop-hover]:ring-primary"
       data-dropzone
     >
-      Drop here to move {count() > 1 ? `${count()} issues` : "issue"} to sprint {props.sprint.name}
+      {count() > 1
+        ? m.issue_dragging_drop_multiple({ count: String(count()), sprintName: props.sprint.name })
+        : m.issue_dragging_drop_single({ sprintName: props.sprint.name })}
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { toast } from "../custom-ui/toast";
+import { m } from "@/paraglide/messages.js";
 
 type SprintFormProps = {
   workspaceSlug: string;
@@ -40,7 +41,7 @@ const createSprintAction = action(
       },
     });
 
-    toast.success("Sprint created successfully");
+    toast.success(m.sprint_form_toast_created());
 
     throw redirect(`/${workspaceSlug}/team/${teamKey}/issues/board`);
   },
@@ -59,13 +60,13 @@ export function SprintForm(props: SprintFormProps) {
     validators: {
       onSubmit: z
         .object({
-          name: z.string().min(1, "Name is required"),
+          name: z.string().min(1, m.common_name_required()),
           goal: z.string().nullable(),
           startDate: z.iso.date(),
           endDate: z.iso.date(),
         })
         .refine((data) => data.endDate >= data.startDate, {
-          message: "End date must be on or after start date",
+          message: m.common_end_date_on_or_after_start_date(),
           path: ["endDate"],
         }),
     },
@@ -92,8 +93,8 @@ export function SprintForm(props: SprintFormProps) {
         <form.AppField name="name">
           {() => (
             <TanStackTextField
-              label="Name"
-              placeholder={`e.g. "Q1 2026 improvements", "Feature X"`}
+              label={m.common_name_label()}
+              placeholder={m.sprint_form_name_placeholder()}
             />
           )}
         </form.AppField>
@@ -101,8 +102,8 @@ export function SprintForm(props: SprintFormProps) {
         <form.AppField name="goal">
           {() => (
             <TanStackTextArea
-              label="Goal"
-              placeholder="What do you want to achieve?"
+              label={m.common_goal()}
+              placeholder={m.sprint_form_goal_placeholder()}
               textareaClass="min-h-24"
             />
           )}
@@ -115,7 +116,7 @@ export function SprintForm(props: SprintFormProps) {
 
               return (
                 <div class="flex flex-col gap-2 w-full">
-                  <Label for={field().name}>Start date</Label>
+                  <Label for={field().name}>{m.common_start_date()}</Label>
                   <DatePicker
                     selected={calendarDate()}
                     onSelect={(date) => field().handleChange(date.toString())}
@@ -131,7 +132,7 @@ export function SprintForm(props: SprintFormProps) {
 
               return (
                 <div class="flex flex-col gap-2 w-full">
-                  <Label for={field().name}>End date</Label>
+                  <Label for={field().name}>{m.common_end_date()}</Label>
                   <DatePicker
                     selected={calendarDate()}
                     onSelect={(date) => field().handleChange(date.toString())}

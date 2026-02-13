@@ -7,6 +7,7 @@ import { StatusPickerPopover } from "@/components/issues/pickers/status-picker";
 import type { InferDbType } from "@blackwall/database/types";
 import { formatDateShort } from "@/lib/dates";
 import { issueMappings } from "@/lib/mappings";
+import { m } from "@/paraglide/messages.js";
 import { createColumnHelper, type ColumnDef } from "@tanstack/solid-table";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import { A } from "@solidjs/router";
@@ -31,7 +32,7 @@ export function IssueDataTable(props: IssueDataTableProps) {
   const columns = [
     ...(props.rowSelection ? [createSelectionColumn<IssueForDataTable>()] : []),
     columnHelper.accessor("key", {
-      header: "Key",
+      header: m.issue_datatable_header_key(),
       meta: { shrink: true },
       cell: (info) => (
         <span class="px-1 py-0.5 whitespace-nowrap text-xs bg-muted text-muted-foreground rounded-sm border">
@@ -40,7 +41,7 @@ export function IssueDataTable(props: IssueDataTableProps) {
       ),
     }),
     columnHelper.accessor("status", {
-      header: "Status",
+      header: m.issue_datatable_header_status(),
       meta: { shrink: true },
       cell: (info) => {
         const status = issueMappings.status[info.getValue()];
@@ -62,7 +63,7 @@ export function IssueDataTable(props: IssueDataTableProps) {
       },
     }),
     columnHelper.accessor("summary", {
-      header: "Summary",
+      header: m.issue_datatable_header_summary(),
       meta: { expand: true },
       cell: (info) => (
         <div class="flex flex-row items-center gap-2">
@@ -78,7 +79,7 @@ export function IssueDataTable(props: IssueDataTableProps) {
       ),
     }),
     columnHelper.accessor("issueSprint", {
-      header: "Sprint",
+      header: m.issue_datatable_header_sprint(),
       meta: { shrink: true },
       cell: (info) => (
         <Show when={info.getValue()}>
@@ -97,7 +98,7 @@ export function IssueDataTable(props: IssueDataTableProps) {
       ),
     }),
     columnHelper.accessor("createdAt", {
-      header: "Created",
+      header: m.issue_datatable_header_created(),
       meta: { shrink: true },
       cell: (info) => (
         <span class="text-muted-foreground ml-auto hidden sm:block">

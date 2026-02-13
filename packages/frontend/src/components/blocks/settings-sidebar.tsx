@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TextField } from "@/components/ui/text-field";
 import { useWorkspaceData } from "@/context/workspace-context";
+import { m } from "@/paraglide/messages.js";
 import { A } from "@solidjs/router";
 import ArrowLeftIcon from "lucide-solid/icons/arrow-left";
 import SearchIcon from "lucide-solid/icons/search";
@@ -33,14 +34,14 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
           })}
         >
           <ArrowLeftIcon class="size-4" />
-          Back to {workspaceData().workspace.displayName}
+          {m.settings_sidebar_back_to_workspace({ workspaceName: workspaceData().workspace.displayName })}
         </A>
 
         <TextField class="relative">
           <div class="absolute h-full pl-2 top-0 bottom-0 left-0 flex items-center justify-center">
             <SearchIcon class="size-4 text-muted-foreground" />
           </div>
-          <TextField.Input placeholder="Search settings..." class="pl-7" />
+          <TextField.Input placeholder={m.settings_sidebar_search_placeholder()} class="pl-7" />
         </TextField>
       </SidebarHeader>
 
@@ -54,7 +55,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                   href={`/${workspaceData().workspace.slug}/settings/general`}
 
                 >
-                  General
+                  {m.settings_sidebar_menu_general()}
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
@@ -64,7 +65,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                   href={`/${workspaceData().workspace.slug}/settings/profile`}
 
                 >
-                  Profile
+                  {m.settings_sidebar_menu_profile()}
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
@@ -74,7 +75,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                   href={`/${workspaceData().workspace.slug}/settings/workspace`}
 
                 >
-                  Workspace
+                  {m.settings_sidebar_menu_workspace()}
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
@@ -84,7 +85,7 @@ export function SettingsSidebar(props: ComponentProps<typeof Sidebar>) {
                   href={`/${workspaceData().workspace.slug}/settings/teams`}
 
                 >
-                  Team management
+                  {m.settings_sidebar_menu_team_management()}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

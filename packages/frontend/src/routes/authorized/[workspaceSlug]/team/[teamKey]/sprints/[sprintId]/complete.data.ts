@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { query } from "@solidjs/router";
 
 export const sprintCompleteContextLoader = query(async (teamKey: string, sprintId: string) => {
@@ -9,7 +10,7 @@ export const sprintCompleteContextLoader = query(async (teamKey: string, sprintI
   });
 
   if (!res.ok) {
-    throw new Error("Sprint not found");
+    throw new Error(m.loader_sprint_not_found());
   }
 
   return await res.json(); // { sprint, plannedSprints, hasUndoneIssues }

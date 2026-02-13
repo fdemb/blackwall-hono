@@ -1,5 +1,6 @@
 import type { BaseMapping } from "@/lib/mappings";
 import { cn } from "@/lib/utils";
+import { m } from "@/paraglide/messages.js";
 import CheckIcon from "lucide-solid/icons/check";
 import PlusIcon from "lucide-solid/icons/plus";
 import SearchIcon from "lucide-solid/icons/search";
@@ -54,10 +55,10 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
 ) => {
   const merged = mergeProps(
     {
-      emptyText: "No options found.",
+      emptyText: m.picker_default_empty_text(),
       closeOnSelect: true,
       createNew: false,
-      createNewLabel: "Create",
+      createNewLabel: m.picker_default_create_label(),
       multiple: false,
     },
     props,
@@ -253,14 +254,14 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
         <TextField.Input
           role="combobox"
           onKeyDown={handleInputKeyDown}
-          placeholder="Search..."
+          placeholder={m.picker_search_placeholder()}
           variant="unstyled"
           class={cn("pr-3 pl-7 py-2 text-base border-b shadow-xs", merged.inputClass)}
           aria-expanded={merged.isOpen ? "true" : "false"}
           aria-controls="picker-listbox"
           aria-activedescendant={`option-${lazyHighlightedOption()?.id}`}
           aria-autocomplete="list"
-          aria-label="Search options"
+          aria-label={m.picker_search_aria_label()}
           onBlur={(e) => {
             e.target.focus();
           }}
@@ -270,7 +271,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
       <Switch>
         <Match when={merged.loading}>
           <div class={cn("p-4 text-base text-muted-foreground text-center", merged.boxClass)}>
-            Loading...
+            {m.common_loading()}
           </div>
         </Match>
 
@@ -287,8 +288,9 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
 
         <Match when={filteredOptions().length > 0}>
           <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
-            {filteredOptions().length} option
-            {filteredOptions().length !== 1 ? "s" : ""} available
+            {filteredOptions().length === 1
+              ? m.picker_options_available_single({ count: String(filteredOptions().length) })
+              : m.picker_options_available_multiple({ count: String(filteredOptions().length) })}
           </div>
 
           <ScrollArea>

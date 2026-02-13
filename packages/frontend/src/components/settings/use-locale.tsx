@@ -9,7 +9,11 @@ type LocaleId = (typeof locales)[number];
 type LocalePreference = LocaleId | null;
 
 function getLocaleLabel(locale: LocaleId): string {
-  return locale === "pl" ? m.settings_locale_option_polish() : m.settings_locale_option_english();
+  if (locale === "en") {
+    return m.settings_locale_option_english();
+  }
+
+  return locale;
 }
 
 const changeLocaleAction = action(async (locale: LocalePreference) => {

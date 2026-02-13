@@ -1,5 +1,6 @@
 import type { Issue, SerializedIssue } from "@blackwall/database/schema";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { useNavigate } from "@solidjs/router";
 import EllipsisIcon from "lucide-solid/icons/ellipsis";
 import TrashIcon from "lucide-solid/icons/trash-2";
@@ -50,7 +51,7 @@ export function IssueMenu(props: IssueMenuProps) {
         <DropdownMenuContent>
           <DropdownMenuItem variant="destructive" onSelect={() => setDeleteDialogOpen(true)}>
             <TrashIcon class="size-4" />
-            Delete
+            {m.common_delete()}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -61,16 +62,15 @@ export function IssueMenu(props: IssueMenuProps) {
             <AlertDialogMedia class="bg-destructive/50">
               <TrashIcon class="size-4" />
             </AlertDialogMedia>
-            <AlertDialogTitle>Delete issue?</AlertDialogTitle>
+            <AlertDialogTitle>{m.issue_menu_delete_title()}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the issue {props.issue.key}
-              .
+              {m.issue_menu_delete_description({ issueKey: props.issue.key })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel size="xs">{m.common_cancel()}</AlertDialogCancel>
             <AlertDialogAction size="xs" variant="destructive" action={handleDelete}>
-              Delete
+              {m.common_delete()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

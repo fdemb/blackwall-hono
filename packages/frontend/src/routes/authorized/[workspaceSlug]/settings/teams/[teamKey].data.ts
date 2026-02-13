@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { query } from "@solidjs/router";
 
 export const teamSettingsLoader = query(async (teamKey: string) => {
@@ -7,7 +8,7 @@ export const teamSettingsLoader = query(async (teamKey: string) => {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch team");
+    throw new Error(m.loader_team_fetch_failed());
   }
 
   return res.json();
@@ -19,7 +20,7 @@ export const availableUsersLoader = query(async (teamKey: string) => {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch available users");
+    throw new Error(m.loader_available_users_fetch_failed());
   }
 
   const { users } = await res.json();

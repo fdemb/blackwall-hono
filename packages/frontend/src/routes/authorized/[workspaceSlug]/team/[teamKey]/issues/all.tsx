@@ -26,11 +26,16 @@ import { api } from "@/lib/api";
 import type { BulkUpdateIssues } from "@blackwall/backend/src/features/issues/issue.zod";
 import { toast } from "@/components/custom-ui/toast";
 import { HideWhileDragging } from "@/components/issues/hide-while-dragging";
+import { m } from "@/paraglide/messages.js";
 
 const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
   await api.api.issues.bulk.$patch({ json: input });
   const count = input.issueIds.length;
-  toast.success(count > 1 ? `${count} issues moved to sprint` : "Issue moved to sprint");
+  toast.success(
+    count > 1
+      ? m.issues_bulk_move_to_sprint_multiple({ count: String(count) })
+      : m.issues_bulk_move_to_sprint_single(),
+  );
 });
 
 export default function AllIssuesPage() {
@@ -65,7 +70,7 @@ export default function AllIssuesPage() {
               {teamData().name}
             </div>
           </BreadcrumbsItem>
-          <BreadcrumbsItem>All Issues</BreadcrumbsItem>
+          <BreadcrumbsItem>{m.team_issues_all_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
@@ -98,16 +103,14 @@ function IssueEmpty() {
         <EmptyMedia variant="icon">
           <ListIcon />
         </EmptyMedia>
-        <EmptyTitle>No issues</EmptyTitle>
-        <EmptyDescription>
-          There are no issues in this team. You can create a new issue to get started.
-        </EmptyDescription>
+        <EmptyTitle>{m.team_issues_all_empty_title()}</EmptyTitle>
+        <EmptyDescription>{m.team_issues_all_empty_description()}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
           <Button onClick={() => open({ status: "to_do" })}>
             <PlusIcon class="size-4" strokeWidth={2.75} />
-            Create
+            {m.common_create()}
           </Button>
         </div>
       </EmptyContent>

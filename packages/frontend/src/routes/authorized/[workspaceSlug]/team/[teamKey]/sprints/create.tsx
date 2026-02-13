@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
+import { m } from "@/paraglide/messages.js";
 
 export default function CreateSprintPage() {
   const params = useParams();
@@ -24,7 +25,7 @@ export default function CreateSprintPage() {
               {teamData().name}
             </div>
           </BreadcrumbsItem>
-          <BreadcrumbsItem>Create sprint</BreadcrumbsItem>
+          <BreadcrumbsItem>{m.team_sprints_create_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
@@ -33,8 +34,8 @@ export default function CreateSprintPage() {
           workspaceSlug={params.workspaceSlug!}
           teamKey={params.teamKey!}
           team={teamData()}
-          title={`Create sprint for ${teamData().name}`}
-          buttonText="Create sprint"
+          title={m.team_sprints_create_title({ teamName: teamData().name })}
+          buttonText={m.team_sprints_create_submit()}
         />
       </ScrollContainer>
     </>

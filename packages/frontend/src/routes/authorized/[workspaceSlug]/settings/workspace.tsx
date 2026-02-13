@@ -14,6 +14,7 @@ import { useAppForm } from "@/context/form-context";
 import { useSessionData } from "@/context/session-context";
 import { useWorkspaceData } from "@/context/workspace-context";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { createAsync, useParams } from "@solidjs/router";
 import { Index, Show } from "solid-js";
 import * as z from "zod";
@@ -29,12 +30,12 @@ export default function WorkspaceSettingsPage() {
   } as const;
 
   return (
-    <SettingsPage title="Workspace settings">
-      <SettingsSection title="Details">
+    <SettingsPage title={m.settings_workspace_page_title()}>
+      <SettingsSection title={m.settings_workspace_section_details()}>
         <SettingsCard>
           <SettingsRow
-            title="Workspace name"
-            description="This is visible to all members of the workspace."
+            title={m.settings_workspace_name_title()}
+            description={m.settings_workspace_name_description()}
             htmlFor={ids.displayName.field}
             descriptionId={ids.displayName.description}
           >
@@ -48,7 +49,7 @@ export default function WorkspaceSettingsPage() {
         </SettingsCard>
       </SettingsSection>
 
-      <SettingsSection title="Members">
+      <SettingsSection title={m.settings_workspace_section_members()}>
         <MembersSection />
       </SettingsSection>
     </SettingsPage>
@@ -71,8 +72,8 @@ function WorkspaceNameForm(props: WorkspaceNameFormProps) {
       onSubmit: z.object({
         name: z
           .string()
-          .min(1, "Workspace name is required")
-          .max(100, "Workspace name must be shorter than 100 characters"),
+          .min(1, m.settings_workspace_name_required())
+          .max(100, m.settings_workspace_name_too_long()),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -80,7 +81,7 @@ function WorkspaceNameForm(props: WorkspaceNameFormProps) {
         await api.api.settings.workspace.$patch({
           json: { displayName: value.name },
         });
-        toast.success("Workspace name updated successfully.");
+        toast.success(m.settings_workspace_toast_name_updated());
         form.reset({ name: value.name });
       } catch (error) {
         toast.error(getErrorMessage(error));
@@ -111,8 +112,8 @@ function WorkspaceNameForm(props: WorkspaceNameFormProps) {
           <TanStackTextField
             id={props.inputId}
             describedBy={props.descriptionId}
-            label="Workspace name"
-            placeholder="e.g. Acme Inc"
+            label={m.settings_workspace_name_title()}
+            placeholder={m.settings_workspace_name_placeholder()}
             labelClass="sr-only"
             onBlur={submitOnBlur}
           />
@@ -131,7 +132,7 @@ function getErrorMessage(error: unknown) {
     return error;
   }
 
-  return "Something went wrong. Please try again.";
+  return m.common_error_generic();
 }
 
 function MembersSection() {
@@ -145,13 +146,15 @@ function MembersSection() {
     <SettingsCard variant="column">
       <div class="flex items-center justify-between px-4 pb-2">
         <p class="text-sm text-muted-foreground">
-          {memberCount()} {memberCount() === 1 ? "member" : "members"}
+          {memberCount() === 1
+            ? m.common_member_count_single({ count: String(memberCount()) })
+            : m.common_member_count_multiple({ count: String(memberCount()) })}
         </p>
 
         <div class="flex items-center gap-2">
           <Dialog>
             <DialogTrigger as={Button} variant="outline" size="sm">
-              Invite
+              {m.common_invite()}
             </DialogTrigger>
             <InviteDialogContent />
           </Dialog>
@@ -163,8 +166,10 @@ function MembersSection() {
           when={memberCount() > 0}
           fallback={
             <div class="flex flex-col items-center justify-center py-8 text-center">
-              <p class="text-sm text-muted-foreground">No members in this workspace yet.</p>
-              <p class="text-xs text-muted-foreground mt-1">Invite members to collaborate.</p>
+              <p class="text-sm text-muted-foreground">{m.settings_workspace_members_empty_title()}</p>
+              <p class="text-xs text-muted-foreground mt-1">
+                {m.settings_workspace_members_empty_description()}
+              </p>
             </div>
           }
         >
@@ -181,7 +186,7 @@ function MembersSection() {
                         <span class="text-sm font-medium truncate">{member().name}</span>
                         <Show when={isCurrentUser()}>
                           <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
-                            You
+                            {m.common_you_badge()}
                           </span>
                         </Show>
                       </div>

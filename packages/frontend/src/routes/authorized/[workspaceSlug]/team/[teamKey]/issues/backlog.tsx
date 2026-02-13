@@ -26,11 +26,16 @@ import { useTeamData } from "../../[teamKey]";
 import { sprintsLoader } from "../sprints/index.data";
 import { IssueDraggingProvider } from "@/context/issue-dragging-context";
 import { HideWhileDragging } from "@/components/issues/hide-while-dragging";
+import { m } from "@/paraglide/messages.js";
 
 const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
   await api.api.issues.bulk.$patch({ json: input });
   const count = input.issueIds.length;
-  toast.success(count > 1 ? `${count} issues moved to sprint` : "Issue moved to sprint");
+  toast.success(
+    count > 1
+      ? m.issues_bulk_move_to_sprint_multiple({ count: String(count) })
+      : m.issues_bulk_move_to_sprint_single(),
+  );
 });
 
 export default function BacklogPage() {
@@ -67,7 +72,7 @@ export default function BacklogPage() {
               {teamData().name}
             </div>
           </BreadcrumbsItem>
-          <BreadcrumbsItem>Backlog</BreadcrumbsItem>
+          <BreadcrumbsItem>{m.team_issues_backlog_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
@@ -100,17 +105,14 @@ function IssueEmpty() {
         <EmptyMedia variant="icon">
           <CircleDashedIcon />
         </EmptyMedia>
-        <EmptyTitle>Backlog is empty</EmptyTitle>
-        <EmptyDescription>
-          Add issues to the backlog to sprint future work. Backlog items can be moved to active
-          sprints when ready.
-        </EmptyDescription>
+        <EmptyTitle>{m.team_issues_backlog_empty_title()}</EmptyTitle>
+        <EmptyDescription>{m.team_issues_backlog_empty_description()}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="w-auto">
           <Button onClick={() => open()}>
             <PlusIcon class="size-4" strokeWidth={2.75} />
-            Create
+            {m.common_create()}
           </Button>
         </div>
       </EmptyContent>

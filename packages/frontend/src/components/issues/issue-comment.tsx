@@ -26,6 +26,7 @@ import { toast } from "../custom-ui/toast";
 import type { SerializedIssueAttachment } from "@blackwall/database";
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/core";
+import { m } from "@/paraglide/messages.js";
 
 type IssueWithCommentsAndEvents = InferDbType<
   "issue",
@@ -89,7 +90,7 @@ const deleteCommentAction = action(async (issueKey: string, commentId: string) =
   await api.api.issues[":issueKey"].comments[":commentId"].$delete({
     param: { issueKey, commentId },
   });
-  toast.success("Comment deleted");
+  toast.success(m.issue_comment_toast_deleted());
 
   throw reload({ revalidate: ["issueShow"] });
 });
@@ -111,7 +112,7 @@ export function CommentMenu(props: CommentMenuProps) {
         <DropdownMenuContent>
           <DropdownMenuItem variant="destructive" onSelect={() => setDeleteDialogOpen(true)}>
             <TrashIcon class="size-4" />
-            Delete
+            {m.common_delete()}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -122,15 +123,13 @@ export function CommentMenu(props: CommentMenuProps) {
             <AlertDialogMedia class="bg-destructive/50">
               <TrashIcon class="size-4" />
             </AlertDialogMedia>
-            <AlertDialogTitle>Delete comment?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the comment.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{m.issue_comment_delete_title()}</AlertDialogTitle>
+            <AlertDialogDescription>{m.issue_comment_delete_description()}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel size="xs">{m.common_cancel()}</AlertDialogCancel>
             <AlertDialogAction size="xs" variant="destructive" action={handleDelete}>
-              Delete
+              {m.common_delete()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -203,7 +202,7 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
         editorRef={setEditor}
         onAttachmentUpload={handleUpload}
         workspaceSlug={props.workspaceSlug}
-        placeholder="Add a comment..."
+        placeholder={m.issue_comment_placeholder()}
         variant="plain"
         class="min-h-24 p-4 squircle-lg bg-muted border"
       />

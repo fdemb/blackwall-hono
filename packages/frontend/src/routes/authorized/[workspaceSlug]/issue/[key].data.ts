@@ -1,10 +1,11 @@
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { query } from "@solidjs/router";
 
 export const issueLoader = query(async (issueKey: string, workspaceSlug: string) => {
   const teamKey = issueKey.split("-")[0];
   if (!teamKey) {
-    throw new Error("Invalid issue key");
+    throw new Error(m.loader_invalid_issue_key());
   }
 
   const [issueRes, labelsRes, membersRes, sprintsRes] = await Promise.all([

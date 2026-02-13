@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { m } from "@/paraglide/messages.js";
 import type { PolymorphicProps } from "@kobalte/core/polymorphic";
 import { TextField as TextFieldPrimitive } from "@kobalte/core/text-field";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -182,7 +183,7 @@ function parseError(error: any): string {
     return error.message;
   }
 
-  return "Validation error";
+  return m.common_validation_error();
 }
 
 function TanStackTextField(props: TanStackTextFieldProps) {

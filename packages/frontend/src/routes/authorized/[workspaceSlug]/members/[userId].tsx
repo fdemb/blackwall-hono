@@ -8,6 +8,7 @@ import {
   SettingsRow,
   SettingsSection,
 } from "@/components/settings/settings-sections";
+import { m } from "@/paraglide/messages.js";
 import { useSessionData } from "@/context/session-context";
 import { createAsync, useParams, A } from "@solidjs/router";
 import { For, Show } from "solid-js";
@@ -20,7 +21,7 @@ export default function MemberDetailPage() {
   const isCurrentUser = () => member()?.id === session().user.id;
 
   const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "Unknown";
+    if (!date) return m.members_detail_unknown_date();
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "long",
@@ -37,57 +38,57 @@ export default function MemberDetailPage() {
               href: `/${params.workspaceSlug}/members`,
             }}
           >
-            Members
+            {m.members_detail_breadcrumb_members()}
           </BreadcrumbsItem>
-          <BreadcrumbsItem>{member()?.name ?? "Member"}</BreadcrumbsItem>
+          <BreadcrumbsItem>{member()?.name ?? m.members_detail_breadcrumb_member_fallback()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
       <ScrollContainer>
         <Show when={member()}>
-          {(m) => (
+          {(memberData) => (
             <div class="flex flex-col gap-6 w-full max-w-3xl mx-auto pt-12">
               <div class="flex items-center gap-4 px-6">
-                <UserAvatar user={m()} size="lg" />
+                <UserAvatar user={memberData()} size="lg" />
                 <div class="flex flex-col min-w-0">
                   <div class="flex items-center gap-2">
-                    <h1 class="text-2xl font-medium truncate">{m().name}</h1>
+                    <h1 class="text-2xl font-medium truncate">{memberData().name}</h1>
                     <Show when={isCurrentUser()}>
-                      <Badge>You</Badge>
+                      <Badge>{m.members_detail_badge_you()}</Badge>
                     </Show>
                   </div>
-                  <Show when={m().email}>
-                    <span class="text-sm text-muted-foreground truncate">{m().email}</span>
+                  <Show when={memberData().email}>
+                    <span class="text-sm text-muted-foreground truncate">{memberData().email}</span>
                   </Show>
                 </div>
               </div>
 
-              <SettingsSection title="Details">
+              <SettingsSection title={m.members_detail_section_details()}>
                 <SettingsCard>
-                  <Show when={m().email}>
-                    <SettingsRow title="Email">
-                      <a href={`mailto:${m().email}`} class="text-sm hover:underline">
-                        {m().email}
+                  <Show when={memberData().email}>
+                    <SettingsRow title={m.members_detail_row_email()}>
+                      <a href={`mailto:${memberData().email}`} class="text-sm hover:underline">
+                        {memberData().email}
                       </a>
                     </SettingsRow>
                   </Show>
-                  <SettingsRow title="Joined">
-                    <span class="text-sm">{formatDate(m().createdAt)}</span>
+                  <SettingsRow title={m.members_detail_row_joined()}>
+                    <span class="text-sm">{formatDate(memberData().createdAt)}</span>
                   </SettingsRow>
                 </SettingsCard>
               </SettingsSection>
 
-              <SettingsSection title="Teams">
+              <SettingsSection title={m.members_detail_section_teams()}>
                 <SettingsCard>
                   <Show
-                    when={m().teams && m().teams.length > 0}
+                    when={memberData().teams && memberData().teams.length > 0}
                     fallback={
                       <div class="px-4 py-3.5">
-                        <p class="text-sm text-muted-foreground">Not a member of any teams yet.</p>
+                        <p class="text-sm text-muted-foreground">{m.members_detail_no_teams()}</p>
                       </div>
                     }
                   >
                     <div class="px-4 py-3.5 flex flex-wrap gap-2">
-                      <For each={m().teams}>
+                      <For each={memberData().teams}>
                         {(team) => (
                           <A
                             href={`/${params.workspaceSlug}/team/${team.key}/issues/board`}

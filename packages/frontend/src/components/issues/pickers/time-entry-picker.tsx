@@ -36,6 +36,7 @@ import PlusIcon from "lucide-solid/icons/plus";
 import TrashIcon from "lucide-solid/icons/trash-2";
 import { createSignal, For, onMount, Show } from "solid-js";
 import type { InferDbType } from "@blackwall/database/types";
+import { m } from "@/paraglide/messages.js";
 
 type TimeEntryWithUser = InferDbType<
   "timeEntry",
@@ -169,14 +170,14 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
 
         <DialogContent class="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Log Time</DialogTitle>
+            <DialogTitle>{m.time_entry_log_title()}</DialogTitle>
           </DialogHeader>
 
           <div class="flex flex-col gap-4">
             <TextField value={durationInput()} onChange={setDurationInput}>
-              <TextField.Label>Duration</TextField.Label>
+              <TextField.Label>{m.time_entry_duration_label()}</TextField.Label>
               <TextField.Input
-                placeholder="e.g., 30, 1h, 1h 30m"
+                placeholder={m.time_entry_duration_placeholder()}
                 onKeyDown={(e: KeyboardEvent) => {
                   if (e.key === "Enter" && parsedDuration()) {
                     e.preventDefault();
@@ -192,15 +193,15 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
             </TextField>
 
             <TextField value={description()} onChange={setDescription}>
-              <TextField.Label>Description (optional)</TextField.Label>
-              <TextField.TextArea placeholder="What did you work on?" rows={2} />
+              <TextField.Label>{m.time_entry_description_optional_label()}</TextField.Label>
+              <TextField.TextArea placeholder={m.time_entry_description_placeholder()} rows={2} />
             </TextField>
           </div>
 
           <DialogFooter>
             <Button size="sm" disabled={!parsedDuration() || isSubmitting()} onClick={handleSubmit}>
               <PlusIcon class="size-4" />
-              Log Time
+              {m.time_entry_log_title()}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -213,19 +214,19 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
           size="xxs"
           class="justify-start px-0 h-auto w-fit"
         >
-          Time log history
+          {m.time_entry_history_button()}
         </DialogTrigger>
 
         <DialogContent class="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Time Log History</DialogTitle>
+            <DialogTitle>{m.time_entry_history_title()}</DialogTitle>
           </DialogHeader>
 
           <Show
             when={timeEntries() && timeEntries()!.length > 0}
             fallback={
               <p class="text-sm text-muted-foreground py-4 text-center">
-                No time entries logged yet.
+                {m.time_entry_history_empty()}
               </p>
             }
           >
@@ -292,7 +293,7 @@ function TimeEntryItem(props: {
           <DropdownMenuContent>
             <DropdownMenuItem variant="destructive" onSelect={() => setDeleteDialogOpen(true)}>
               <TrashIcon class="size-4" />
-              Delete
+              {m.common_delete()}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -304,15 +305,15 @@ function TimeEntryItem(props: {
             <AlertDialogMedia class="bg-destructive/50">
               <TrashIcon class="size-4" />
             </AlertDialogMedia>
-            <AlertDialogTitle>Delete time entry?</AlertDialogTitle>
+            <AlertDialogTitle>{m.time_entry_delete_title()}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {formatDuration(props.entry.duration)} from the logged time.
+              {m.time_entry_delete_description({ duration: formatDuration(props.entry.duration) })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel size="xs">{m.common_cancel()}</AlertDialogCancel>
             <AlertDialogAction size="xs" variant="destructive" action={handleDelete}>
-              Delete
+              {m.common_delete()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

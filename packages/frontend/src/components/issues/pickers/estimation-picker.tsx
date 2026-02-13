@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 import { action, reload, useAction } from "@solidjs/router";
 import { Popover } from "@kobalte/core/popover";
 import { createSignal, For } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 const ESTIMATION_OPTIONS = [1, 2, 3, 5, 8, 13] as const;
 
@@ -50,7 +51,7 @@ export function EstimationPickerPopover(props: {
                   classList={{ "bg-accent": props.estimationPoints === points }}
                   onClick={() => handleChange(points)}
                 >
-                  {points} {points === 1 ? "point" : "points"}
+                  {points} {points === 1 ? m.issue_estimation_point() : m.issue_estimation_points()}
                 </button>
               )}
             </For>
@@ -60,7 +61,7 @@ export function EstimationPickerPopover(props: {
               class="flex items-center gap-2 px-3 py-1.5 text-sm rounded hover:bg-accent text-left text-muted-foreground"
               onClick={() => handleChange(null)}
             >
-              Clear
+              {m.common_clear()}
             </button>
           </div>
         </Popover.Content>

@@ -6,10 +6,12 @@
   ],
   "type": "module",
   "scripts": {
-    "dev:backend": "bun run --filter backend* dev",
-    "dev:frontend": "bun run --filter frontend* dev",
+    "dev:backend": "bun run --filter '@blackwall/backend' dev",
+    "dev:frontend": "bun run --filter 'frontend' dev",
     "build": "bun run --filter blackwall build",
-    "db:seed": "bun run --filter @blackwall/database db:seed",
+    "db:seed": "bun run --filter '@blackwall/database' db:seed",
+    "db:generate": "bun run --filter '@blackwall/database' db:generate",
+    "db:migrate": "bun run --filter '@blackwall/database' db:migrate",
     "typecheck": "bun run --filter '*' typecheck",
     "typecheck:frontend": "bun run --filter frontend typecheck",
     "typecheck:backend": "bun run --filter @blackwall/backend typecheck",
@@ -19,11 +21,11 @@
     "typecheck:email": "bun run --filter @blackwall/email typecheck",
     "typecheck:blackwall": "bun run --filter blackwall typecheck"
   },
-  "patchedDependencies": {
-    "tinykeys@3.0.0": "patches/tinykeys@3.0.0.patch"
-  },
   "dependencies": {
     "oxfmt": "^0.27.0",
     "oxlint": "^1.42.0"
+  },
+  "patchedDependencies": {
+    "tinykeys@3.0.0": "patches/tinykeys@3.0.0.patch"
   }
 }

@@ -39,6 +39,7 @@ import { sprintsLoader } from "../index.data";
 import { useKeybinds } from "@/context/keybind.context";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { m } from "@/paraglide/messages.js";
 
 const archiveSprintAction = action(
   async (workspaceSlug: string, teamKey: string, sprintId: string) => {
@@ -46,7 +47,7 @@ const archiveSprintAction = action(
       param: { teamKey, sprintId },
     });
 
-    toast.success("Sprint archived and hidden from default lists");
+    toast.success(m.common_sprint_archived_hidden());
     throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
   },
 );
@@ -56,7 +57,7 @@ const startSprintAction = action(async (teamKey: string, sprintId: string) => {
     param: { teamKey, sprintId },
   });
 
-  toast.success("Sprint started");
+  toast.success(m.common_sprint_started());
 });
 
 function calculateEstimationStats(issues: IssueForDataTable[]) {
@@ -164,7 +165,7 @@ export default function SprintDetailPage() {
                 href: `/${params.workspaceSlug}/team/${params.teamKey}/sprints`,
               }}
             >
-              Sprints
+              {m.team_sprints_list_breadcrumb()}
             </BreadcrumbsItem>
             <BreadcrumbsItem>{sprint()!.name}</BreadcrumbsItem>
           </Breadcrumbs>
@@ -183,7 +184,7 @@ export default function SprintDetailPage() {
                     class={buttonVariants({ variant: "outline", size: "sm" })}
                     href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/edit`}
                   >
-                    Edit
+                    {m.common_edit()}
                   </A>
                 </Show>
                 <Show when={isActiveSprint() && !isCompleted()}>
@@ -194,14 +195,14 @@ export default function SprintDetailPage() {
                         href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${params.sprintId}/complete`}
                       >
                         <CircleCheckIcon class="size-4" />
-                        Complete sprint
+                        {m.team_sprints_detail_complete_sprint()}
                       </A>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <span class="mr-2">Complete sprint</span>
+                      <span class="mr-2">{m.team_sprints_detail_complete_sprint()}</span>
                       <KbdGroup>
                         <Kbd>C</Kbd>
-                        then
+                        {m.common_then()}
                         <Kbd>O</Kbd>
                       </KbdGroup>
                     </TooltipContent>
@@ -209,7 +210,7 @@ export default function SprintDetailPage() {
                 </Show>
                 <Show when={!isActiveSprint()}>
                   <Button variant="outline" size="sm" onClick={() => setArchiveDialogOpen(true)}>
-                    Archive
+                    {m.common_archive()}
                   </Button>
                 </Show>
                 <Show when={isPlanned()}>
@@ -222,14 +223,16 @@ export default function SprintDetailPage() {
                         onClick={() => void startCurrentSprint()}
                       >
                         <PlayIcon class="size-4" />
-                        {startSubmission.pending ? "Starting..." : "Start sprint"}
+                        {startSubmission.pending
+                          ? m.team_sprints_list_action_starting()
+                          : m.team_sprints_detail_start_sprint()}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <span class="mr-2">Start sprint</span>
+                      <span class="mr-2">{m.team_sprints_detail_start_sprint()}</span>
                       <KbdGroup>
                         <Kbd>S</Kbd>
-                        then
+                        {m.common_then()}
                         <Kbd>T</Kbd>
                       </KbdGroup>
                     </TooltipContent>
@@ -258,10 +261,16 @@ export default function SprintDetailPage() {
               <div class="flex flex-col gap-2">
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-muted-foreground">
-                    {stats().completedPoints} / {stats().totalPoints} points completed
+                    {m.team_sprints_detail_points_completed({
+                      completedPoints: String(stats().completedPoints),
+                      totalPoints: String(stats().totalPoints),
+                    })}
                   </span>
                   <span class="text-muted-foreground">
-                    {stats().estimatedCount} of {stats().totalCount} issues estimated
+                    {m.team_sprints_detail_issues_estimated({
+                      estimatedCount: String(stats().estimatedCount),
+                      totalCount: String(stats().totalCount),
+                    })}
                   </span>
                 </div>
                 <div class="h-2 bg-muted rounded-full overflow-hidden">
@@ -308,11 +317,8 @@ function SprintIssuesEmpty() {
         <EmptyMedia variant="icon">
           <CircleDotIcon />
         </EmptyMedia>
-        <EmptyTitle>No issues in this sprint</EmptyTitle>
-        <EmptyDescription>
-          Add issues to this sprint to track progress. You can assign existing issues or create new
-          ones.
-        </EmptyDescription>
+        <EmptyTitle>{m.team_sprints_detail_empty_title()}</EmptyTitle>
+        <EmptyDescription>{m.team_sprints_detail_empty_description()}</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { useNavigate, useParams } from "@solidjs/router";
 import * as z from "zod";
 
@@ -23,8 +24,8 @@ export default function CreateTeamPage() {
     },
     validators: {
       onSubmit: z.object({
-        name: z.string().min(1, "Name is required"),
-        key: z.string().min(1, "Key is required").max(5, "Key must be at most 5 characters"),
+        name: z.string().min(1, m.common_name_required()),
+        key: z.string().min(1, m.settings_teams_key_required()).max(5, m.settings_teams_key_max()),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -42,10 +43,10 @@ export default function CreateTeamPage() {
   return (
     <>
       <SettingsBackButton href={`/${params.workspaceSlug}/settings/teams`}>
-        Back to team management
+        {m.settings_teams_back_to_management()}
       </SettingsBackButton>
 
-      <SettingsPage title="Create a team">
+      <SettingsPage title={m.settings_teams_create_page_title()}>
         <SettingsSection>
           <form
             class="w-full flex flex-col"
@@ -56,14 +57,17 @@ export default function CreateTeamPage() {
             }}
           >
             <SettingsCard>
-              <SettingsRow title="Name" description="The name of the team.">
+              <SettingsRow
+                title={m.common_name_label()}
+                description={m.settings_teams_name_description()}
+              >
                 <form.AppField name="name">
                   {() => (
                     <TanStackTextField
                       id="name"
                       describedBy="name-description"
-                      label="Name"
-                      placeholder="e.g. Awesome Team"
+                      label={m.common_name_label()}
+                      placeholder={m.settings_teams_name_placeholder()}
                       autocomplete="name"
                       labelClass="sr-only"
                       rootClass="items-end"
@@ -73,16 +77,16 @@ export default function CreateTeamPage() {
               </SettingsRow>
 
               <SettingsRow
-                title="Key"
-                description="Used to identify the team issues were created in."
+                title={m.settings_teams_key_title()}
+                description={m.settings_teams_key_description()}
               >
                 <form.AppField name="key">
                   {() => (
                     <TanStackTextField
                       id="key"
                       describedBy="key-description"
-                      label="Key"
-                      placeholder="e.g. AWSM"
+                      label={m.settings_teams_key_title()}
+                      placeholder={m.settings_teams_key_placeholder()}
                       autocomplete="key"
                       labelClass="sr-only"
                       rootClass="items-end"
@@ -96,7 +100,7 @@ export default function CreateTeamPage() {
               <form.Subscribe>
                 {(state) => (
                   <Button type="submit" size="sm" disabled={!state().canSubmit}>
-                    Create team
+                    {m.settings_teams_create_button()}
                   </Button>
                 )}
               </form.Subscribe>

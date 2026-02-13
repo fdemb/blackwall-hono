@@ -3,6 +3,7 @@ import CircleIcon from "lucide-solid/icons/circle";
 import CircleCheck from "lucide-solid/icons/circle-check";
 import CircleFadingArrowUpIcon from "lucide-solid/icons/circle-fading-arrow-up";
 import type { JSX } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 export type BaseMapping = {
   label: string;
@@ -13,36 +14,36 @@ export type BaseMapping = {
 export const issueMappings = {
   status: {
     to_do: {
-      label: "To Do",
+      label: m.issue_status_to_do(),
       textClass: "text-theme-teal",
       icon: CircleIcon,
     },
     in_progress: {
-      label: "In Progress",
+      label: m.issue_status_in_progress(),
       textClass: "text-theme-blue",
       icon: CircleFadingArrowUpIcon,
     },
     done: {
-      label: "Done",
+      label: m.issue_status_done(),
       textClass: "text-theme-green",
       icon: CircleCheck,
     },
   } as const satisfies Record<Issue["status"], BaseMapping>,
   priority: {
     low: {
-      label: "Low",
+      label: m.issue_priority_low(),
       textClass: "text-theme-green",
     },
     medium: {
-      label: "Medium",
+      label: m.issue_priority_medium(),
       textClass: "text-theme-blue",
     },
     high: {
-      label: "High",
+      label: m.issue_priority_high(),
       textClass: "text-theme-yellow",
     },
     urgent: {
-      label: "Urgent",
+      label: m.issue_priority_urgent(),
       textClass: "text-theme-red",
     },
   } as const satisfies Record<Issue["priority"], BaseMapping>,

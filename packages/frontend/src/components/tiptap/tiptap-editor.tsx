@@ -14,6 +14,7 @@ import { createEffect, createSignal, mergeProps, on, onCleanup } from "solid-js"
 import { SlashCommand, type SlashCommandItem } from "./extensions/slash-command";
 import { createSuggestionRenderer } from "./suggestion-renderer";
 import { backendUrl } from "@/lib/env";
+import { m } from "@/paraglide/messages.js";
 
 export type TiptapProps = {
   initialContent?: Content;
@@ -77,54 +78,54 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
   const getSlashCommandItems = (query: string): SlashCommandItem[] => {
     const items: SlashCommandItem[] = [
       {
-        title: "Image",
-        description: "Upload an image",
+        title: m.tiptap_slash_image_title(),
+        description: m.tiptap_slash_image_description(),
         icon: () => <ImageIcon class="size-4" />,
         command: ({ editor, range }) => triggerFileUpload(editor, range),
       },
       {
-        title: "Heading 1",
-        description: "Large heading",
+        title: m.tiptap_slash_heading_1_title(),
+        description: m.tiptap_slash_heading_1_description(),
         icon: () => <Heading1Icon class="size-4" />,
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).setNode("heading", { level: 1 }).run();
         },
       },
       {
-        title: "Heading 2",
-        description: "Medium heading",
+        title: m.tiptap_slash_heading_2_title(),
+        description: m.tiptap_slash_heading_2_description(),
         icon: () => <Heading2Icon class="size-4" />,
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).setNode("heading", { level: 2 }).run();
         },
       },
       {
-        title: "Bullet List",
-        description: "Create a bullet list",
+        title: m.tiptap_slash_bullet_list_title(),
+        description: m.tiptap_slash_bullet_list_description(),
         icon: () => <ListIcon class="size-4" />,
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleBulletList().run();
         },
       },
       {
-        title: "Numbered List",
-        description: "Create a numbered list",
+        title: m.tiptap_slash_numbered_list_title(),
+        description: m.tiptap_slash_numbered_list_description(),
         icon: () => <ListOrderedIcon class="size-4" />,
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleOrderedList().run();
         },
       },
       {
-        title: "Code Block",
-        description: "Add a code block",
+        title: m.tiptap_slash_code_block_title(),
+        description: m.tiptap_slash_code_block_description(),
         icon: () => <CodeIcon class="size-4" />,
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
         },
       },
       {
-        title: "Quote",
-        description: "Add a blockquote",
+        title: m.tiptap_slash_quote_title(),
+        description: m.tiptap_slash_quote_description(),
         icon: () => <QuoteIcon class="size-4" />,
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleBlockquote().run();

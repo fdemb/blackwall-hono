@@ -27,6 +27,7 @@ import LandPlotIcon from "lucide-solid/icons/land-plot";
 import ChevronsUpDownIcon from "lucide-solid/icons/chevrons-up-down";
 import type { CompleteIssueSprint } from "@blackwall/backend/src/features/issue-sprints/issue-sprint.zod";
 import { Show } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 type CompleteSprintFormProps = {
   workspaceSlug: string;
@@ -44,7 +45,7 @@ const completeSprintAction = action(
       json: value,
     });
 
-    toast.success("Sprint completed successfully");
+    toast.success(m.complete_sprint_form_toast_completed());
     throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints`);
   },
 );
@@ -62,7 +63,7 @@ const formSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["targetSprintId"],
-        message: "Choose a planned sprint",
+        message: m.complete_sprint_form_validation_choose_planned(),
       });
     }
 
@@ -71,7 +72,7 @@ const formSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["newSprintName"],
-          message: "Sprint name is required",
+          message: m.complete_sprint_form_validation_name_required(),
         });
       }
 
@@ -79,7 +80,7 @@ const formSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["newSprintEndDate"],
-          message: "End date must be on or after start date",
+          message: m.common_end_date_on_or_after_start_date(),
         });
       }
     }
@@ -139,18 +140,18 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
       <div class="flex flex-col gap-3 items-center">
         <TeamAvatar team={props.team} size="md" />
         <h1 class="text-xl sm:text-2xl font-medium text-center">
-          Complete sprint for {props.team.name}
+          {m.complete_sprint_form_title({ teamName: props.team.name })}
         </h1>
       </div>
 
       <div class="flex flex-col gap-4 text-center">
         <p class="text-muted-foreground">
-          You are about to complete the sprint "{props.sprint.name}".
+          {m.complete_sprint_form_intro_line_one({ sprintName: props.sprint.name })}
         </p>
         <p class="text-muted-foreground text-sm">
           {props.hasUndoneIssues
-            ? "Choose what happens to undone issues before you finish."
-            : "All issues in this sprint are done. You can complete the sprint now."}
+            ? m.complete_sprint_form_intro_with_undone()
+            : m.complete_sprint_form_intro_all_done()}
         </p>
       </div>
 
@@ -166,7 +167,7 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
           <form.AppField name="onUndoneIssues">
             {(field) => (
               <FieldSet>
-                <FieldLegend variant="label">On undone issues</FieldLegend>
+                <FieldLegend variant="label">{m.complete_sprint_form_on_undone_legend()}</FieldLegend>
                 <RadioGroup
                   value={field().state.value}
                   onValueChange={(value) => field().handleChange(value)}
@@ -174,15 +175,15 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
                   <FieldLabel for="completeMoveToBacklog">
                     <Field orientation="horizontal">
                       <FieldContent>
-                        <FieldTitle>Move to backlog</FieldTitle>
+                        <FieldTitle>{m.complete_sprint_form_option_move_backlog_title()}</FieldTitle>
                         <FieldDescription>
-                          Move undone issues to backlog for future sprinting.
+                          {m.complete_sprint_form_option_move_backlog_description()}
                         </FieldDescription>
                       </FieldContent>
                       <RadioGroupItem
                         value="moveToBacklog"
                         id="completeMoveToBacklog"
-                        aria-label="Move to backlog"
+                        aria-label={m.complete_sprint_form_option_move_backlog_title()}
                       />
                     </Field>
                   </FieldLabel>
@@ -190,15 +191,15 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
                   <FieldLabel for="completeMoveToPlannedSprint">
                     <Field orientation="horizontal">
                       <FieldContent>
-                        <FieldTitle>Move to planned sprint</FieldTitle>
+                        <FieldTitle>{m.complete_sprint_form_option_move_planned_title()}</FieldTitle>
                         <FieldDescription>
-                          Move undone issues to an existing planned sprint.
+                          {m.complete_sprint_form_option_move_planned_description()}
                         </FieldDescription>
                       </FieldContent>
                       <RadioGroupItem
                         value="moveToPlannedSprint"
                         id="completeMoveToPlannedSprint"
-                        aria-label="Move to planned sprint"
+                        aria-label={m.complete_sprint_form_option_move_planned_title()}
                       />
                     </Field>
                   </FieldLabel>
@@ -206,15 +207,15 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
                   <FieldLabel for="completeMoveToNewSprint">
                     <Field orientation="horizontal">
                       <FieldContent>
-                        <FieldTitle>Move to new sprint</FieldTitle>
+                        <FieldTitle>{m.complete_sprint_form_option_move_new_title()}</FieldTitle>
                         <FieldDescription>
-                          Create a new planned sprint and move undone issues there.
+                          {m.complete_sprint_form_option_move_new_description()}
                         </FieldDescription>
                       </FieldContent>
                       <RadioGroupItem
                         value="moveToNewSprint"
                         id="completeMoveToNewSprint"
-                        aria-label="Move to new sprint"
+                        aria-label={m.complete_sprint_form_option_move_new_title()}
                       />
                     </Field>
                   </FieldLabel>
@@ -231,7 +232,7 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
                 <form.AppField name="targetSprintId">
                   {(field) => (
                     <div class="flex flex-col gap-2">
-                      <Label for="targetSprintId">Planned sprint</Label>
+                      <Label for="targetSprintId">{m.complete_sprint_form_planned_sprint_label()}</Label>
                       <Popover placement="bottom-start" gutter={8}>
                         <Popover.Trigger
                           as={Button}
@@ -241,7 +242,7 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
                         >
                           <LandPlotIcon class="size-4" />
                           {props.plannedSprints.find((s) => s.id === field().state.value)?.name ??
-                            "Select planned sprint"}
+                            m.complete_sprint_form_select_planned_sprint()}
                           <ChevronsUpDownIcon class="size-4" />
                         </Popover.Trigger>
                         <PickerPopover
@@ -259,7 +260,10 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
                 <>
                   <form.AppField name="newSprintName">
                     {() => (
-                      <TanStackTextField label="New sprint name" placeholder="e.g. Sprint 2" />
+                      <TanStackTextField
+                        label={m.complete_sprint_form_new_sprint_name_label()}
+                        placeholder={m.complete_sprint_form_new_sprint_name_placeholder()}
+                      />
                     )}
                   </form.AppField>
 
@@ -270,7 +274,7 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
 
                         return (
                           <div class="flex flex-col gap-2 w-full">
-                            <Label for={field().name}>Start date</Label>
+                            <Label for={field().name}>{m.common_start_date()}</Label>
                             <DatePicker
                               selected={calendarDate()}
                               onSelect={(date) => field().handleChange(date.toString())}
@@ -286,7 +290,7 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
 
                         return (
                           <div class="flex flex-col gap-2 w-full">
-                            <Label for={field().name}>End date</Label>
+                            <Label for={field().name}>{m.common_end_date()}</Label>
                             <DatePicker
                               selected={calendarDate()}
                               onSelect={(date) => field().handleChange(date.toString())}
@@ -306,7 +310,7 @@ export function CompleteSprintForm(props: CompleteSprintFormProps) {
           {(state) => (
             <div class="flex flex-col gap-2 items-center mt-2">
               <Button type="submit" size="lg" disabled={!state().canSubmit}>
-                Complete sprint
+                {m.team_sprints_detail_complete_sprint()}
               </Button>
             </div>
           )}

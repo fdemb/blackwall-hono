@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
+import { m } from "@/paraglide/messages.js";
 
 export default function CompleteSprintPage() {
   const params = useParams();
@@ -29,7 +30,7 @@ export default function CompleteSprintPage() {
                   {teamData().name}
                 </div>
               </BreadcrumbsItem>
-              <BreadcrumbsItem>Complete sprint</BreadcrumbsItem>
+              <BreadcrumbsItem>{m.team_sprints_detail_complete_sprint()}</BreadcrumbsItem>
             </Breadcrumbs>
           </PageHeader>
 

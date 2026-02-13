@@ -5,6 +5,7 @@ import { A, useParams } from "@solidjs/router";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import { Show } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 export function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
   const params = useParams();
@@ -26,14 +27,14 @@ export function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
               </div>
               <div class="px-4 py-3 flex flex-col gap-3">
                 <div class="flex flex-row items-center justify-between">
-                  <p class="text-xs text-muted-foreground">Start date</p>
+                  <p class="text-xs text-muted-foreground">{m.common_start_date()}</p>
                   <p class="text-sm font-medium">
                     {new Date(sprint().startDate).toLocaleDateString()}
                   </p>
                 </div>
 
                 <div class="flex flex-row items-center justify-between">
-                  <p class="text-xs text-muted-foreground">End date</p>
+                  <p class="text-xs text-muted-foreground">{m.common_end_date()}</p>
                   <p class="text-sm font-medium">
                     {new Date(sprint().endDate).toLocaleDateString()}
                   </p>
@@ -41,7 +42,7 @@ export function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
 
                 <Show when={sprint().goal}>
                   <div>
-                    <p class="text-xs text-muted-foreground mb-1">Goal</p>
+                    <p class="text-xs text-muted-foreground mb-1">{m.common_goal()}</p>
                     <p class="text-sm">{sprint().goal}</p>
                   </div>
                 </Show>
@@ -55,7 +56,7 @@ export function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
                     class: "flex-1",
                   })}
                 >
-                  Details
+                  {m.common_details()}
                 </A>
                 <A
                   href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}/edit`}
@@ -65,7 +66,7 @@ export function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
                     class: "flex-1",
                   })}
                 >
-                  Edit
+                  {m.common_edit()}
                 </A>
                 <A
                   href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/${sprint().id}/complete`}
@@ -75,7 +76,7 @@ export function SprintSection(props: { sprint: SerializedIssueSprint | null }) {
                     class: "flex-1",
                   })}
                 >
-                  Complete
+                  {m.common_complete()}
                 </A>
               </div>
             </PopoverContent>

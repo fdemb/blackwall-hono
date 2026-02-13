@@ -6,6 +6,7 @@ import { Calendar } from "./calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
+import { m } from "@/paraglide/messages.js";
 
 const dateFormatter = new DateFormatter("en-US", {
   dateStyle: "long",
@@ -49,7 +50,7 @@ export function DatePicker(props: DatePickerProps) {
         name={props.name}
       >
         <CalendarIcon />
-        <Solid.Show when={formattedDate()} fallback={<span>Pick a date</span>}>
+        <Solid.Show when={formattedDate()} fallback={<span>{m.common_pick_a_date()}</span>}>
           {formattedDate()}
         </Solid.Show>
         <ChevronDownIcon class="size-5 ml-auto" />

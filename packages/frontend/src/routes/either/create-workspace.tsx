@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { useNavigate } from "@solidjs/router";
 import type { CreateWorkspace } from "@blackwall/backend/src/features/workspaces/workspace.zod";
 
@@ -25,7 +26,7 @@ export default function CreateWorkspacePage() {
   }));
 
   return (
-    <AuthCard title="Create Workspace">
+    <AuthCard title={m.either_create_workspace_title()}>
       <form
         class="flex flex-col gap-6"
         onSubmit={(e) => {
@@ -34,12 +35,14 @@ export default function CreateWorkspacePage() {
           form.handleSubmit();
         }}
       >
-        <form.AppField name="displayName">{() => <TanStackTextField label="Name" />}</form.AppField>
+        <form.AppField name="displayName">
+          {() => <TanStackTextField label={m.either_create_workspace_name_label()} />}
+        </form.AppField>
 
         <form.AppField name="slug">
           {() => (
             <TanStackTextField
-              label="URL"
+              label={m.either_create_workspace_url_label()}
               inputClass="pl-[170px]"
               beforeInput={
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
@@ -51,7 +54,7 @@ export default function CreateWorkspacePage() {
         </form.AppField>
 
         <Button type="submit" class="w-full">
-          Create Workspace
+          {m.either_create_workspace_submit()}
         </Button>
       </form>
     </AuthCard>

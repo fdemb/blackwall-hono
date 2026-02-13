@@ -14,6 +14,7 @@ import {
 } from "../ui/dropdown-menu";
 import { A, action, redirect, useAction } from "@solidjs/router";
 import { authClient } from "@/lib/auth-client";
+import { m } from "@/paraglide/messages.js";
 
 const logoutAction = action(async () => {
   await authClient.signOut();
@@ -48,12 +49,12 @@ export function UserMenu() {
       <DropdownMenuContent class="min-w-[12rem]">
         <DropdownMenuItem as={A} href={`/${workspaceData().workspace.slug}/settings/general`}>
           <SettingsIcon />
-          Settings
+          {m.user_menu_settings()}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onLogOut}>
           <LogOutIcon />
-          Log out
+          {m.user_menu_log_out()}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

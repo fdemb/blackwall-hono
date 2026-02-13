@@ -8,6 +8,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { m } from "@/paraglide/messages.js";
 import UsersIcon from "lucide-solid/icons/users";
 import { useWorkspaceData } from "@/context/workspace-context";
 import { createAsync, useParams } from "@solidjs/router";
@@ -23,7 +24,7 @@ export default function MembersPage() {
     <>
       <PageHeader>
         <Breadcrumbs>
-          <BreadcrumbsItem>Workspace members</BreadcrumbsItem>
+          <BreadcrumbsItem>{m.members_index_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
 
@@ -41,8 +42,8 @@ function MembersEmpty() {
         <EmptyMedia variant="icon">
           <UsersIcon />
         </EmptyMedia>
-        <EmptyTitle>No members yet</EmptyTitle>
-        <EmptyDescription>Invite teammates to collaborate on issues and sprints.</EmptyDescription>
+        <EmptyTitle>{m.members_index_empty_title()}</EmptyTitle>
+        <EmptyDescription>{m.members_index_empty_description()}</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

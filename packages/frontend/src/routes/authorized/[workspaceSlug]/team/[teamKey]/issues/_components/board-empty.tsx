@@ -12,6 +12,7 @@ import { A, useParams } from "@solidjs/router";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import PlayIcon from "lucide-solid/icons/play";
 import { Show } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 export function BoardEmpty(props: {
   plannedSprint: SerializedIssueSprint | null;
@@ -24,10 +25,8 @@ export function BoardEmpty(props: {
         <EmptyMedia variant="icon">
           <LandPlotIcon />
         </EmptyMedia>
-        <EmptyTitle>No active sprint</EmptyTitle>
-        <EmptyDescription>
-          Start a planned sprint or create a new one to use the board.
-        </EmptyDescription>
+        <EmptyTitle>{m.team_issues_board_empty_no_active_sprint_title()}</EmptyTitle>
+        <EmptyDescription>{m.team_issues_board_empty_no_active_sprint_description()}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div class="flex flex-row gap-3">
@@ -35,7 +34,7 @@ export function BoardEmpty(props: {
             {(plannedSprint) => (
               <Button onClick={() => props.onStartPlannedSprint(plannedSprint().id)}>
                 <PlayIcon class="size-4" />
-                Start {plannedSprint().name}
+                {m.team_issues_board_empty_start_sprint({ sprintName: plannedSprint().name })}
               </Button>
             )}
           </Show>
@@ -43,7 +42,7 @@ export function BoardEmpty(props: {
             href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
             class={buttonVariants({ variant: props.plannedSprint ? "secondary" : "default" })}
           >
-            Create sprint
+            {m.team_sprints_create_breadcrumb()}
           </A>
         </div>
       </EmptyContent>

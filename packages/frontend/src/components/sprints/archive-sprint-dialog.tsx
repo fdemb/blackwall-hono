@@ -10,6 +10,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { m } from "@/paraglide/messages.js";
 
 type ArchiveSprintDialogProps = {
   open: boolean;
@@ -25,16 +26,13 @@ export function ArchiveSprintDialog(props: ArchiveSprintDialogProps) {
           <AlertDialogMedia class="bg-destructive/50">
             <ArchiveIcon class="size-4" />
           </AlertDialogMedia>
-          <AlertDialogTitle>Archive this sprint?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This hides the sprint from default sprint lists. Only non-done issues are moved to
-            backlog; done issues stay linked for history.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{m.archive_sprint_dialog_title()}</AlertDialogTitle>
+          <AlertDialogDescription>{m.archive_sprint_dialog_description()}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel size="xs">Cancel</AlertDialogCancel>
+          <AlertDialogCancel size="xs">{m.common_cancel()}</AlertDialogCancel>
           <AlertDialogAction size="xs" variant="destructive" action={props.onConfirm}>
-            Archive sprint
+            {m.archive_sprint_dialog_confirm()}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

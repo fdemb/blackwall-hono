@@ -4,6 +4,7 @@ import { DataTable } from "@/components/datatable/datatable";
 import { SettingsPage, SettingsSection } from "@/components/settings/settings-sections";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDateShort } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 import { createColumnHelper } from "@tanstack/solid-table";
 import { A, createAsync, useParams } from "@solidjs/router";
 import { teamsSettingsLoader } from "./index.data";
@@ -19,15 +20,15 @@ export default function TeamsSettingsPage() {
   const params = useParams();
 
   return (
-    <SettingsPage title="Team management" fullWidth>
+    <SettingsPage title={m.settings_teams_index_page_title()} fullWidth>
       <SettingsSection
-        title="Teams"
+        title={m.settings_teams_index_section_title()}
         rightContent={
           <A
             class={buttonVariants({ variant: "default", size: "sm" })}
             href={`/${params.workspaceSlug}/settings/teams/create`}
           >
-            Create team
+            {m.settings_teams_create_button()}
           </A>
         }
       >
@@ -47,7 +48,7 @@ function TeamTable() {
   const columns = [
     columnHelper.accessor((row) => row.team.name, {
       id: "name",
-      header: "Name",
+      header: m.team_sprints_list_table_header_name(),
       meta: {
         expand: true,
       },
@@ -60,20 +61,20 @@ function TeamTable() {
     }),
     columnHelper.accessor((row) => row.team.key, {
       id: "key",
-      header: "Key",
+      header: m.settings_teams_key_title(),
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("usersCount", {
-      header: "Members",
+      header: m.settings_teams_table_header_members(),
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("issuesCount", {
-      header: "Issues",
+      header: m.settings_teams_table_header_issues(),
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor((row) => row.team.createdAt, {
       id: "createdAt",
-      header: "Created",
+      header: m.settings_teams_table_header_created(),
       cell: (info) => formatDateShort(new Date(info.getValue())),
     }),
   ];

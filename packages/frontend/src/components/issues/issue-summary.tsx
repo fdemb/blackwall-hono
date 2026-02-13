@@ -4,6 +4,7 @@ import { createSignal } from "solid-js";
 import { action, reload, useAction } from "@solidjs/router";
 import { toast } from "../custom-ui/toast";
 import { IssueEditButtons } from "./issue-edit-buttons";
+import { m } from "@/paraglide/messages.js";
 
 const changeSummaryAction = action(async (issueKey: string, summary: string) => {
   await api.api.issues[":issueKey"].$patch({
@@ -23,7 +24,7 @@ export function IssueSummary(props: { issue: SerializedIssue }) {
   async function handleSave() {
     if (summary() !== props.issue.summary) {
       await _changeSummaryAction(props.issue.key, summary());
-      toast.success("Summary updated");
+      toast.success(m.issue_summary_toast_updated());
     }
 
     setIsEditing(false);

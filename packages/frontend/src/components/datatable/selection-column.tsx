@@ -1,5 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import type { ColumnDef, RowData, Table } from "@tanstack/solid-table";
+import { m } from "@/paraglide/messages.js";
 
 export function createSelectionColumn<TData extends RowData>(): ColumnDef<TData, unknown> {
   return {
@@ -12,7 +13,7 @@ export function createSelectionColumn<TData extends RowData>(): ColumnDef<TData,
         checked={table.getIsAllPageRowsSelected()}
         indeterminate={table.getIsSomePageRowsSelected()}
         onChange={(checked) => table.toggleAllPageRowsSelected(checked)}
-        aria-label="Select all"
+        aria-label={m.datatable_selection_select_all()}
       />
     ),
     cell: ({ row }) => (
@@ -22,7 +23,7 @@ export function createSelectionColumn<TData extends RowData>(): ColumnDef<TData,
         checked={row.getIsSelected()}
         disabled={!row.getCanSelect()}
         onChange={(checked) => row.toggleSelected(checked)}
-        aria-label="Select row"
+        aria-label={m.datatable_selection_select_row()}
         onClick={(e: MouseEvent) => {
           e.stopPropagation();
           e.preventDefault();

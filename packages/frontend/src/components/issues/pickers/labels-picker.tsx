@@ -9,6 +9,7 @@ import PlusIcon from "lucide-solid/icons/plus";
 import { createResource, createSignal, Index } from "solid-js";
 import { action, reload, useAction } from "@solidjs/router";
 import type { SerializedLabel } from "@blackwall/database/schema";
+import { m } from "@/paraglide/messages.js";
 
 const createAndAddLabel = action(async (name: string, issueKey: string) => {
   const createRes = await api.api.labels.$post({
@@ -134,8 +135,8 @@ export function IssueLabelsPicker(props: { labels: SerializedLabel[]; issueKey: 
           options={allLabels() ?? []}
           value={labelIds()}
           loading={allLabels.loading}
-          emptyText="No labels found. Start typing to create."
-          createNewLabel="Create label"
+          emptyText={m.issue_labels_picker_empty_text()}
+          createNewLabel={m.issue_labels_picker_create_label()}
           onCreateNew={handleCreateNewLabel}
           onChange={handleChange}
         />

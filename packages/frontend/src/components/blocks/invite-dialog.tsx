@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { useDialogContext } from "@kobalte/core/dialog";
 import * as z from "zod";
 import { useAppForm } from "../../context/form-context";
@@ -20,7 +21,7 @@ export function InviteDialogContent() {
     },
     validators: {
       onSubmit: z.object({
-        email: z.email().min(1, "Email is required"),
+        email: z.email().min(1, m.invite_dialog_email_required()),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -35,10 +36,8 @@ export function InviteDialogContent() {
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Invite user</DialogTitle>
-        <DialogDescription>
-          Enter the email address of the user you want to invite.
-        </DialogDescription>
+        <DialogTitle>{m.invite_dialog_title()}</DialogTitle>
+        <DialogDescription>{m.invite_dialog_description()}</DialogDescription>
       </DialogHeader>
 
       <form
@@ -53,8 +52,8 @@ export function InviteDialogContent() {
             <TanStackTextField
               id="email"
               describedBy="email-description"
-              label="Email address"
-              placeholder="john.doe@example.com"
+              label={m.auth_email_address_label()}
+              placeholder={m.auth_email_placeholder_signup()}
             />
           )}
         </form.AppField>
@@ -68,12 +67,12 @@ export function InviteDialogContent() {
               ctx.close();
             }}
           >
-            Cancel
+            {m.common_cancel()}
           </Button>
           <form.Subscribe>
             {(state) => (
               <Button type="submit" disabled={!state().canSubmit}>
-                Invite
+                {m.common_invite()}
               </Button>
             )}
           </form.Subscribe>

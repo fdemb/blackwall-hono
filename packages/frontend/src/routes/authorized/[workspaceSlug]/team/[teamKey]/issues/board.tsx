@@ -31,6 +31,7 @@ import { sprintsLoader } from "../sprints/index.data";
 import { toast } from "@/components/custom-ui/toast";
 import { SprintSection } from "./_components/sprint-section";
 import { BoardEmpty } from "./_components/board-empty";
+import { m } from "@/paraglide/messages.js";
 
 type IssueForBoard = InferDbType<
   "issue",
@@ -41,9 +42,9 @@ type IssueForBoard = InferDbType<
 >;
 
 const columns = [
-  { name: "To do", id: "to_do", icon: CircleIcon },
-  { name: "In progress", id: "in_progress", icon: CircleDotDashedIcon },
-  { name: "Done", id: "done", icon: CircleCheckIcon },
+  { id: "to_do", icon: CircleIcon },
+  { id: "in_progress", icon: CircleDotDashedIcon },
+  { id: "done", icon: CircleCheckIcon },
 ] as const;
 
 const moveIssue = action(async (issueKeys: string[], status: IssueStatus) => {
@@ -58,7 +59,7 @@ const startSprintAction = action(async (teamKey: string, sprintId: string) => {
   await api.api["issue-sprints"].teams[":teamKey"].sprints[":sprintId"].start.$post({
     param: { teamKey, sprintId },
   });
-  toast.success("Sprint started");
+  toast.success(m.common_sprint_started());
 });
 
 export default function BoardPage() {
@@ -153,7 +154,7 @@ export default function BoardPage() {
                   {teamData().name}
                 </div>
               </BreadcrumbsItem>
-              <BreadcrumbsItem>Board</BreadcrumbsItem>
+              <BreadcrumbsItem>{m.team_issues_board_breadcrumb()}</BreadcrumbsItem>
             </Breadcrumbs>
 
             <SprintSection sprint={activeSprint()} />
@@ -178,7 +179,7 @@ export default function BoardPage() {
                 <For each={columns}>
                   {(col) => (
                     <BoardList
-                      statusName={col.name}
+                      statusName={issueMappings.status[col.id].label}
                       statusId={col.id}
                       issues={data()[col.id] ?? []}
                       statusIcon={col.icon}
@@ -316,7 +317,7 @@ function BoardList(props: BoardListProps) {
       >
         <Show
           when={displayIssues().length > 0 || isDropTarget()}
-          fallback={<span class="p-6 text-center text-muted-foreground">No issues</span>}
+          fallback={<span class="p-6 text-center text-muted-foreground">{m.common_no_issues()}</span>}
         >
           <For each={displayIssues()}>
             {(issue, index) => (

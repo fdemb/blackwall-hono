@@ -1,4 +1,5 @@
 import { toast } from "@/components/custom-ui/toast";
+import { m } from "@/paraglide/messages.js";
 import { FormApi } from "@tanstack/solid-form";
 
 export const validateFields = (
@@ -37,7 +38,7 @@ export const actionWrapper = async <T extends unknown>(
     if (error instanceof Error && typeof error.message === "string") {
       toast.error(error.message);
     } else {
-      toast.error("An unexpected error occurred");
+      toast.error(m.common_unexpected_error());
     }
     throw error;
   } finally {

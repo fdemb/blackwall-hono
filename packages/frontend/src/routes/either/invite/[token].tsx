@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { createAsync, useNavigate, useParams } from "@solidjs/router";
 import * as z from "zod";
 import { invitationLoader } from "./[token].data";
@@ -19,8 +20,8 @@ export default function InvitePage() {
     },
     validators: {
       onSubmit: z.object({
-        name: z.string().min(2, "Name is required"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
+        name: z.string().min(2, m.either_invite_name_required()),
+        password: z.string().min(8, m.either_invite_password_min()),
       }),
     },
     onSubmit: async ({ value, formApi }) => {
@@ -33,7 +34,7 @@ export default function InvitePage() {
         const error = await res.json();
         formApi.setErrorMap({
           // @ts-expect-error TODO - change to some result type or error wrapper that handles this
-          onSubmit: error.error || "Failed to join workspace",
+          onSubmit: error.error || m.either_invite_join_failed(),
         });
         return;
       }
@@ -44,7 +45,9 @@ export default function InvitePage() {
 
   return (
     <div>
-      <AuthCard title={`Join ${invitation()?.workspace.displayName}`}>
+      <AuthCard
+        title={m.either_invite_join_title({ workspaceName: invitation()?.workspace.displayName ?? "" })}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -56,9 +59,9 @@ export default function InvitePage() {
             <form.AppField name="name">
               {() => (
                 <TanStackTextField
-                  label="Name"
+                  label={m.either_invite_name_label()}
                   autofocus
-                  placeholder="Enter your full name..."
+                  placeholder={m.either_invite_name_placeholder()}
                   inputClass="p-3 h-auto !text-base"
                 />
               )}
@@ -67,9 +70,9 @@ export default function InvitePage() {
             <form.AppField name="password">
               {() => (
                 <TanStackTextField
-                  label="Password"
+                  label={m.either_invite_password_label()}
                   type="password"
-                  placeholder="Your secure password..."
+                  placeholder={m.either_invite_password_placeholder()}
                   inputClass="p-3 h-auto !text-base"
                 />
               )}
@@ -79,7 +82,7 @@ export default function InvitePage() {
               {(state) => (
                 <div class="flex flex-col gap-2">
                   <Button type="submit" size="lg" class="text-base" disabled={!state().canSubmit}>
-                    Join Workspace
+                    {m.either_invite_submit()}
                   </Button>
                 </div>
               )}

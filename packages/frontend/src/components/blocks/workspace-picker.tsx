@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { query, useNavigate } from "@solidjs/router";
 import { api } from "@/lib/api";
 import { createResource } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 const workspacesQuery = query(async () => {
   const res = await api.api.workspaces.$get();
@@ -32,7 +33,7 @@ export function WorkspacePicker() {
       ...(workspaces ?? []),
       {
         id: "create-workspace",
-        label: "Create Workspace",
+        label: m.either_create_workspace_title(),
       },
     ];
   };
@@ -59,7 +60,7 @@ export function WorkspacePicker() {
         value={workspaceData().workspace.id}
         loading={workspacesData.loading}
         onChange={handleChange}
-        emptyText="No workspaces found."
+        emptyText={m.workspace_picker_no_workspaces_found()}
       />
     </Popover>
   );

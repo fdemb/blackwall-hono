@@ -22,6 +22,7 @@ import { useSessionData } from "@/context/session-context";
 import { api } from "@/lib/api";
 import { backendUrl } from "@/lib/env";
 import { cn } from "@/lib/utils";
+import { m } from "@/paraglide/messages.js";
 import Trash2 from "lucide-solid/icons/trash-2";
 import { createSignal, Show } from "solid-js";
 import * as z from "zod";
@@ -38,12 +39,12 @@ export default function ProfileSettingsPage() {
   } as const;
 
   return (
-    <SettingsPage title="Profile">
-      <SettingsSection title="Account">
+    <SettingsPage title={m.settings_profile_page_title()}>
+      <SettingsSection title={m.settings_profile_section_account()}>
         <SettingsCard>
           <SettingsRow
-            title="Display name"
-            description="This is visible to everyone in your workspaces."
+            title={m.settings_profile_display_name_title()}
+            description={m.settings_profile_display_name_description()}
             htmlFor={ids.displayName.field}
             descriptionId={ids.displayName.description}
           >
@@ -55,19 +56,19 @@ export default function ProfileSettingsPage() {
           </SettingsRow>
 
           <SettingsRow
-            title="Avatar"
-            description="Used across comments, mentions, and anywhere your profile appears."
+            title={m.settings_profile_avatar_title()}
+            description={m.settings_profile_avatar_description()}
           >
             <AvatarUpload />
           </SettingsRow>
         </SettingsCard>
       </SettingsSection>
 
-      <SettingsSection title="Security">
+      <SettingsSection title={m.settings_profile_section_security()}>
         <SettingsCard>
           <SettingsRow
-            title="Password"
-            description="Change your password to keep your account secure."
+            title={m.settings_profile_password_title()}
+            description={m.settings_profile_password_description()}
           >
             <PasswordChangeDialog />
           </SettingsRow>
@@ -92,8 +93,8 @@ function DisplayNameForm(props: DisplayNameFormProps) {
       onSubmit: z.object({
         name: z
           .string()
-          .min(2, "Name must be at least 2 characters long")
-          .max(100, "Name must be shorter than 100 characters"),
+          .min(2, m.settings_profile_name_min())
+          .max(100, m.settings_profile_name_max()),
       }),
     },
     onSubmit: async ({ value }) => {
@@ -101,7 +102,7 @@ function DisplayNameForm(props: DisplayNameFormProps) {
         await api.api.settings.profile.$patch({
           json: { name: value.name },
         });
-        toast.success("Name updated successfully.");
+        toast.success(m.settings_profile_toast_name_updated());
         form.reset({ name: value.name });
       } catch (error) {
         toast.error(getErrorMessage(error));
@@ -132,8 +133,8 @@ function DisplayNameForm(props: DisplayNameFormProps) {
           <TanStackTextField
             id={props.inputId}
             describedBy={props.descriptionId}
-            label="Display name"
-            placeholder="e.g. Ada Lovelace"
+            label={m.settings_profile_display_name_title()}
+            placeholder={m.settings_profile_display_name_placeholder()}
             autocomplete="name"
             labelClass="sr-only"
             onBlur={submitOnBlur}
@@ -150,10 +151,10 @@ function AvatarUpload() {
 
   const validateFile = (file: File): string | null => {
     if (!file.type.startsWith("image/")) {
-      return "Only image files are supported.";
+      return m.settings_profile_avatar_validation_image_only();
     }
     if (file.size > MAX_AVATAR_FILE_SIZE) {
-      return "Image must be smaller than 5MB.";
+      return m.settings_profile_avatar_validation_max_size();
     }
     return null;
   };
@@ -180,7 +181,7 @@ function AvatarUpload() {
           credentials: "include",
         },
       );
-      toast.success("Avatar updated.");
+      toast.success(m.settings_profile_toast_avatar_updated());
       window.location.reload();
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -204,7 +205,7 @@ function AvatarUpload() {
           credentials: "include",
         },
       );
-      toast.success("Avatar removed.");
+      toast.success(m.settings_profile_toast_avatar_removed());
       window.location.reload();
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -248,7 +249,7 @@ function AvatarUpload() {
           variant="ghost"
           size="icon"
           onClick={() => void handleRemove()}
-          aria-label="Remove avatar"
+          aria-label={m.settings_profile_remove_avatar_aria_label()}
         >
           <Trash2 class="size-4" />
         </Button>
@@ -268,12 +269,12 @@ function PasswordChangeDialog() {
     validators: {
       onSubmit: z
         .object({
-          currentPassword: z.string().min(8, "Enter your current password"),
-          newPassword: z.string().min(8, "New password must be at least 8 characters"),
-          confirmPassword: z.string().min(8, "Confirm your new password"),
+          currentPassword: z.string().min(8, m.settings_profile_password_validation_current()),
+          newPassword: z.string().min(8, m.settings_profile_password_validation_new()),
+          confirmPassword: z.string().min(8, m.settings_profile_password_validation_confirm()),
         })
         .refine((values) => values.newPassword === values.confirmPassword, {
-          message: "Passwords do not match",
+          message: m.settings_profile_password_validation_mismatch(),
           path: ["confirmPassword"],
         }),
     },
@@ -285,7 +286,7 @@ function PasswordChangeDialog() {
             newPassword: value.newPassword,
           },
         });
-        toast.success("Password updated.");
+        toast.success(m.settings_profile_toast_password_updated());
         form.reset();
         setIsOpen(false);
       } catch (error) {
@@ -297,14 +298,12 @@ function PasswordChangeDialog() {
   return (
     <Dialog open={isOpen()} onOpenChange={setIsOpen}>
       <DialogTrigger as={Button} variant="outline" size="sm">
-        Change password
+        {m.settings_profile_change_password_button()}
       </DialogTrigger>
       <DialogContent class="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
-          <DialogDescription>
-            Enter your current password and choose a new one to update your account security.
-          </DialogDescription>
+          <DialogTitle>{m.settings_profile_change_password_button()}</DialogTitle>
+          <DialogDescription>{m.settings_profile_change_password_description()}</DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -317,10 +316,10 @@ function PasswordChangeDialog() {
           <form.AppField name="currentPassword">
             {() => (
               <TanStackTextField
-                label="Current password"
+                label={m.settings_profile_current_password_label()}
                 type="password"
                 autocomplete="current-password"
-                placeholder="Enter your current password"
+                placeholder={m.settings_profile_current_password_placeholder()}
               />
             )}
           </form.AppField>
@@ -328,10 +327,10 @@ function PasswordChangeDialog() {
           <form.AppField name="newPassword">
             {() => (
               <TanStackTextField
-                label="New password"
+                label={m.settings_profile_new_password_label()}
                 type="password"
                 autocomplete="new-password"
-                placeholder="Choose a strong password"
+                placeholder={m.settings_profile_new_password_placeholder()}
               />
             )}
           </form.AppField>
@@ -339,10 +338,10 @@ function PasswordChangeDialog() {
           <form.AppField name="confirmPassword">
             {() => (
               <TanStackTextField
-                label="Confirm new password"
+                label={m.settings_profile_confirm_password_label()}
                 type="password"
                 autocomplete="new-password"
-                placeholder="Repeat your new password"
+                placeholder={m.settings_profile_confirm_password_placeholder()}
               />
             )}
           </form.AppField>
@@ -352,10 +351,10 @@ function PasswordChangeDialog() {
               {(state) => (
                 <>
                   <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                    Cancel
+                    {m.common_cancel()}
                   </Button>
                   <Button type="submit" disabled={!state().canSubmit}>
-                    Update password
+                    {m.settings_profile_update_password_button()}
                   </Button>
                 </>
               )}
@@ -376,5 +375,5 @@ function getErrorMessage(error: unknown) {
     return error;
   }
 
-  return "Something went wrong. Please try again.";
+  return m.common_error_generic();
 }

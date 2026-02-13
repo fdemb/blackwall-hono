@@ -38,6 +38,7 @@ import { GlobalSearchDialog } from "./global-search-dialog";
 import { FastLink } from "../custom-ui/fast-link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Kbd, KbdGroup } from "../ui/kbd";
+import { m } from "@/paraglide/messages.js";
 
 type LinkNavItem = {
   title: string;
@@ -69,13 +70,13 @@ function createNavItems(): () => NavGroup[] {
     {
       children: [
         {
-          title: "My issues",
+          title: m.app_sidebar_nav_my_issues(),
           type: "link",
           icon: ListTodoIcon,
           href: `/${workspaceData().workspace.slug}/my-issues`,
         },
         {
-          title: "Members",
+          title: m.app_sidebar_nav_members(),
           type: "link",
           href: `/${workspaceData().workspace.slug}/members`,
           icon: Users2Icon,
@@ -83,7 +84,7 @@ function createNavItems(): () => NavGroup[] {
       ],
     },
     {
-      title: "Teams",
+      title: m.app_sidebar_group_teams(),
       children: teams().map((team) => ({
         id: `team-${team.key}`,
         title: team.name,
@@ -91,31 +92,31 @@ function createNavItems(): () => NavGroup[] {
         icon: () => <TeamAvatar team={team} size="5" />,
         children: [
           {
-            title: "Backlog",
+            title: m.app_sidebar_nav_backlog(),
             type: "link",
             href: `/${workspaceData().workspace.slug}/team/${team.key}/issues/backlog`,
             icon: CircleDashedIcon,
           },
           {
-            title: "Active Issues",
+            title: m.app_sidebar_nav_active_issues(),
             type: "link",
             href: `/${workspaceData().workspace.slug}/team/${team.key}/issues/active`,
             icon: AlertCircleIcon,
           },
           {
-            title: "All Issues",
+            title: m.app_sidebar_nav_all_issues(),
             type: "link",
             href: `/${workspaceData().workspace.slug}/team/${team.key}/issues/all`,
             icon: ListIcon,
           },
           {
-            title: "Board",
+            title: m.app_sidebar_nav_board(),
             type: "link",
             href: `/${workspaceData().workspace.slug}/team/${team.key}/issues/board`,
             icon: KanbanIcon,
           },
           {
-            title: "Sprints",
+            title: m.app_sidebar_nav_sprints(),
             type: "link",
             href: `/${workspaceData().workspace.slug}/team/${team.key}/sprints`,
             icon: LandPlotIcon,
@@ -165,14 +166,14 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
             <TooltipTrigger as="div" class="w-full">
               <Button size="sm" class="w-full" onClick={() => open()}>
                 <PlusIcon class="size-4" strokeWidth={2.75} />
-                Create
+                {m.common_create()}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <span class="mr-2">Create a new issue</span>
+              <span class="mr-2">{m.app_sidebar_create_issue_tooltip()}</span>
               <KbdGroup>
                 <Kbd>C</Kbd>
-                then
+                {m.common_then()}
                 <Kbd>R</Kbd>
               </KbdGroup>
             </TooltipContent>

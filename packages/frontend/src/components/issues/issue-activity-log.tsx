@@ -3,6 +3,7 @@ import type { IssueChangeEventType, SerializedUser } from "@blackwall/database/s
 import type { InferDbType } from "@blackwall/database/types";
 import { issueMappings } from "@/lib/mappings";
 import { formatRelative } from "date-fns";
+import { m } from "@/paraglide/messages.js";
 import { createMemo, Index, Match, Show, Switch } from "solid-js";
 import { IssueComment, IssueCommentForm } from "./issue-comment";
 
@@ -95,15 +96,15 @@ function buildTimelineItems(
 function formatEventTypeText(eventType: IssueChangeEventType): string {
   switch (eventType) {
     case "issue_created":
-      return "created the issue";
+      return m.issue_activity_event_created();
     case "assignee_changed":
-      return "assigned the issue to ";
+      return m.issue_activity_event_assigned_to();
     case "priority_changed":
-      return "changed the priority to ";
+      return m.issue_activity_event_priority_to();
     case "status_changed":
-      return "changed the status to ";
+      return m.issue_activity_event_status_to();
     case "time_logged":
-      return "logged time";
+      return m.issue_activity_event_logged_time();
     default:
       return eventType;
   }
@@ -114,12 +115,12 @@ function getEventEntityText(event: Event, assignedTo: SerializedUser | null): st
     case "assignee_changed": {
       const assignedToId = event.changes?.assignedToId?.to;
       if (assignedToId === event.actorId) {
-        return "themselves";
+        return m.issue_activity_entity_themselves();
       }
       if (assignedTo) {
         return assignedTo.name;
       }
-      return assignedToId ?? "nobody";
+      return assignedToId ?? m.issue_activity_entity_nobody();
     }
     case "priority_changed": {
       const toPriority = event.changes?.priority?.to;

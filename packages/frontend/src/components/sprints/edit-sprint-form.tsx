@@ -11,6 +11,7 @@ import { DatePicker } from "@/components/custom-ui/date-picker";
 import { Button } from "@/components/ui/button";
 import type { UpdateIssueSprint } from "@blackwall/backend/src/features/issue-sprints/issue-sprint.zod";
 import { toast } from "../custom-ui/toast";
+import { m } from "@/paraglide/messages.js";
 
 type EditSprintFormProps = {
   workspaceSlug: string;
@@ -26,7 +27,7 @@ const updateSprintAction = action(
       json: value,
     });
 
-    toast.success("Sprint updated successfully");
+    toast.success(m.edit_sprint_form_toast_updated());
     throw redirect(`/${workspaceSlug}/team/${teamKey}/sprints/${sprintId}`);
   },
 );
@@ -44,13 +45,13 @@ export function EditSprintForm(props: EditSprintFormProps) {
     validators: {
       onSubmit: z
         .object({
-          name: z.string().min(1, "Name is required"),
+          name: z.string().min(1, m.common_name_required()),
           goal: z.string().nullable(),
           startDate: z.iso.date(),
           endDate: z.iso.date(),
         })
         .refine((data) => data.endDate >= data.startDate, {
-          message: "End date must be on or after start date",
+          message: m.common_end_date_on_or_after_start_date(),
           path: ["endDate"],
         }),
     },
@@ -63,7 +64,7 @@ export function EditSprintForm(props: EditSprintFormProps) {
     <div class="flex flex-col gap-6 mx-auto max-w-2xl p-4 sm:pt-12 sm:pb-12">
       <div class="flex flex-col gap-3 items-center">
         <TeamAvatar team={props.team} size="md" />
-        <h1 class="text-xl sm:text-2xl font-medium text-center">Edit sprint</h1>
+        <h1 class="text-xl sm:text-2xl font-medium text-center">{m.edit_sprint_form_title()}</h1>
       </div>
 
       <form
@@ -77,8 +78,8 @@ export function EditSprintForm(props: EditSprintFormProps) {
         <form.AppField name="name">
           {() => (
             <TanStackTextField
-              label="Name"
-              placeholder={`e.g. "Q1 2026 improvements", "Feature X"`}
+              label={m.common_name_label()}
+              placeholder={m.sprint_form_name_placeholder()}
             />
           )}
         </form.AppField>
@@ -86,8 +87,8 @@ export function EditSprintForm(props: EditSprintFormProps) {
         <form.AppField name="goal">
           {() => (
             <TanStackTextArea
-              label="Goal"
-              placeholder="What do you want to achieve?"
+              label={m.common_goal()}
+              placeholder={m.sprint_form_goal_placeholder()}
               textareaClass="min-h-24"
             />
           )}
@@ -100,7 +101,7 @@ export function EditSprintForm(props: EditSprintFormProps) {
 
               return (
                 <div class="flex flex-col gap-2 w-full">
-                  <Label for={field().name}>Start date</Label>
+                  <Label for={field().name}>{m.common_start_date()}</Label>
                   <DatePicker
                     selected={calendarDate()}
                     onSelect={(date) => field().handleChange(date.toString())}
@@ -116,7 +117,7 @@ export function EditSprintForm(props: EditSprintFormProps) {
 
               return (
                 <div class="flex flex-col gap-2 w-full">
-                  <Label for={field().name}>End date</Label>
+                  <Label for={field().name}>{m.common_end_date()}</Label>
                   <DatePicker
                     selected={calendarDate()}
                     onSelect={(date) => field().handleChange(date.toString())}
@@ -131,7 +132,7 @@ export function EditSprintForm(props: EditSprintFormProps) {
           {(state) => (
             <div class="flex flex-col gap-2 items-center mt-2">
               <Button type="submit" size="lg" disabled={!state().canSubmit}>
-                Save changes
+                {m.common_save_changes()}
               </Button>
             </div>
           )}

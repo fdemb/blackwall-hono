@@ -9,6 +9,7 @@ import type { PickerOption } from "../custom-ui/picker";
 import { PickerDialog } from "../custom-ui/picker-dialog";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
+import { m } from "@/paraglide/messages.js";
 
 interface PickerOptionWithType extends PickerOption {
   type: "issue" | "user";
@@ -74,7 +75,7 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
 
   return (
     <Dialog open={open()} onOpenChange={handleOpenChange}>
-      <DialogTrigger as={Button} size="iconSm" variant="outline">
+      <DialogTrigger as={Button} size="iconSm" variant="outline" aria-label={m.global_search_open_aria_label()}>
         <SearchIcon class="size-4" strokeWidth={2.75} />
       </DialogTrigger>
 
@@ -84,7 +85,11 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
         manualFiltering
         search={searchTerm()}
         onSearchChange={setSearchTermDebounced}
-        emptyText={searchTerm().length > 0 ? "No results" : "Search for an issue or user"}
+        emptyText={
+          searchTerm().length > 0
+            ? m.global_search_empty_no_results()
+            : m.global_search_empty_prompt()
+        }
         closeOnSelect
         renderOption={(option) => (
           <div class="flex flex-row items-center gap-2">

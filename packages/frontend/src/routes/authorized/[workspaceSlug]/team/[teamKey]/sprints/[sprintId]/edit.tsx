@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
+import { m } from "@/paraglide/messages.js";
 
 export default function EditSprintPage() {
   const params = useParams();
@@ -32,7 +33,7 @@ export default function EditSprintPage() {
             <BreadcrumbsItem
               linkProps={{ href: `/${params.workspaceSlug}/team/${params.teamKey}/sprints` }}
             >
-              Sprints
+              {m.team_sprints_list_breadcrumb()}
             </BreadcrumbsItem>
             <BreadcrumbsItem
               linkProps={{
@@ -41,7 +42,7 @@ export default function EditSprintPage() {
             >
               {sprint()!.name}
             </BreadcrumbsItem>
-            <BreadcrumbsItem>Edit</BreadcrumbsItem>
+            <BreadcrumbsItem>{m.common_edit()}</BreadcrumbsItem>
           </Breadcrumbs>
         </PageHeader>
 

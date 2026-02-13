@@ -3,6 +3,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { Button } from "../ui/button";
 import CheckIcon from "lucide-solid/icons/check";
 import XIcon from "lucide-solid/icons/x";
+import { m } from "@/paraglide/messages.js";
 
 type IssueEditButtonsProps = {
   isEditing: boolean;
@@ -23,7 +24,7 @@ export const IssueEditButtons: Component<IssueEditButtonsProps> = (props) => {
               <CheckIcon class="size-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Save</TooltipContent>
+          <TooltipContent>{m.common_save()}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -32,7 +33,7 @@ export const IssueEditButtons: Component<IssueEditButtonsProps> = (props) => {
               <XIcon class="size-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Cancel</TooltipContent>
+          <TooltipContent>{m.common_cancel()}</TooltipContent>
         </Tooltip>
       </div>
     </Show>

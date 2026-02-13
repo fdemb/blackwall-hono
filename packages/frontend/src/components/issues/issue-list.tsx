@@ -5,6 +5,7 @@ import { createRowSelection } from "@/components/datatable/row-selection-feature
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatDateShort } from "@/lib/dates";
 import { issueMappings } from "@/lib/mappings";
+import { m } from "@/paraglide/messages.js";
 import { Index } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
@@ -82,7 +83,7 @@ function IssueListItem(props: {
           visibility="outline"
           checked={props.isSelected}
           onChange={props.onToggleSelection}
-          aria-label="Select row"
+          aria-label={m.datatable_selection_select_row()}
           onClick={(e: MouseEvent) => {
             e.stopPropagation();
             e.preventDefault();

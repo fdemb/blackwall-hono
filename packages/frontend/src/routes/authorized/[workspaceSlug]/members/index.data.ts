@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { m } from "@/paraglide/messages.js";
 import { query } from "@solidjs/router";
 
 export const membersLoader = query(async (slug: string) => {
@@ -9,7 +10,7 @@ export const membersLoader = query(async (slug: string) => {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch members");
+    throw new Error(m.loader_members_fetch_failed());
   }
 
   const { members } = await res.json();
