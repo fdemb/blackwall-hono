@@ -350,7 +350,15 @@ function BoardList(props: BoardListProps) {
 }
 
 function DropIndicator() {
-  return <div class="h-1 bg-primary rounded-full mx-1" />;
+  const { dragState } = useBoardDnD();
+  const height = () => dragState.initialRect?.height ?? 0;
+
+  return (
+    <div
+      class="border-2 border-dashed border-primary/40 bg-primary/5 squircle-md"
+      style={{ height: `${height()}px` }}
+    />
+  );
 }
 
 type BoardItemProps = {
@@ -373,7 +381,7 @@ function BoardItem(props: BoardItemProps) {
       data-issue-key={props.issue.key}
       class="p-4 border squircle-md relative shadow-sm bg-surface select-none"
       classList={{
-        "opacity-50": isDragged(),
+        "hidden": isDragged(),
       }}
       style={{ "touch-action": "none" }}
       draggable={false}
