@@ -37,7 +37,9 @@ export function EstimationPickerPopover(props: {
         size="sm"
         class="min-w-16 justify-start font-normal"
       >
-        {props.estimationPoints ?? "—"}
+        {props.estimationPoints === null
+          ? "—"
+          : `${props.estimationPoints} ${m.issue_estimation_points({ count: String(props.estimationPoints) })}`}
       </Popover.Trigger>
 
       <Popover.Portal>
@@ -51,7 +53,7 @@ export function EstimationPickerPopover(props: {
                   classList={{ "bg-accent": props.estimationPoints === points }}
                   onClick={() => handleChange(points)}
                 >
-                  {points} {points === 1 ? m.issue_estimation_point() : m.issue_estimation_points()}
+                  {points} {m.issue_estimation_points({ count: String(points) })}
                 </button>
               )}
             </For>

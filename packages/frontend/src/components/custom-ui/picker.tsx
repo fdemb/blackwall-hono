@@ -288,9 +288,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
 
         <Match when={filteredOptions().length > 0}>
           <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
-            {filteredOptions().length === 1
-              ? m.picker_options_available_single({ count: String(filteredOptions().length) })
-              : m.picker_options_available_multiple({ count: String(filteredOptions().length) })}
+            {m.picker_options_available({ count: String(filteredOptions().length) })}
           </div>
 
           <ScrollArea>

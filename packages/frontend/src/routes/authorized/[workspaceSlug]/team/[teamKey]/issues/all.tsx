@@ -32,9 +32,7 @@ const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
   await api.api.issues.bulk.$patch({ json: input });
   const count = input.issueIds.length;
   toast.success(
-    count > 1
-      ? m.issues_bulk_move_to_sprint_multiple({ count: String(count) })
-      : m.issues_bulk_move_to_sprint_single(),
+    m.issues_bulk_move_to_sprint({ count: String(count) }),
   );
 });
 

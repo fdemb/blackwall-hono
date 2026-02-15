@@ -40,9 +40,7 @@ const SprintDropZone: Component<{ sprint: SerializedIssueSprint }> = (props) => 
       class="bg-card squircle-md border border-dashed fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center justify-center px-6 py-4 animate-in slide-in-from-bottom-4 fade-in-50 ease-out transition-shadow data-[drop-hover]:ring-2 data-[drop-hover]:ring-primary"
       data-dropzone
     >
-      {count() > 1
-        ? m.issue_dragging_drop_multiple({ count: String(count()), sprintName: props.sprint.name })
-        : m.issue_dragging_drop_single({ sprintName: props.sprint.name })}
+      {m.issue_dragging_drop({ count: String(count()), sprintName: props.sprint.name })}
     </div>
   );
 };

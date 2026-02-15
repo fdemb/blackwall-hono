@@ -146,9 +146,7 @@ function MembersSection() {
     <SettingsCard variant="column">
       <div class="flex items-center justify-between px-4 pb-2">
         <p class="text-sm text-muted-foreground">
-          {memberCount() === 1
-            ? m.common_member_count_single({ count: String(memberCount()) })
-            : m.common_member_count_multiple({ count: String(memberCount()) })}
+          {m.common_member_count({ count: String(memberCount()) })}
         </p>
 
         <div class="flex items-center gap-2">

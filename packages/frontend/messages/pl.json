@@ -51,8 +51,16 @@
   "common_goal": "Cel",
   "common_invite": "Zaproś",
   "common_loading": "Ładowanie...",
-  "common_member_count_multiple": "{count} członków",
-  "common_member_count_single": "{count} członek",
+  "common_member_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} członek",
+        "countPlural=*": "{count} członków"
+      }
+    }
+  ],
   "common_more": "Więcej",
   "common_name_label": "Nazwa",
   "common_name_required": "Nazwa jest wymagana",
@@ -139,11 +147,42 @@
   "issue_datatable_header_sprint": "Sprint",
   "issue_datatable_header_status": "Status",
   "issue_datatable_header_summary": "Podsumowanie",
-  "issue_dragging_drop_multiple": "Upuść tutaj, aby przenieść {count} zgłoszeń do sprintu {sprintName}",
-  "issue_dragging_drop_single": "Upuść tutaj, aby przenieść zgłoszenie do sprintu {sprintName}",
-  "issue_dragging_overlay_count": "{count} zgłoszeń",
-  "issue_estimation_point": "punkt",
-  "issue_estimation_points": "punkty",
+  "issue_dragging_drop": [
+    {
+      "declarations": ["input count", "input sprintName", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Upuść tutaj, aby przenieść {count} zgłoszenie do sprintu {sprintName}",
+        "countPlural=few": "Upuść tutaj, aby przenieść {count} zgłoszenia do sprintu {sprintName}",
+        "countPlural=many": "Upuść tutaj, aby przenieść {count} zgłoszeń do sprintu {sprintName}",
+        "countPlural=*": "Upuść tutaj, aby przenieść {count} zgłoszeń do sprintu {sprintName}"
+      }
+    }
+  ],
+  "issue_dragging_overlay_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} zgłoszenie",
+        "countPlural=few": "{count} zgłoszenia",
+        "countPlural=many": "{count} zgłoszeń",
+        "countPlural=*": "{count} zgłoszeń"
+      }
+    }
+  ],
+  "issue_estimation_points": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "punkt",
+        "countPlural=few": "punkty",
+        "countPlural=many": "punktów",
+        "countPlural=*": "punktów"
+      }
+    }
+  ],
   "issue_labels_picker_create_label": "Utwórz etykietę",
   "issue_labels_picker_empty_text": "Nie znaleziono etykiet. Zacznij pisać, aby utworzyć.",
   "issue_menu_delete_description": "Tej operacji nie można cofnąć. Zgłoszenie {issueKey} zostanie trwale usunięte.",
@@ -161,13 +200,24 @@
   "issue_priority_picker_toast_updated": "Priorytet zaktualizowany pomyślnie",
   "issue_priority_urgent": "Pilny",
   "issue_selection_delete_description": "Tej operacji nie można cofnąć. Wybrane zgłoszenia zostaną trwale usunięte.",
-  "issue_selection_delete_title": "Usunąć {count} wybranych zgłoszeń?",
+  "issue_selection_delete_title": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Usunąć {count} wybrane zgłoszenie?",
+        "countPlural=few": "Usunąć {count} wybrane zgłoszenia?",
+        "countPlural=many": "Usunąć {count} wybranych zgłoszeń?",
+        "countPlural=*": "Usunąć {count} wybranych zgłoszeń?"
+      }
+    }
+  ],
   "issue_selection_selected_count": "{count} zaznaczono",
   "issue_selection_toast_deleted": "Zgłoszenia usunięte pomyślnie",
   "issue_selection_toast_updated": "Zgłoszenia zaktualizowane pomyślnie",
   "issue_selection_unassigned": "Nieprzypisane",
   "issue_sidebar_label_assigned_to": "Przypisane do",
-  "issue_sidebar_label_estimate": "Estymacja",
+  "issue_sidebar_label_estimate": "Szacowanie",
   "issue_sidebar_label_labels": "Etykiety",
   "issue_sidebar_label_priority": "Priorytet",
   "issue_sidebar_label_sprint": "Sprint",
@@ -177,8 +227,18 @@
   "issue_status_in_progress": "W toku",
   "issue_status_to_do": "Do zrobienia",
   "issue_summary_toast_updated": "Podsumowanie zaktualizowane",
-  "issues_bulk_move_to_sprint_multiple": "{count} zgłoszeń przeniesiono do sprintu",
-  "issues_bulk_move_to_sprint_single": "Zgłoszenie przeniesiono do sprintu",
+  "issues_bulk_move_to_sprint": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} zgłoszenie przeniesiono do sprintu",
+        "countPlural=few": "{count} zgłoszenia przeniesiono do sprintu",
+        "countPlural=many": "{count} zgłoszeń przeniesiono do sprintu",
+        "countPlural=*": "{count} zgłoszeń przeniesiono do sprintu"
+      }
+    }
+  ],
   "loader_available_users_fetch_failed": "Nie udało się pobrać dostępnych użytkowników",
   "loader_invalid_issue_key": "Nieprawidłowy klucz zgłoszenia",
   "loader_member_detail_fetch_failed": "Nie udało się pobrać szczegółów członka",
@@ -206,8 +266,18 @@
   "my_issues_empty_title": "Brak zgłoszeń przypisanych do Ciebie",
   "picker_default_create_label": "Utwórz",
   "picker_default_empty_text": "Nie znaleziono opcji.",
-  "picker_options_available_multiple": "{count} opcji dostępnych",
-  "picker_options_available_single": "{count} opcja dostępna",
+  "picker_options_available": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opcja dostępna",
+        "countPlural=few": "{count} opcje dostępne",
+        "countPlural=many": "{count} opcji dostępnych",
+        "countPlural=*": "{count} opcji dostępnych"
+      }
+    }
+  ],
   "picker_search_aria_label": "Szukaj opcji",
   "picker_search_placeholder": "Szukaj...",
   "settings_general_language_description": "Wybierz preferowany język lub użyj domyślnego języka systemu.",
@@ -273,7 +343,7 @@
   "settings_teams_members_empty_title": "W tym zespole nie ma jeszcze członków.",
   "settings_teams_members_section_title": "Członkowie",
   "settings_teams_name_description": "Nazwa zespołu.",
-  "settings_teams_name_placeholder": "np. Świetny Zespół",
+  "settings_teams_name_placeholder": "np. Zespół X",
   "settings_teams_remove_member_aria_label": "Usuń {name} z zespołu",
   "settings_teams_table_header_created": "Utworzono",
   "settings_teams_table_header_issues": "Zgłoszenia",
@@ -326,7 +396,22 @@
   "team_sprints_detail_complete_sprint": "Zakończ sprint",
   "team_sprints_detail_empty_description": "Dodaj zgłoszenia do tego sprintu, aby śledzić postęp. Możesz przypisać istniejące zgłoszenia lub utworzyć nowe.",
   "team_sprints_detail_empty_title": "Brak zgłoszeń w tym sprincie",
-  "team_sprints_detail_issues_estimated": "{estimatedCount} z {totalCount} zgłoszeń ma estymację",
+  "team_sprints_detail_issues_estimated": [
+    {
+      "declarations": [
+        "input estimatedCount",
+        "input totalCount",
+        "local totalCountPlural = totalCount: plural"
+      ],
+      "selectors": ["totalCountPlural"],
+      "match": {
+        "totalCountPlural=one": "{estimatedCount} z {totalCount} zgłoszenia ma ustawione punkty",
+        "totalCountPlural=few": "{estimatedCount} z {totalCount} zgłoszeń ma ustawione punkty",
+        "totalCountPlural=many": "{estimatedCount} z {totalCount} zgłoszeń ma ustawione punkty",
+        "totalCountPlural=*": "{estimatedCount} z {totalCount} zgłoszeń ma ustawione punkty"
+      }
+    }
+  ],
   "team_sprints_detail_points_completed": "Ukończono {completedPoints} / {totalPoints} punktów",
   "team_sprints_detail_start_sprint": "Rozpocznij sprint",
   "team_sprints_list_action_starting": "Rozpoczynanie...",

@@ -51,8 +51,16 @@
   "common_goal": "Goal",
   "common_invite": "Invite",
   "common_loading": "Loading...",
-  "common_member_count_multiple": "{count} members",
-  "common_member_count_single": "{count} member",
+  "common_member_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} member",
+        "countPlural=other": "{count} members"
+      }
+    }
+  ],
   "common_more": "More",
   "common_name_label": "Name",
   "common_name_required": "Name is required",
@@ -139,11 +147,40 @@
   "issue_datatable_header_sprint": "Sprint",
   "issue_datatable_header_status": "Status",
   "issue_datatable_header_summary": "Summary",
-  "issue_dragging_drop_multiple": "Drop here to move {count} issues to sprint {sprintName}",
-  "issue_dragging_drop_single": "Drop here to move issue to sprint {sprintName}",
-  "issue_dragging_overlay_count": "{count} issues",
-  "issue_estimation_point": "point",
-  "issue_estimation_points": "points",
+  "issue_dragging_drop": [
+    {
+      "declarations": [
+        "input count",
+        "input sprintName",
+        "local countPlural = count: plural"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Drop here to move {count} issue to sprint {sprintName}",
+        "countPlural=other": "Drop here to move {count} issues to sprint {sprintName}"
+      }
+    }
+  ],
+  "issue_dragging_overlay_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} issue",
+        "countPlural=other": "{count} issues"
+      }
+    }
+  ],
+  "issue_estimation_points": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "point",
+        "countPlural=other": "points"
+      }
+    }
+  ],
   "issue_labels_picker_create_label": "Create label",
   "issue_labels_picker_empty_text": "No labels found. Start typing to create.",
   "issue_menu_delete_description": "This action cannot be undone. This will permanently delete the issue {issueKey}.",
@@ -161,7 +198,16 @@
   "issue_priority_picker_toast_updated": "Priority updated successfully",
   "issue_priority_urgent": "Urgent",
   "issue_selection_delete_description": "This action cannot be undone. This will permanently delete the selected issues.",
-  "issue_selection_delete_title": "Delete {count} selected issues?",
+  "issue_selection_delete_title": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Delete {count} selected issue?",
+        "countPlural=other": "Delete {count} selected issues?"
+      }
+    }
+  ],
   "issue_selection_selected_count": "{count} selected",
   "issue_selection_toast_deleted": "Issues deleted successfully",
   "issue_selection_toast_updated": "Issues updated successfully",
@@ -177,8 +223,16 @@
   "issue_status_in_progress": "In Progress",
   "issue_status_to_do": "To Do",
   "issue_summary_toast_updated": "Summary updated",
-  "issues_bulk_move_to_sprint_multiple": "{count} issues moved to sprint",
-  "issues_bulk_move_to_sprint_single": "Issue moved to sprint",
+  "issues_bulk_move_to_sprint": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} issue moved to sprint",
+        "countPlural=other": "{count} issues moved to sprint"
+      }
+    }
+  ],
   "loader_available_users_fetch_failed": "Failed to fetch available users",
   "loader_invalid_issue_key": "Invalid issue key",
   "loader_member_detail_fetch_failed": "Failed to fetch member details",
@@ -206,8 +260,16 @@
   "my_issues_empty_title": "No issues assigned to you",
   "picker_default_create_label": "Create",
   "picker_default_empty_text": "No options found.",
-  "picker_options_available_multiple": "{count} options available",
-  "picker_options_available_single": "{count} option available",
+  "picker_options_available": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} option available",
+        "countPlural=other": "{count} options available"
+      }
+    }
+  ],
   "picker_search_aria_label": "Search options",
   "picker_search_placeholder": "Search...",
   "settings_general_language_description": "Select a preferred language, or use your system default.",
@@ -326,7 +388,20 @@
   "team_sprints_detail_complete_sprint": "Complete sprint",
   "team_sprints_detail_empty_description": "Add issues to this sprint to track progress. You can assign existing issues or create new ones.",
   "team_sprints_detail_empty_title": "No issues in this sprint",
-  "team_sprints_detail_issues_estimated": "{estimatedCount} of {totalCount} issues estimated",
+  "team_sprints_detail_issues_estimated": [
+    {
+      "declarations": [
+        "input estimatedCount",
+        "input totalCount",
+        "local totalCountPlural = totalCount: plural"
+      ],
+      "selectors": ["totalCountPlural"],
+      "match": {
+        "totalCountPlural=one": "{estimatedCount} of {totalCount} issue estimated",
+        "totalCountPlural=other": "{estimatedCount} of {totalCount} issues estimated"
+      }
+    }
+  ],
   "team_sprints_detail_points_completed": "{completedPoints} / {totalPoints} points completed",
   "team_sprints_detail_start_sprint": "Start sprint",
   "team_sprints_list_action_starting": "Starting...",
