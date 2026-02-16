@@ -7,6 +7,8 @@ import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { InviteDialogContent } from "./invite-dialog";
 import ChevronRightIcon from "lucide-solid/icons/chevron-right";
+import { m } from "@/paraglide/messages";
+import { Badge } from "../custom-ui/badge";
 
 type UserForWorkspaceMemberList = SerializedUser & {
   teams?: { name: string }[];
@@ -24,11 +26,11 @@ export function WorkspaceMemberList(props: WorkspaceMemberListProps) {
     <div class="flex flex-col">
       <div class="flex items-center justify-between px-4 py-3 border-b">
         <p class="text-sm text-muted-foreground">
-          {memberCount()} {memberCount() === 1 ? "member" : "members"}
+          {m.common_member_count({ count: String(memberCount()) })}
         </p>
         <Dialog>
           <DialogTrigger as={Button} variant="outline" size="sm">
-            Invite
+            {m.common_invite()}
           </DialogTrigger>
           <InviteDialogContent />
         </Dialog>
@@ -61,9 +63,7 @@ function WorkspaceMemberListItem(props: {
           <div class="flex items-center gap-2">
             <span class="text-sm font-medium truncate">{props.member.name}</span>
             <Show when={isCurrentUser()}>
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
-                You
-              </span>
+              <Badge size="xs">{m.common_you_badge()}</Badge>
             </Show>
           </div>
           <Show when={props.member.email}>

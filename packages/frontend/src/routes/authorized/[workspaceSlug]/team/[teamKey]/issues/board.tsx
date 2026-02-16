@@ -187,9 +187,9 @@ export default function BoardPage() {
           }
         >
           <ScrollContainer>
-            <div ref={(el) => (boardContainerRef = el)} class="p-4 h-full">
-              <ScrollArea rootClass="h-full" viewportRef={(el) => dnd.setScrollContainerRef(el)}>
-                <div class="flex flex-row gap-4 relative h-full">
+            <div ref={(el) => (boardContainerRef = el)} class="p-4 min-h-full">
+              <ScrollArea rootClass="min-h-full" viewportRef={(el) => dnd.setScrollContainerRef(el)}>
+                <div class="flex flex-row gap-4 relative min-h-full">
                   <For each={columns}>
                     {(col) => (
                       <BoardList
@@ -216,7 +216,7 @@ export default function BoardPage() {
 
 function BoardCard(props: { issue: IssueForBoard }) {
   return (
-    <div class="w-full flex flex-col">
+    <div class="w-full flex flex-col p-4 ring-[0.5px] ring-foreground/10 ring-inset squircle-md relative shadow-sm bg-background select-none hover:bg-surface">
       <div class="pb-2">
         <p class="font-medium text-lg">{props.issue.summary}</p>
       </div>
@@ -259,9 +259,7 @@ function DragOverlay(props: { issues: IssueForBoard[]; ref?: (el: HTMLElement) =
             width: `${dragState.initialRect!.width}px`,
           }}
         >
-          <div class="p-4 border squircle-md shadow-xl bg-surface">
-            <BoardCard issue={issue()} />
-          </div>
+          <BoardCard issue={issue()} />
         </div>
       )}
     </Show>
@@ -330,11 +328,7 @@ function BoardList(props: BoardListProps) {
           setAnimationRef(el);
           setColumnRef(props.statusId, el);
         }}
-        class="bg-card squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5"
-        classList={{
-          "ring-border dark:ring-white/10": !isDropTarget(),
-          "ring-primary/50 bg-primary/5": isDropTarget(),
-        }}
+        class="bg-card squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5 transition-sensible ring-foreground/12"
       >
         <Show
           when={displayIssues().length > 0 || isDropTarget()}
@@ -404,7 +398,6 @@ function BoardItem(props: BoardItemProps) {
     <A
       ref={setRef}
       data-issue-key={props.issue.key}
-      class="p-4 border squircle-md relative shadow-sm bg-surface select-none"
       classList={{
         hidden: isDragged(),
       }}
