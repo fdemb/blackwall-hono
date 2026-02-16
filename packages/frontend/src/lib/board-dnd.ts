@@ -145,6 +145,8 @@ export function createBoardDnD() {
 
           if (first) {
             const rect = el.getBoundingClientRect();
+            const siblings = getIssueElementsInColumn(issueStatus);
+            const initialIndex = siblings.findIndex((s) => s.dataset.issueKey === issueKey);
             setDragState(
               produce((draft) => {
                 draft.isDragging = true;
@@ -153,7 +155,7 @@ export function createBoardDnD() {
                 draft.dragY = 0;
                 draft.initialRect = rect;
                 draft.overColumnId = issueStatus;
-                draft.overIndex = 0;
+                draft.overIndex = initialIndex >= 0 ? initialIndex : 0;
               }),
             );
           }

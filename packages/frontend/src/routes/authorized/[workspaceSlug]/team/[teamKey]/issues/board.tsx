@@ -32,6 +32,7 @@ import { toast } from "@/components/custom-ui/toast";
 import { SprintSection } from "./_components/sprint-section";
 import { BoardEmpty } from "./_components/board-empty";
 import { m } from "@/paraglide/messages.js";
+import { animateDropReturn, createBoardAnimation } from "@/lib/board-animation";
 
 type IssueForBoard = InferDbType<
   "issue",
@@ -120,6 +121,9 @@ export default function BoardPage() {
     () => (sprints() ?? []).find((sprint) => sprint.status === "planned") ?? null,
   );
 
+  let overlayRef: HTMLElement | undefined;
+  let boardContainerRef: HTMLElement | undefined;
+
   async function handleDrop() {
     if (!dragState.draggedIssueKey || !dragState.overColumnId) {
       resetDrag();
@@ -137,64 +141,75 @@ export default function BoardPage() {
       ...currentColumnIssues.slice(targetIndex).map((i) => i.key),
     ];
 
-    resetDrag();
+    const finalize = async () => {
+      resetDrag();
+      await _moveIssue(newColumnOrder, newStatus);
+    };
 
-    await _moveIssue(newColumnOrder, newStatus);
+    if (
+      overlayRef &&
+      boardContainerRef &&
+      animateDropReturn(overlayRef, boardContainerRef, finalize)
+    )
+      return;
+    await finalize();
   }
 
   return (
     <BoardDnDContext.Provider value={{ ...dnd, onDrop: handleDrop }}>
-      <div class="flex flex-col">
-        <PageHeader>
-          <div class="flex flex-1 flex-row items-center justify-between">
-            <Breadcrumbs>
-              <BreadcrumbsItem>
-                <div class="flex flex-row items-center gap-1">
-                  <TeamAvatar team={teamData()} size="5" />
-                  {teamData().name}
+      <div class="flex flex-col h-full">
+        <div class="flex flex-col">
+          <PageHeader>
+            <div class="flex flex-1 flex-row items-center justify-between">
+              <Breadcrumbs>
+                <BreadcrumbsItem>
+                  <div class="flex flex-row items-center gap-1">
+                    <TeamAvatar team={teamData()} size="5" />
+                    {teamData().name}
+                  </div>
+                </BreadcrumbsItem>
+                <BreadcrumbsItem>{m.team_issues_board_breadcrumb()}</BreadcrumbsItem>
+              </Breadcrumbs>
+
+              <SprintSection sprint={activeSprint()} />
+            </div>
+          </PageHeader>
+        </div>
+        <Show
+          when={activeSprint()}
+          fallback={
+            <div class="p-4">
+              <BoardEmpty
+                plannedSprint={firstPlannedSprint()}
+                onStartPlannedSprint={(sprintId) => _startSprint(params.teamKey!, sprintId)}
+              />
+            </div>
+          }
+        >
+          <ScrollContainer>
+            <div ref={(el) => (boardContainerRef = el)} class="p-4 h-full">
+              <ScrollArea rootClass="h-full" viewportRef={(el) => dnd.setScrollContainerRef(el)}>
+                <div class="flex flex-row gap-4 relative h-full">
+                  <For each={columns}>
+                    {(col) => (
+                      <BoardList
+                        statusName={issueMappings.status[col.id].label}
+                        statusId={col.id}
+                        issues={data()[col.id] ?? []}
+                        statusIcon={col.icon}
+                      />
+                    )}
+                  </For>
+
+                  <Show when={dragState.isDragging && dragState.initialRect}>
+                    <DragOverlay ref={(el) => (overlayRef = el)} issues={loaderData() ?? []} />
+                  </Show>
                 </div>
-              </BreadcrumbsItem>
-              <BreadcrumbsItem>{m.team_issues_board_breadcrumb()}</BreadcrumbsItem>
-            </Breadcrumbs>
-
-            <SprintSection sprint={activeSprint()} />
-          </div>
-        </PageHeader>
+              </ScrollArea>
+            </div>
+          </ScrollContainer>
+        </Show>
       </div>
-      <Show
-        when={activeSprint()}
-        fallback={
-          <div class="p-4">
-            <BoardEmpty
-              plannedSprint={firstPlannedSprint()}
-              onStartPlannedSprint={(sprintId) => _startSprint(params.teamKey!, sprintId)}
-            />
-          </div>
-        }
-      >
-        <ScrollContainer>
-          <div class="p-4">
-            <ScrollArea viewportRef={(el) => dnd.setScrollContainerRef(el)}>
-              <div class="flex flex-row gap-4 min-h-96 relative">
-                <For each={columns}>
-                  {(col) => (
-                    <BoardList
-                      statusName={issueMappings.status[col.id].label}
-                      statusId={col.id}
-                      issues={data()[col.id] ?? []}
-                      statusIcon={col.icon}
-                    />
-                  )}
-                </For>
-
-                <Show when={dragState.isDragging && dragState.initialRect}>
-                  <DragOverlay issues={loaderData() ?? []} />
-                </Show>
-              </div>
-            </ScrollArea>
-          </div>
-        </ScrollContainer>
-      </Show>
     </BoardDnDContext.Provider>
   );
 }
@@ -226,7 +241,7 @@ function BoardCard(props: { issue: IssueForBoard }) {
   );
 }
 
-function DragOverlay(props: { issues: IssueForBoard[] }) {
+function DragOverlay(props: { issues: IssueForBoard[]; ref?: (el: HTMLElement) => void }) {
   const { dragState } = useBoardDnD();
   const draggedIssue = createMemo(() =>
     props.issues.find((i) => i.key === dragState.draggedIssueKey),
@@ -236,6 +251,7 @@ function DragOverlay(props: { issues: IssueForBoard[] }) {
     <Show when={draggedIssue()}>
       {(issue) => (
         <div
+          ref={props.ref}
           class="fixed pointer-events-none z-50 transition-transform duration-75"
           style={{
             left: `${dragState.initialRect!.left + dragState.dragX}px`,
@@ -243,7 +259,7 @@ function DragOverlay(props: { issues: IssueForBoard[] }) {
             width: `${dragState.initialRect!.width}px`,
           }}
         >
-          <div class="p-4 ring-2 ring-primary squircle-md shadow-xl bg-card scale-105 opacity-95">
+          <div class="p-4 border squircle-md shadow-xl bg-surface">
             <BoardCard issue={issue()} />
           </div>
         </div>
@@ -284,6 +300,8 @@ function BoardList(props: BoardListProps) {
     return [...props.issues].sort((a, b) => a.order - b.order);
   });
 
+  const setAnimationRef = createBoardAnimation(dragState, props.statusId);
+
   return (
     <div class="flex flex-col min-w-80 group">
       <div class={`pb-2 text-sm flex flex-row items-center ${mappedStatus().textClass}`}>
@@ -308,7 +326,10 @@ function BoardList(props: BoardListProps) {
         </Button>
       </div>
       <div
-        ref={(el) => setColumnRef(props.statusId, el)}
+        ref={(el) => {
+          setAnimationRef(el);
+          setColumnRef(props.statusId, el);
+        }}
         class="bg-card squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5"
         classList={{
           "ring-border dark:ring-white/10": !isDropTarget(),
@@ -358,7 +379,8 @@ function DropIndicator() {
 
   return (
     <div
-      class="border-2 border-dashed border-primary/40 bg-primary/5 squircle-md"
+      data-drop-indicator
+      class="border-2 border-dashed border-primary/40 bg-primary/5 squircle-md animate-in fade-in duration-200"
       style={{ height: `${height()}px` }}
     />
   );
