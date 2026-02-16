@@ -317,7 +317,9 @@ function BoardList(props: BoardListProps) {
       >
         <Show
           when={displayIssues().length > 0 || isDropTarget()}
-          fallback={<span class="p-6 text-center text-muted-foreground">{m.common_no_issues()}</span>}
+          fallback={
+            <span class="p-6 text-center text-muted-foreground">{m.common_no_issues()}</span>
+          }
         >
           <For each={displayIssues()}>
             {(issue, index) => (
@@ -382,7 +384,7 @@ function BoardItem(props: BoardItemProps) {
       data-issue-key={props.issue.key}
       class="p-4 border squircle-md relative shadow-sm bg-surface select-none"
       classList={{
-        "hidden": isDragged(),
+        hidden: isDragged(),
       }}
       style={{ "touch-action": "none" }}
       draggable={false}

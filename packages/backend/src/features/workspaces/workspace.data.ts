@@ -102,7 +102,11 @@ export async function getWorkspaceMember(input: { workspaceId: string; userId: s
       },
     },
     with: {
-      teams: true,
+      teams: {
+        where: {
+          workspaceId: input.workspaceId,
+        },
+      },
     },
   });
 

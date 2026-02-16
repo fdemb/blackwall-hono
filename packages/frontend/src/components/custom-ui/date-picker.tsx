@@ -7,8 +7,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import { m } from "@/paraglide/messages.js";
+import { getLocale } from "@/paraglide/runtime";
 
-const dateFormatter = new DateFormatter("en-US", {
+const dateFormatter = new DateFormatter(getLocale(), {
   dateStyle: "long",
 });
 

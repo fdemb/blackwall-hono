@@ -13,16 +13,19 @@ import { useSessionData } from "@/context/session-context";
 import { createAsync, useParams, A } from "@solidjs/router";
 import { For, Show } from "solid-js";
 import { memberDetailLoader } from "./[userId].data";
+import { getLocale } from "@/paraglide/runtime";
+import { useWorkspaceData } from "@/context/workspace-context";
 
 export default function MemberDetailPage() {
   const params = useParams();
   const session = useSessionData();
   const member = createAsync(() => memberDetailLoader(params.workspaceSlug!, params.userId!));
   const isCurrentUser = () => member()?.id === session().user.id;
+  const workspaceData = useWorkspaceData();
 
   const formatDate = (date: string | Date | null | undefined) => {
     if (!date) return m.members_detail_unknown_date();
-    return new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat(getLocale(), {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -40,7 +43,9 @@ export default function MemberDetailPage() {
           >
             {m.members_detail_breadcrumb_members()}
           </BreadcrumbsItem>
-          <BreadcrumbsItem>{member()?.name ?? m.members_detail_breadcrumb_member_fallback()}</BreadcrumbsItem>
+          <BreadcrumbsItem>
+            {member()?.name ?? m.members_detail_breadcrumb_member_fallback()}
+          </BreadcrumbsItem>
         </Breadcrumbs>
       </PageHeader>
       <ScrollContainer>
@@ -77,7 +82,11 @@ export default function MemberDetailPage() {
                 </SettingsCard>
               </SettingsSection>
 
-              <SettingsSection title={m.members_detail_section_teams()}>
+              <SettingsSection
+                title={m.members_detail_section_teams({
+                  workspaceName: workspaceData().workspace.displayName,
+                })}
+              >
                 <SettingsCard>
                   <Show
                     when={memberData().teams && memberData().teams.length > 0}

@@ -149,11 +149,7 @@
   "issue_datatable_header_summary": "Summary",
   "issue_dragging_drop": [
     {
-      "declarations": [
-        "input count",
-        "input sprintName",
-        "local countPlural = count: plural"
-      ],
+      "declarations": ["input count", "input sprintName", "local countPlural = count: plural"],
       "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Drop here to move {count} issue to sprint {sprintName}",
@@ -249,7 +245,7 @@
   "members_detail_row_email": "Email",
   "members_detail_row_joined": "Joined",
   "members_detail_section_details": "Details",
-  "members_detail_section_teams": "Teams",
+  "members_detail_section_teams": "Teams in {workspaceName}",
   "members_detail_unknown_date": "Unknown",
   "members_index_breadcrumb": "Workspace members",
   "members_index_empty_description": "Invite teammates to collaborate on issues and sprints.",
@@ -438,6 +434,7 @@
   "tiptap_slash_numbered_list_title": "Numbered List",
   "tiptap_slash_quote_description": "Add a blockquote",
   "tiptap_slash_quote_title": "Quote",
+  "tiptap_slash_hint": "/ to show commands",
   "user_menu_log_out": "Log out",
   "user_menu_settings": "Settings",
   "workspace_picker_no_workspaces_found": "No workspaces found."

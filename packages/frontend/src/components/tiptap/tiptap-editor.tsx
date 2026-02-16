@@ -1,4 +1,4 @@
-import { Editor, type Content, type JSONContent } from "@tiptap/core";
+import { Editor, type Content } from "@tiptap/core";
 import { Image } from "@tiptap/extension-image";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { StarterKit } from "@tiptap/starter-kit";
@@ -149,6 +149,10 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
           }),
           Image,
           Placeholder.configure({ placeholder: merged.placeholder }),
+          Placeholder.configure({
+            placeholder: m.tiptap_slash_hint(),
+            dataAttribute: "slash-hint",
+          }),
           SlashCommand.configure({
             suggestion: {
               items: ({ query }) => getSlashCommandItems(query),
