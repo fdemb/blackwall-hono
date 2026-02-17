@@ -1,6 +1,6 @@
 import type { InferDbType } from "@blackwall/database/types";
 import { UserAvatar } from "../custom-ui/avatar";
-import { formatRelative } from "date-fns";
+import { formatRelative } from "@/lib/dates";
 import { TiptapEditor } from "../tiptap/tiptap-editor";
 import { createEffect, createSignal, Show } from "solid-js";
 import { api, apiFetch } from "@/lib/api";
@@ -23,7 +23,6 @@ import EllipsisIcon from "lucide-solid/icons/ellipsis";
 import TrashIcon from "lucide-solid/icons/trash-2";
 import SendHorizontalIcon from "lucide-solid/icons/send-horizontal";
 import { toast } from "../custom-ui/toast";
-import type { SerializedIssueAttachment } from "@blackwall/database";
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/core";
 import { m } from "@/paraglide/messages.js";

@@ -29,7 +29,7 @@ import {
 import { TextField } from "@/components/ui/text-field";
 import { api } from "@/lib/api";
 import { query, createAsync, action, reload, useAction } from "@solidjs/router";
-import { formatRelative } from "date-fns";
+import { formatRelative } from "@/lib/dates";
 import ClockIcon from "lucide-solid/icons/clock";
 import EllipsisIcon from "lucide-solid/icons/ellipsis";
 import PlusIcon from "lucide-solid/icons/plus";

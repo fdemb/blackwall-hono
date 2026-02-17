@@ -2,7 +2,7 @@ import { UserAvatar } from "@/components/custom-ui/avatar";
 import type { IssueChangeEventType, SerializedUser } from "@blackwall/database/schema";
 import type { InferDbType } from "@blackwall/database/types";
 import { issueMappings } from "@/lib/mappings";
-import { formatRelative } from "date-fns";
+import { formatRelative } from "@/lib/dates";
 import { m } from "@/paraglide/messages.js";
 import { createMemo, Index, Match, Show, Switch } from "solid-js";
 import { IssueComment, IssueCommentForm } from "./issue-comment";
