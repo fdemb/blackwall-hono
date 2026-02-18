@@ -39,6 +39,7 @@ import { sprintsLoader } from "../index.data";
 import { useKeybinds } from "@/context/keybind.context";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 
 const archiveSprintAction = action(
@@ -146,9 +147,12 @@ export default function SprintDetailPage() {
   });
 
   return (
-    <Show when={sprint()}>
-      <>
-        <PageHeader>
+    <>
+      <Title>{m.meta_title_sprint()}</Title>
+      <Meta name="description" content={m.meta_desc_sprint()} />
+      <Show when={sprint()}>
+        <>
+          <PageHeader>
           <Breadcrumbs>
             <BreadcrumbsItem
               linkProps={{
@@ -307,6 +311,7 @@ export default function SprintDetailPage() {
         />
       </>
     </Show>
+    </>
   );
 }
 

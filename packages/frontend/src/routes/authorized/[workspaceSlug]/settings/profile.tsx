@@ -22,6 +22,7 @@ import { useSessionData } from "@/context/session-context";
 import { api } from "@/lib/api";
 import { backendUrl } from "@/lib/env";
 import { cn } from "@/lib/utils";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import Trash2 from "lucide-solid/icons/trash-2";
 import { createSignal, Show } from "solid-js";
@@ -39,7 +40,10 @@ export default function ProfileSettingsPage() {
   } as const;
 
   return (
-    <SettingsPage title={m.settings_profile_page_title()}>
+    <>
+      <Title>{m.meta_title_profile()}</Title>
+      <Meta name="description" content={m.meta_desc_profile()} />
+      <SettingsPage title={m.settings_profile_page_title()}>
       <SettingsSection title={m.settings_profile_section_account()}>
         <SettingsCard>
           <SettingsRow
@@ -75,6 +79,7 @@ export default function ProfileSettingsPage() {
         </SettingsCard>
       </SettingsSection>
     </SettingsPage>
+    </>
   );
 }
 

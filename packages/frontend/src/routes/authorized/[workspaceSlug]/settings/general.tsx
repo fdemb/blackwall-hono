@@ -9,6 +9,7 @@ import { useLocale } from "@/components/settings/use-locale";
 import { useTheme } from "@/components/settings/use-theme";
 import { Button } from "@/components/ui/button";
 import { useSessionData } from "@/context/session-context";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { Popover } from "@kobalte/core/popover";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
@@ -19,7 +20,10 @@ export default function GeneralSettingsPage() {
   const session = useSessionData();
 
   return (
-    <SettingsPage title={m.settings_general_page_title()}>
+    <>
+      <Title>{m.meta_title_settings()}</Title>
+      <Meta name="description" content={m.meta_desc_settings()} />
+      <SettingsPage title={m.settings_general_page_title()}>
       <SettingsSection title={m.settings_general_ui_section_title()}>
         <SettingsCard>
           <SettingsRow
@@ -39,6 +43,7 @@ export default function GeneralSettingsPage() {
         </SettingsCard>
       </SettingsSection>
     </SettingsPage>
+    </>
   );
 }
 

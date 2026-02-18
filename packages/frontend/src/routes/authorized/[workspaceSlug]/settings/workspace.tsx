@@ -14,6 +14,7 @@ import { useAppForm } from "@/context/form-context";
 import { useSessionData } from "@/context/session-context";
 import { useWorkspaceData } from "@/context/workspace-context";
 import { api } from "@/lib/api";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { createAsync, useParams } from "@solidjs/router";
 import { Index, Show } from "solid-js";
@@ -30,7 +31,10 @@ export default function WorkspaceSettingsPage() {
   } as const;
 
   return (
-    <SettingsPage title={m.settings_workspace_page_title()}>
+    <>
+      <Title>{m.meta_title_workspace_settings()}</Title>
+      <Meta name="description" content={m.meta_desc_workspace_settings()} />
+      <SettingsPage title={m.settings_workspace_page_title()}>
       <SettingsSection title={m.settings_workspace_section_details()}>
         <SettingsCard>
           <SettingsRow
@@ -53,6 +57,7 @@ export default function WorkspaceSettingsPage() {
         <MembersSection />
       </SettingsSection>
     </SettingsPage>
+    </>
   );
 }
 

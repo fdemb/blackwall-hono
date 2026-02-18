@@ -43,6 +43,7 @@ import MoreHorizontalIcon from "lucide-solid/icons/more-horizontal";
 import PlayIcon from "lucide-solid/icons/play";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import { Button } from "@/components/ui/button";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 
 const archiveSprintAction = action(
@@ -71,6 +72,8 @@ export default function SprintsPage() {
 
   return (
     <>
+      <Title>{m.meta_title_sprints()}</Title>
+      <Meta name="description" content={m.meta_desc_sprints()} />
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem>

@@ -31,6 +31,7 @@ import { sprintsLoader } from "../sprints/index.data";
 import { toast } from "@/components/custom-ui/toast";
 import { SprintSection } from "./_components/sprint-section";
 import { BoardEmpty } from "./_components/board-empty";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { animateDropReturn, createBoardAnimation } from "@/lib/board-animation";
 
@@ -156,7 +157,10 @@ export default function BoardPage() {
   }
 
   return (
-    <BoardDnDContext.Provider value={{ ...dnd, onDrop: handleDrop }}>
+    <>
+      <Title>{m.meta_title_board()}</Title>
+      <Meta name="description" content={m.meta_desc_board()} />
+      <BoardDnDContext.Provider value={{ ...dnd, onDrop: handleDrop }}>
       <div class="flex flex-col h-full">
         <div class="flex flex-col">
           <PageHeader>
@@ -211,6 +215,7 @@ export default function BoardPage() {
         </Show>
       </div>
     </BoardDnDContext.Provider>
+    </>
   );
 }
 

@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { validateFields } from "@/lib/form.utils";
 import { m } from "@/paraglide/messages.js";
 import { A, action, redirect, useAction } from "@solidjs/router";
+import { Title, Meta } from "@solidjs/meta";
 import { createSignal, Match, Switch } from "solid-js";
 import * as z from "zod";
 
@@ -52,7 +53,10 @@ export default function SignupPage() {
   const form = useSignupForm();
 
   return (
-    <AuthCard title={m.auth_signup_title()}>
+    <>
+      <Title>{m.meta_title_signup()}</Title>
+      <Meta name="description" content={m.meta_desc_signup()} />
+      <AuthCard title={m.auth_signup_title()}>
       <Switch>
         <Match when={step() === "account"}>
           <AccountForm
@@ -73,6 +77,7 @@ export default function SignupPage() {
         </Match>
       </Switch>
     </AuthCard>
+    </>
   );
 }
 

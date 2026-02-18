@@ -4,6 +4,7 @@ import { DataTable } from "@/components/datatable/datatable";
 import { SettingsPage, SettingsSection } from "@/components/settings/settings-sections";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDateShort } from "@/lib/dates";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { createColumnHelper } from "@tanstack/solid-table";
 import { A, createAsync, useParams } from "@solidjs/router";
@@ -20,7 +21,10 @@ export default function TeamsSettingsPage() {
   const params = useParams();
 
   return (
-    <SettingsPage title={m.settings_teams_index_page_title()} fullWidth>
+    <>
+      <Title>{m.meta_title_teams()}</Title>
+      <Meta name="description" content={m.meta_desc_teams()} />
+      <SettingsPage title={m.settings_teams_index_page_title()} fullWidth>
       <SettingsSection
         title={m.settings_teams_index_section_title()}
         rightContent={
@@ -35,6 +39,7 @@ export default function TeamsSettingsPage() {
         <TeamTable />
       </SettingsSection>
     </SettingsPage>
+    </>
   );
 }
 

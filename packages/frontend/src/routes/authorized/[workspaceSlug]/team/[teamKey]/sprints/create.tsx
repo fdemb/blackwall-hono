@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 
 export default function CreateSprintPage() {
@@ -13,6 +14,8 @@ export default function CreateSprintPage() {
 
   return (
     <>
+      <Title>{m.meta_title_create_sprint()}</Title>
+      <Meta name="description" content={m.meta_desc_create_sprint()} />
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem

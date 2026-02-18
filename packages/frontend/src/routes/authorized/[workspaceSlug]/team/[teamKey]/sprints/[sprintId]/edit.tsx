@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { Breadcrumbs, BreadcrumbsItem } from "@/components/custom-ui/breadcrumbs";
 import { TeamAvatar } from "@/components/custom-ui/avatar";
 import { ScrollContainer } from "@/components/custom-ui/scroll-area";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 
 export default function EditSprintPage() {
@@ -16,9 +17,12 @@ export default function EditSprintPage() {
   const sprint = () => data()?.sprint;
 
   return (
-    <Show when={sprint()}>
-      <>
-        <PageHeader>
+    <>
+      <Title>{m.meta_title_edit_sprint()}</Title>
+      <Meta name="description" content={m.meta_desc_edit_sprint()} />
+      <Show when={sprint()}>
+        <>
+          <PageHeader>
           <Breadcrumbs>
             <BreadcrumbsItem
               linkProps={{
@@ -56,5 +60,6 @@ export default function EditSprintPage() {
         </ScrollContainer>
       </>
     </Show>
+    </>
   );
 }

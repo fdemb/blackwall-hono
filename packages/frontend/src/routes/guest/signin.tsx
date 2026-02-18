@@ -6,6 +6,7 @@ import { useAppForm } from "@/context/form-context";
 import { authClient } from "@/lib/auth-client";
 import { m } from "@/paraglide/messages.js";
 import { A, action, redirect, useAction } from "@solidjs/router";
+import { Title, Meta } from "@solidjs/meta";
 import * as z from "zod";
 
 const signinAction = action(async (email: string, password: string) => {
@@ -42,7 +43,10 @@ export default function SignInPage() {
   }));
 
   return (
-    <AuthCard title={m.auth_signin_title()}>
+    <>
+      <Title>{m.meta_title_signin()}</Title>
+      <Meta name="description" content={m.meta_desc_signin()} />
+      <AuthCard title={m.auth_signin_title()}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -90,5 +94,6 @@ export default function SignInPage() {
         </div>
       </form>
     </AuthCard>
+    </>
   );
 }

@@ -26,6 +26,7 @@ import { api } from "@/lib/api";
 import type { BulkUpdateIssues } from "@blackwall/backend/src/features/issues/issue.zod";
 import { toast } from "@/components/custom-ui/toast";
 import { HideWhileDragging } from "@/components/issues/hide-while-dragging";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 
 const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
@@ -55,8 +56,11 @@ export default function ActiveIssuesPage() {
   });
 
   return (
-    <IssueDraggingProvider
-      sprints={openSprints()}
+    <>
+      <Title>{m.meta_title_active_issues()}</Title>
+      <Meta name="description" content={m.meta_desc_active_issues()} />
+      <IssueDraggingProvider
+        sprints={openSprints()}
       selectedIssues={selectedIssues}
       onDrop={(issues, sprint) => moveToSprint({ issueIds: issues.map((i) => i.id), updates: { sprintId: sprint.id } })}
     >
@@ -89,6 +93,7 @@ export default function ActiveIssuesPage() {
         />
       </Show>
     </IssueDraggingProvider>
+    </>
   );
 }
 

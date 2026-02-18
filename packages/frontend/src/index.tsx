@@ -1,6 +1,7 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 import { Navigate, Route, Router } from "@solidjs/router";
+import { MetaProvider, Title, Meta } from "@solidjs/meta";
 import "../assets/styles/globals.css";
 import { KeybindProvider } from "./context/keybind.context";
 import type { ParentComponent } from "solid-js";
@@ -95,10 +96,12 @@ const TeamDetailPage = lazy(
 
 const Root: ParentComponent = (props) => {
   return (
-    <>
+    <MetaProvider>
+      <Title>{m.meta_title_default()}</Title>
+      <Meta name="description" content={m.meta_desc_default()} />
       <Toaster />
       <KeybindProvider>{props.children}</KeybindProvider>
-    </>
+    </MetaProvider>
   );
 };
 

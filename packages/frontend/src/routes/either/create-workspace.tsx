@@ -5,6 +5,7 @@ import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
 import { m } from "@/paraglide/messages.js";
 import { useNavigate } from "@solidjs/router";
+import { Title, Meta } from "@solidjs/meta";
 import type { CreateWorkspace } from "@blackwall/backend/src/features/workspaces/workspace.zod";
 
 export default function CreateWorkspacePage() {
@@ -26,7 +27,10 @@ export default function CreateWorkspacePage() {
   }));
 
   return (
-    <AuthCard title={m.either_create_workspace_title()}>
+    <>
+      <Title>{m.meta_title_create_workspace()}</Title>
+      <Meta name="description" content={m.meta_desc_create_workspace()} />
+      <AuthCard title={m.either_create_workspace_title()}>
       <form
         class="flex flex-col gap-6"
         onSubmit={(e) => {
@@ -58,5 +62,6 @@ export default function CreateWorkspacePage() {
         </Button>
       </form>
     </AuthCard>
+    </>
   );
 }

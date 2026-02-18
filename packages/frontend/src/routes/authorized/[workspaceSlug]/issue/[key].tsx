@@ -12,6 +12,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useWorkspaceData } from "@/context/workspace-context";
 import type { SerializedTeam } from "@blackwall/database/schema";
 import { createAsync, useParams } from "@solidjs/router";
+import { Title, Meta } from "@solidjs/meta";
+import { m } from "@/paraglide/messages.js";
 import PanelRightIcon from "lucide-solid/icons/panel-right";
 import { Show } from "solid-js";
 import { Portal } from "solid-js/web";
@@ -47,6 +49,8 @@ export default function IssueDetailPage() {
 
   return (
     <>
+      <Title>{m.meta_title_issue({ key: params.key! })}</Title>
+      <Meta name="description" content={m.meta_desc_issue({ key: params.key! })} />
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem

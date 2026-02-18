@@ -8,6 +8,7 @@ import {
   SettingsRow,
   SettingsSection,
 } from "@/components/settings/settings-sections";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { useSessionData } from "@/context/session-context";
 import { createAsync, useParams, A } from "@solidjs/router";
@@ -34,6 +35,8 @@ export default function MemberDetailPage() {
 
   return (
     <>
+      <Title>{m.meta_title_member({ name: member()?.name ?? "Member" })}</Title>
+      <Meta name="description" content={m.meta_desc_member()} />
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem

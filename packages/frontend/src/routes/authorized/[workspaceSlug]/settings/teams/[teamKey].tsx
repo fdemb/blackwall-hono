@@ -14,6 +14,7 @@ import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { useSessionData } from "@/context/session-context";
 import { api } from "@/lib/api";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { Popover } from "@kobalte/core/popover";
 import { createAsync, revalidate, useNavigate, useParams } from "@solidjs/router";
@@ -28,10 +29,13 @@ export default function TeamDetailPage() {
   const teamData = createAsync(() => teamSettingsLoader(params.teamKey!));
 
   return (
-    <Show when={teamData()}>
-      {(data) => (
-        <>
-          <SettingsBackButton href={`/${params.workspaceSlug}/settings/teams`}>
+    <>
+      <Title>{m.meta_title_team_settings()}</Title>
+      <Meta name="description" content={m.meta_desc_team_settings()} />
+      <Show when={teamData()}>
+        {(data) => (
+          <>
+            <SettingsBackButton href={`/${params.workspaceSlug}/settings/teams`}>
             {m.settings_teams_back_to_management()}
           </SettingsBackButton>
           <SettingsPage title={data().team.name}>
@@ -48,6 +52,7 @@ export default function TeamDetailPage() {
         </>
       )}
     </Show>
+    </>
   );
 }
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import { useNavigate, useParams } from "@solidjs/router";
 import * as z from "zod";
@@ -42,6 +43,8 @@ export default function CreateTeamPage() {
 
   return (
     <>
+      <Title>{m.meta_title_create_team()}</Title>
+      <Meta name="description" content={m.meta_desc_create_team()} />
       <SettingsBackButton href={`/${params.workspaceSlug}/settings/teams`}>
         {m.settings_teams_back_to_management()}
       </SettingsBackButton>

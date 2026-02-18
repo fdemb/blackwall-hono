@@ -26,6 +26,7 @@ import { useTeamData } from "../../[teamKey]";
 import { sprintsLoader } from "../sprints/index.data";
 import { IssueDraggingProvider } from "@/context/issue-dragging-context";
 import { HideWhileDragging } from "@/components/issues/hide-while-dragging";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 
 const moveToSprintAction = action(async (input: BulkUpdateIssues) => {
@@ -57,8 +58,11 @@ export default function BacklogPage() {
   });
 
   return (
-    <IssueDraggingProvider
-      sprints={openSprints()}
+    <>
+      <Title>{m.meta_title_backlog()}</Title>
+      <Meta name="description" content={m.meta_desc_backlog()} />
+      <IssueDraggingProvider
+        sprints={openSprints()}
       selectedIssues={selectedIssues}
       onDrop={(issues, sprint) => moveToSprint({ issueIds: issues.map((i) => i.id), updates: { sprintId: sprint.id } })}
     >
@@ -91,6 +95,7 @@ export default function BacklogPage() {
         />
       </Show>
     </IssueDraggingProvider>
+    </>
   );
 }
 

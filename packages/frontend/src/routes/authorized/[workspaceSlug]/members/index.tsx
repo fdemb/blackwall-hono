@@ -8,6 +8,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Title, Meta } from "@solidjs/meta";
 import { m } from "@/paraglide/messages.js";
 import UsersIcon from "lucide-solid/icons/users";
 import { useWorkspaceData } from "@/context/workspace-context";
@@ -22,6 +23,8 @@ export default function MembersPage() {
 
   return (
     <>
+      <Title>{m.meta_title_members()}</Title>
+      <Meta name="description" content={m.meta_desc_members()} />
       <PageHeader>
         <Breadcrumbs>
           <BreadcrumbsItem>{m.members_index_breadcrumb()}</BreadcrumbsItem>

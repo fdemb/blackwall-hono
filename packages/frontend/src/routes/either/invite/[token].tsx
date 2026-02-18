@@ -5,6 +5,7 @@ import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
 import { m } from "@/paraglide/messages.js";
 import { createAsync, useNavigate, useParams } from "@solidjs/router";
+import { Title, Meta } from "@solidjs/meta";
 import * as z from "zod";
 import { invitationLoader } from "./[token].data";
 
@@ -45,6 +46,8 @@ export default function InvitePage() {
 
   return (
     <div>
+      <Title>{m.meta_title_join_workspace()}</Title>
+      <Meta name="description" content={m.meta_desc_join_workspace()} />
       <AuthCard
         title={m.either_invite_join_title({ workspaceName: invitation()?.workspace.displayName ?? "" })}
       >
