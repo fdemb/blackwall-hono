@@ -22,6 +22,7 @@ import {
   EmptyContent,
 } from "@/components/ui/empty";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import LandPlotIcon from "lucide-solid/icons/land-plot";
 import type { SerializedIssueSprint } from "@blackwall/database/schema";
 import { createColumnHelper, type ColumnDef } from "@tanstack/solid-table";
@@ -84,6 +85,12 @@ export default function SprintsPage() {
           </BreadcrumbsItem>
           <BreadcrumbsItem>{m.team_sprints_list_breadcrumb()}</BreadcrumbsItem>
         </Breadcrumbs>
+        <A
+          href={`/${params.workspaceSlug}/team/${params.teamKey}/sprints/create`}
+          class={cn(buttonVariants({ size: "xs" }), "ml-auto")}
+        >
+          {m.team_sprints_create_breadcrumb()}
+        </A>
       </PageHeader>
 
       <Show

@@ -7,7 +7,10 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.label.workspaceId,
       to: r.workspace.id,
     }),
-    issues: r.many.issue(),
+    issues: r.many.issue({
+      from: r.label.id.through(r.labelOnIssue.labelId),
+      to: r.issue.id.through(r.labelOnIssue.issueId),
+    }),
   },
   workspace: {
     labels: r.many.label(),
@@ -166,7 +169,10 @@ export const relations = defineRelations(schema, (r) => ({
     }),
   },
   issueSprint: {
-    workspaces: r.many.workspace(),
+    workspaces: r.many.workspace({
+      from: r.issueSprint.id.through(r.team.activeSprintId),
+      to: r.workspace.id.through(r.team.workspaceId),
+    }),
     issues: r.many.issue(),
   },
   workspaceInvitation: {

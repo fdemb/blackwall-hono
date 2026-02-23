@@ -31,9 +31,6 @@ async function build() {
     compile: {
       outfile: join(DIST_DIR, "blackwall"),
     },
-    define: {
-      DATABASE_URL: "blackwall_data/database.sqlite",
-    },
   });
 
   console.log(output);

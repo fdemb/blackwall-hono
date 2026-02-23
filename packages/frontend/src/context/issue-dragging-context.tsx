@@ -3,6 +3,9 @@ import { createIssueDnD, IssueDnDContext, useIssueDnD } from "@/lib/issue-dnd";
 import { m } from "@/paraglide/messages.js";
 import { For, onCleanup, Show, type Accessor, type Component, type ParentComponent } from "solid-js";
 import { Portal } from "solid-js/web";
+import { SprintStatusBadge } from "@/components/sprints/sprint-status-badge";
+import { formatDateShort } from "@/lib/dates";
+import CalendarIcon from "lucide-solid/icons/calendar";
 
 const DragOverlay: Component<{ issues: SerializedIssue[]; x: number; y: number }> = (props) => {
   return (
@@ -37,10 +40,23 @@ const SprintDropZone: Component<{ sprint: SerializedIssueSprint }> = (props) => 
   return (
     <div
       ref={(el) => setDropZoneRef(props.sprint.id, el)}
-      class="bg-card squircle-md border border-dashed fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center justify-center px-6 py-4 animate-in slide-in-from-bottom-4 fade-in-50 ease-out transition-shadow data-[drop-hover]:ring-2 data-[drop-hover]:ring-primary"
+      class="bg-card squircle-md border border-dashed flex flex-col items-center justify-center px-6 py-4 gap-1.5 animate-in slide-in-from-bottom-4 fade-in-50 ease-out transition-shadow data-[drop-hover]:ring-2 data-[drop-hover]:ring-primary"
       data-dropzone
     >
-      {m.issue_dragging_drop({ count: String(count()), sprintName: props.sprint.name })}
+      <div class="flex items-center gap-2">
+        <span class="font-medium text-sm">{props.sprint.name}</span>
+        <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarIcon class="size-3.5" />
+          <span>
+            {formatDateShort(new Date(props.sprint.startDate))} –{" "}
+            {formatDateShort(new Date(props.sprint.endDate))}
+          </span>
+        </div>
+        <SprintStatusBadge sprint={props.sprint} class="text-xs" />
+      </div>
+      <p class="text-xs text-muted-foreground mt-0.5">
+        {m.issue_dragging_drop({ count: String(count()), sprintName: props.sprint.name })}
+      </p>
     </div>
   );
 };
@@ -62,9 +78,11 @@ const IssueDraggingProvider: ParentComponent<IssueDraggingProviderProps> = (prop
     <IssueDnDContext.Provider value={dnd}>
       <Show when={dnd.dragState.draggedIssues.length > 0}>
         <DragOverlay issues={dnd.dragState.draggedIssues} x={dnd.dragState.cursorX} y={dnd.dragState.cursorY} />
-        <For each={props.sprints}>
-          {(sprint) => <SprintDropZone sprint={sprint} />}
-        </For>
+        <div class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
+          <For each={props.sprints}>
+            {(sprint) => <SprintDropZone sprint={sprint} />}
+          </For>
+        </div>
       </Show>
       {props.children}
     </IssueDnDContext.Provider>

@@ -31,7 +31,7 @@ import { Dynamic } from "solid-js/web";
 import { TeamAvatar } from "../custom-ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Button } from "../ui/button";
-import { LogoNoBg } from "./logos";
+import { Logo } from "./logos";
 import { UserMenu } from "./user-menu";
 import { WorkspacePicker } from "./workspace-picker";
 import { GlobalSearchDialog } from "./global-search-dialog";
@@ -156,8 +156,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
     <Sidebar {...props}>
       <SidebarHeader>
         <div class="flex items-center gap-1 text-lg leading-none font-medium p-1">
-          <LogoNoBg class="size-6 shrink-0 mr-1 text-primary" />
-          <span>/</span>
+          <Logo class="size-7 shrink-0 mr-1 text-primary" />
           <WorkspacePicker />
         </div>
 

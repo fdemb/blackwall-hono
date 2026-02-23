@@ -1,43 +1,12 @@
-import { cn } from "@/lib/utils";
-import { splitProps, type ComponentProps } from "solid-js";
+import type { ComponentProps } from "solid-js";
 
 export function Logo(props: ComponentProps<"svg">) {
-  const [local, others] = splitProps(props, ["class"]);
   return (
-    <svg
-      width="64"
-      height="64"
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class={cn("size-7 rounded-xs", local.class)}
-      {...others}
-    >
-      <rect width="64" height="64" fill="#C9184A" />
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
-        d="M64 11.4375H58.5352V23.1875H64V26.125H46.002V37.875H64V40.8125H58.5352V52.5625H64V55.5H0V52.5625H5.46484V40.8125H0V37.875H19.5645V26.125H0V23.1875H5.46484V11.4375H0V8.5H64V11.4375ZM8.40234 52.5625H30.5312V40.8125H8.40234V52.5625ZM33.4688 52.5625H55.5977V40.8125H33.4688V52.5625ZM22.502 37.875H43.0645V26.125H22.502V37.875ZM8.40234 23.1875H30.5312V11.4375H8.40234V23.1875ZM33.4688 23.1875H55.5977V11.4375H33.4688V23.1875Z"
-        fill="#fff"
-      />
-    </svg>
-  );
-}
-
-export function LogoNoBg(props: ComponentProps<"svg">) {
-  return (
-    <svg
-      width="64"
-      height="64"
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M64 11.4375H58.5352V23.1875H64V26.125H46.002V37.875H64V40.8125H58.5352V52.5625H64V55.5H0V52.5625H5.46484V40.8125H0V37.875H19.5645V26.125H0V23.1875H5.46484V11.4375H0V8.5H64V11.4375ZM8.40234 52.5625H30.5312V40.8125H8.40234V52.5625ZM33.4688 52.5625H55.5977V40.8125H33.4688V52.5625ZM22.502 37.875H43.0645V26.125H22.502V37.875ZM8.40234 23.1875H30.5312V11.4375H8.40234V23.1875ZM33.4688 23.1875H55.5977V11.4375H33.4688V23.1875Z"
+        d="M22.9717 0.802612L27.7324 3.55066V20.1991L8.68361 31.1971L4.26759 28.6483V11.5848L4.28029 11.5927L22.9717 0.802612ZM5.04591 28.1991L8.28908 30.0712V25.5809L5.04591 23.7089V28.1991ZM9.07716 25.5809V30.0712L17.6221 25.1385V20.6483L9.07716 25.5809ZM18.4004 20.1991V24.6893L26.9551 19.7499V15.2596L18.4004 20.1991ZM5.04591 22.8104L8.28908 24.6835V20.1932L5.04591 18.3202V22.8104ZM9.07716 20.1932V24.6835L12.9561 22.4442V17.954L9.07716 20.1932ZM13.7334 17.5048V21.995L22.2891 17.0555V12.5653L13.7334 17.5048ZM5.04591 17.4227L8.28908 19.2948V14.7762L5.04591 12.9032V17.4227ZM9.07716 14.7928V19.2948L17.6221 14.3622V9.87195L9.07716 14.7928ZM23.0654 12.1171V16.6073L26.9551 14.3622V9.87195L23.0654 12.1171ZM5.04591 12.0341L8.68361 14.1346L17.2627 9.18054L13.5996 7.06628L5.04591 12.0341ZM18.4004 9.42273V13.913L26.9551 8.97351V4.47156L18.4004 9.42273ZM14.3779 6.61707L18.041 8.73132L26.6455 3.76453L22.9326 1.67761L14.3779 6.61707Z"
         fill="currentColor"
       />
     </svg>
@@ -46,9 +15,9 @@ export function LogoNoBg(props: ComponentProps<"svg">) {
 
 export function LogoText() {
   return (
-    <div class="flex flex-row items-center gap-1 ">
-      <Logo class="size-5 shrink-0" />
-      <span class="text-lg font-[452] tracking-tighter">Blackwall</span>
+    <div class="flex flex-col items-center gap-2">
+      <Logo class="size-9 shrink-0 text-primary" />
+      <span class="text-lg uppercase tracking-wider font-medium">Blackwall</span>
     </div>
   );
 }
