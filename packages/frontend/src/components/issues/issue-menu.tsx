@@ -45,7 +45,13 @@ export function IssueMenu(props: IssueMenuProps) {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger as={Button} variant="ghost" size="iconXs">
+        <DropdownMenuTrigger
+          as={Button}
+          variant="ghost"
+          size="iconXs"
+          aria-label={m.common_more()}
+          data-testid="issue-menu-trigger"
+        >
           <EllipsisIcon class="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>

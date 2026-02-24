@@ -23,13 +23,18 @@ export function WorkspaceMemberList(props: WorkspaceMemberListProps) {
   const memberCount = () => props.members.length;
 
   return (
-    <div class="flex flex-col">
+    <div class="flex flex-col" data-testid="workspace-members-list">
       <div class="flex items-center justify-between px-4 py-3 border-b">
         <p class="text-sm text-muted-foreground">
           {m.common_member_count({ count: String(memberCount()) })}
         </p>
         <Dialog>
-          <DialogTrigger as={Button} variant="outline" size="sm">
+          <DialogTrigger
+            as={Button}
+            variant="outline"
+            size="sm"
+            data-testid="workspace-members-invite-trigger"
+          >
             {m.common_invite()}
           </DialogTrigger>
           <InviteDialogContent />
@@ -56,6 +61,7 @@ function WorkspaceMemberListItem(props: {
     <FastLink
       class="group px-4 py-3 hover:bg-accent bg-background flex flex-row min-w-0 items-center justify-between"
       href={`/${props.workspace.slug}/members/${props.member.id}`}
+      data-testid={`workspace-member-${props.member.id}`}
     >
       <div class="flex flex-row items-center flex-1 min-w-0 gap-3">
         <UserAvatar user={props.member} size="sm" />

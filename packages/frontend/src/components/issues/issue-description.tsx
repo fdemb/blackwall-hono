@@ -68,13 +68,14 @@ export function IssueDescription(props: { issue: SerializedIssue }) {
   };
 
   return (
-    <div class="pt-6 relative">
+    <div class="pt-6 relative" data-testid="issue-description">
       <TiptapEditor
         editorRef={setEditor}
         initialContent={props.issue.description}
         onAttachmentUpload={handleUpload}
         workspaceSlug={workspaceData().workspace.slug}
         variant="plain"
+        testId="issue-description-editor"
       />
 
       <IssueEditButtons isEditing={isEditing()} onSave={handleSave} onCancel={handleCancel} />

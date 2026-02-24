@@ -161,6 +161,7 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
           variant="outline"
           size="sm"
           class="min-w-16 justify-start font-normal gap-2 w-fit"
+          data-testid="time-entry-log-trigger"
         >
           <ClockIcon class="size-4 text-muted-foreground" />
           <Show when={totalTime()} fallback="—">
@@ -178,6 +179,7 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
               <TextField.Label>{m.time_entry_duration_label()}</TextField.Label>
               <TextField.Input
                 placeholder={m.time_entry_duration_placeholder()}
+                data-testid="time-entry-duration-input"
                 onKeyDown={(e: KeyboardEvent) => {
                   if (e.key === "Enter" && parsedDuration()) {
                     e.preventDefault();
@@ -194,12 +196,21 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
 
             <TextField value={description()} onChange={setDescription}>
               <TextField.Label>{m.time_entry_description_optional_label()}</TextField.Label>
-              <TextField.TextArea placeholder={m.time_entry_description_placeholder()} rows={2} />
+              <TextField.TextArea
+                placeholder={m.time_entry_description_placeholder()}
+                rows={2}
+                data-testid="time-entry-description-input"
+              />
             </TextField>
           </div>
 
           <DialogFooter>
-            <Button size="sm" disabled={!parsedDuration() || isSubmitting()} onClick={handleSubmit}>
+            <Button
+              size="sm"
+              disabled={!parsedDuration() || isSubmitting()}
+              onClick={handleSubmit}
+              data-testid="time-entry-log-submit"
+            >
               <PlusIcon class="size-4" />
               {m.time_entry_log_title()}
             </Button>
@@ -213,6 +224,7 @@ export function TimeEntryPickerPopover(props: { issueKey: string; workspaceSlug:
           variant="link"
           size="xxs"
           class="justify-start px-0 h-auto w-fit"
+          data-testid="time-entry-history-trigger"
         >
           {m.time_entry_history_button()}
         </DialogTrigger>
@@ -269,7 +281,7 @@ function TimeEntryItem(props: {
 
   return (
     <>
-      <div class="flex items-center gap-2 p-2 rounded-md hover:bg-accent group">
+      <div class="flex items-center gap-2 p-2 rounded-md hover:bg-accent group" data-testid="time-entry-item">
         <UserAvatar user={props.entry.user} size="xs" />
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
@@ -287,6 +299,7 @@ function TimeEntryItem(props: {
             variant="ghost"
             size="iconXs"
             class="opacity-0 group-hover:opacity-100"
+            aria-label={m.common_more()}
           >
             <EllipsisIcon class="size-4" />
           </DropdownMenuTrigger>

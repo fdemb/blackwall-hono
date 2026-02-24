@@ -58,7 +58,10 @@ export type IssueCommentProps = {
 
 export function IssueComment(props: IssueCommentProps) {
   return (
-    <div class="p-4 squircle-lg bg-muted border flex flex-col gap-3.5">
+    <div
+      class="p-4 squircle-lg bg-muted border flex flex-col gap-3.5"
+      data-testid="issue-comment-item"
+    >
       <div class="flex flex-row gap-1 items-center">
         <UserAvatar user={props.comment.author} size="xs" />
         <p class="font-medium">{props.comment.author.name}</p>
@@ -105,7 +108,13 @@ export function CommentMenu(props: CommentMenuProps) {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger as={Button} variant="ghost" size="iconXs" class="ml-auto">
+        <DropdownMenuTrigger
+          as={Button}
+          variant="ghost"
+          size="iconXs"
+          class="ml-auto"
+          aria-label={m.common_more()}
+        >
           <EllipsisIcon class="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -196,6 +205,7 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
         handleSubmit();
       }}
       class="relative"
+      data-testid="issue-comment-form"
     >
       <TiptapEditor
         editorRef={setEditor}
@@ -204,12 +214,15 @@ export function IssueCommentForm(props: IssueCommentFormProps) {
         placeholder={m.issue_comment_placeholder()}
         variant="plain"
         class="min-h-24 p-4 squircle-lg bg-muted border"
+        testId="issue-comment-editor"
       />
 
       <Button
         type="submit"
         size="sm"
         class="absolute bottom-4 right-4 px-1.5! aspect-square"
+        aria-label={m.common_create()}
+        data-testid="issue-comment-submit"
         disabled={empty()}
       >
         <SendHorizontalIcon class="size-4" />

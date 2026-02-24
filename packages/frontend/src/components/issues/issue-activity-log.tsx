@@ -138,7 +138,7 @@ export function IssueActivityLog(props: IssueActivityLogProps) {
   );
 
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4" data-testid="issue-activity-log">
       <Index each={timelineItems()}>
         {(item) => {
           return (

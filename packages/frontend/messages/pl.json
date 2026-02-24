@@ -10,6 +10,7 @@
   "app_sidebar_nav_members": "Członkowie",
   "app_sidebar_nav_my_issues": "Moje zgłoszenia",
   "app_sidebar_nav_sprints": "Sprinty",
+  "either_back_button": "Wróć do {workspace}",
   "archive_sprint_dialog_confirm": "Archiwizuj sprint",
   "archive_sprint_dialog_description": "To ukryje sprint na domyślnych listach sprintów. Do backlogu zostaną przeniesione tylko zgłoszenia niezakończone; zakończone pozostaną powiązane dla historii.",
   "archive_sprint_dialog_title": "Zarchiwizować ten sprint?",

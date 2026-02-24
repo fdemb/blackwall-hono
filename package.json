@@ -6,6 +6,7 @@
   ],
   "type": "module",
   "scripts": {
+    "dev": "bun run --filter '*' dev",
     "dev:backend": "bun run --filter '@blackwall/backend' dev",
     "dev:frontend": "bun run --filter 'frontend' dev",
     "build": "bun run --filter blackwall build",
@@ -19,7 +20,10 @@
     "typecheck:database": "bun run --filter @blackwall/database typecheck",
     "typecheck:queue": "bun run --filter @blackwall/queue typecheck",
     "typecheck:email": "bun run --filter @blackwall/email typecheck",
-    "typecheck:blackwall": "bun run --filter blackwall typecheck"
+    "typecheck:blackwall": "bun run --filter blackwall typecheck",
+    "typecheck:e2e": "bun run --filter '@blackwall/e2e' typecheck",
+    "test:e2e": "bun run --env-file=packages/e2e/.env.e2e --filter '@blackwall/e2e' test",
+    "test:e2e:ui": "bun run --env-file=packages/e2e/.env.e2e --filter '@blackwall/e2e' test:ui"
   },
   "dependencies": {
     "@solidjs/meta": "^0.29.4",

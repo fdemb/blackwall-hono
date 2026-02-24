@@ -306,7 +306,7 @@ function BoardList(props: BoardListProps) {
   const setAnimationRef = createBoardAnimation(dragState, props.statusId);
 
   return (
-    <div class="flex flex-col min-w-80 group">
+    <div class="flex flex-col min-w-80 group" data-testid={`board-column-${props.statusId}`}>
       <div class={`pb-2 text-sm flex flex-row items-center ${mappedStatus().textClass}`}>
         <Dynamic class="size-4 mr-1" component={props.statusIcon} />
         <p>{props.statusName}</p>
@@ -317,6 +317,7 @@ function BoardList(props: BoardListProps) {
         <Button
           variant="secondary"
           class="size-5! p-0! items-center! justify-center! ml-auto hidden group-hover:flex"
+          aria-label={m.common_create()}
           onClick={() =>
             open({
               status: props.statusId,
@@ -334,6 +335,7 @@ function BoardList(props: BoardListProps) {
           setColumnRef(props.statusId, el);
         }}
         class="bg-card squircle-lg p-2 ring-1 ring-inset h-full grow flex flex-col gap-2.5 transition-sensible ring-foreground/12"
+        data-testid={`board-column-dropzone-${props.statusId}`}
       >
         <Show
           when={displayIssues().length > 0 || isDropTarget()}
@@ -403,6 +405,7 @@ function BoardItem(props: BoardItemProps) {
     <A
       ref={setRef}
       data-issue-key={props.issue.key}
+      data-testid={`board-card-${props.issue.key}`}
       classList={{
         hidden: isDragged(),
       }}

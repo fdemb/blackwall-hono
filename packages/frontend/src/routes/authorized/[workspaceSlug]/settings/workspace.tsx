@@ -156,7 +156,12 @@ function MembersSection() {
 
         <div class="flex items-center gap-2">
           <Dialog>
-            <DialogTrigger as={Button} variant="outline" size="sm">
+            <DialogTrigger
+              as={Button}
+              variant="outline"
+              size="sm"
+              data-testid="workspace-settings-invite-trigger"
+            >
               {m.common_invite()}
             </DialogTrigger>
             <InviteDialogContent />
@@ -164,7 +169,7 @@ function MembersSection() {
         </div>
       </div>
 
-      <div class="flex flex-col divide-y divide-border">
+      <div class="flex flex-col divide-y divide-border" data-testid="workspace-settings-members-list">
         <Show
           when={memberCount() > 0}
           fallback={

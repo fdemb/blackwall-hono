@@ -58,6 +58,7 @@ export function IssueSummary(props: { issue: SerializedIssue }) {
       <h1
         ref={h1Ref}
         contentEditable={true}
+        data-testid="issue-summary-input"
         class="w-full text-xl sm:text-2xl font-medium outline-none"
         onInput={handleInput}
         onPaste={handlePaste}

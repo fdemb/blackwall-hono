@@ -262,6 +262,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
           aria-activedescendant={`option-${lazyHighlightedOption()?.id}`}
           aria-autocomplete="list"
           aria-label={m.picker_search_aria_label()}
+          data-testid="picker-search-input"
           onBlur={(e) => {
             e.target.focus();
           }}
@@ -297,6 +298,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
               id="picker-listbox"
               role="listbox"
               aria-multiselectable={merged.multiple || undefined}
+              data-testid="picker-listbox"
             >
               <Index each={filteredOptions()}>
                 {(option, idx) => (

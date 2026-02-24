@@ -30,38 +30,39 @@ export default function CreateWorkspacePage() {
     <>
       <Title>{m.meta_title_create_workspace()}</Title>
       <Meta name="description" content={m.meta_desc_create_workspace()} />
+
       <AuthCard title={m.either_create_workspace_title()}>
-      <form
-        class="flex flex-col gap-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-      >
-        <form.AppField name="displayName">
-          {() => <TanStackTextField label={m.either_create_workspace_name_label()} />}
-        </form.AppField>
+        <form
+          class="flex flex-col gap-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <form.AppField name="displayName">
+            {() => <TanStackTextField label={m.either_create_workspace_name_label()} />}
+          </form.AppField>
 
-        <form.AppField name="slug">
-          {() => (
-            <TanStackTextField
-              label={m.either_create_workspace_url_label()}
-              inputClass="pl-[170px]"
-              beforeInput={
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                  https://blackwallapp.com/
-                </span>
-              }
-            />
-          )}
-        </form.AppField>
+          <form.AppField name="slug">
+            {() => (
+              <TanStackTextField
+                label={m.either_create_workspace_url_label()}
+                inputClass="pl-[183px]"
+                beforeInput={
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                    https://blackwallapp.com/
+                  </span>
+                }
+              />
+            )}
+          </form.AppField>
 
-        <Button type="submit" class="w-full">
-          {m.either_create_workspace_submit()}
-        </Button>
-      </form>
-    </AuthCard>
+          <Button type="submit" class="w-full">
+            {m.either_create_workspace_submit()}
+          </Button>
+        </form>
+      </AuthCard>
     </>
   );
 }

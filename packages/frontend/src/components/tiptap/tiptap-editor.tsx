@@ -25,6 +25,7 @@ export type TiptapProps = {
   class?: string;
   editable?: boolean;
   onPointerDown?: (e: PointerEvent) => void;
+  testId?: string;
 };
 
 const tiptapVariants = cva("", {
@@ -205,6 +206,7 @@ export const TiptapEditor = (props: TiptapProps & VariantProps<typeof tiptapVari
       }}
       class="w-full h-full"
       onPointerDown={props.onPointerDown}
+      data-testid={merged.testId}
     />
   );
 };

@@ -110,7 +110,11 @@ export function IssueLabelsPicker(props: { labels: SerializedLabel[]; issueKey: 
   return (
     <div class="flex flex-wrap gap-y-2 gap-x-1 items-center">
       <Index each={props.labels}>
-        {(label) => <Badge color={label().colorKey}>{label().name}</Badge>}
+        {(label) => (
+          <Badge color={label().colorKey} data-testid="issue-label-badge">
+            {label().name}
+          </Badge>
+        )}
       </Index>
 
       <Popover
@@ -125,6 +129,8 @@ export function IssueLabelsPicker(props: { labels: SerializedLabel[]; issueKey: 
           as={Button}
           variant="ghost"
           size="sm"
+          aria-label={m.issue_labels_picker_create_label()}
+          data-testid="issue-labels-picker-trigger"
         >
           <PlusIcon class="size-4" />
         </Popover.Trigger>

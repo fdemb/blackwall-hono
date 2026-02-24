@@ -62,6 +62,7 @@ export function InviteDialogContent() {
           <Button
             type="button"
             variant="ghost"
+            data-testid="invite-dialog-cancel"
             onClick={() => {
               form.reset();
               ctx.close();
@@ -71,7 +72,7 @@ export function InviteDialogContent() {
           </Button>
           <form.Subscribe>
             {(state) => (
-              <Button type="submit" disabled={!state().canSubmit}>
+              <Button type="submit" disabled={!state().canSubmit} data-testid="invite-dialog-submit">
                 {m.common_invite()}
               </Button>
             )}

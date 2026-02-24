@@ -10,6 +10,7 @@ import { lazy } from "solid-js";
 import { redirectIfSession } from "./routes/guest/_layout.data";
 import { redirectToPreferredWorkspace } from "./routes/authorized/index.data";
 import { getSession } from "./routes/authorized/_layout.data";
+import { eitherLoader } from "./routes/either/_layout.data";
 import { workspaceLoader } from "./routes/authorized/[workspaceSlug].data";
 import { teamLoader } from "./routes/authorized/[workspaceSlug]/team/[teamKey].data";
 import { invitationLoader } from "./routes/either/invite/[token].data";
@@ -51,6 +52,7 @@ const WorkspaceProvider = lazy(() => import("./routes/authorized/[workspaceSlug]
 const MainLayout = lazy(() => import("./routes/authorized/[workspaceSlug]/_main"));
 const AuthorizedLayout = lazy(() => import("./routes/authorized/_layout"));
 const GuestLayout = lazy(() => import("./routes/guest/_layout"));
+const EitherLayout = lazy(() => import("./routes/either/_layout"));
 const SignInPage = lazy(() => import("./routes/guest/signin"));
 const SignupPage = lazy(() => import("./routes/guest/signup"));
 const TeamLayout = lazy(() => import("./routes/authorized/[workspaceSlug]/team/[teamKey]"));
@@ -114,12 +116,14 @@ const AppRouter = () => (
       <Route path="/signup" component={SignupPage} />
     </Route>
 
-    <Route path="/create-workspace" component={CreateWorkspacePage} />
-    <Route
-      path="/invite/:token"
-      component={InvitePage}
-      preload={({ params }) => invitationLoader(params.token!)}
-    />
+    <Route path="/" component={EitherLayout} preload={() => eitherLoader()}>
+      <Route path="/create-workspace" component={CreateWorkspacePage} />
+      <Route
+        path="/invite/:token"
+        component={InvitePage}
+        preload={({ params }) => invitationLoader(params.token!)}
+      />
+    </Route>
 
     <Route path="/" component={AuthorizedLayout} preload={() => getSession()}>
       <Route path="/" component={HomePage} preload={() => redirectToPreferredWorkspace()} />

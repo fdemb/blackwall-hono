@@ -36,6 +36,8 @@ export function UserMenu() {
         as={Button}
         class="flex items-center! font-normal justify-start text-left !p-2 h-auto"
         variant="ghost"
+        aria-label="Open user menu"
+        data-testid="user-menu-trigger"
       >
         <div class="flex flex-row gap-2 items-center w-full min-w-0">
           <UserAvatar user={session().user} class="shrink-0" />

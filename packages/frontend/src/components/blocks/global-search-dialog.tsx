@@ -75,7 +75,13 @@ export function GlobalSearchDialog(props: { workspaceSlug: string }) {
 
   return (
     <Dialog open={open()} onOpenChange={handleOpenChange}>
-      <DialogTrigger as={Button} size="iconSm" variant="outline" aria-label={m.global_search_open_aria_label()}>
+      <DialogTrigger
+        as={Button}
+        size="iconSm"
+        variant="outline"
+        aria-label={m.global_search_open_aria_label()}
+        data-testid="global-search-trigger"
+      >
         <SearchIcon class="size-4" strokeWidth={2.75} />
       </DialogTrigger>
 

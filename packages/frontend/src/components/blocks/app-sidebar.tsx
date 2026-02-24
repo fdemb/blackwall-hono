@@ -163,7 +163,12 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
         <div class="flex flex-row gap-2">
           <Tooltip>
             <TooltipTrigger as="div" class="w-full">
-              <Button size="sm" class="w-full" onClick={() => open()}>
+              <Button
+                size="sm"
+                class="w-full"
+                data-testid="sidebar-create-button"
+                onClick={() => open()}
+              >
                 <PlusIcon class="size-4" strokeWidth={2.75} />
                 {m.common_create()}
               </Button>

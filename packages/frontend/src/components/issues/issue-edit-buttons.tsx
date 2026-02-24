@@ -20,7 +20,13 @@ export const IssueEditButtons: Component<IssueEditButtonsProps> = (props) => {
       >
         <Tooltip>
           <TooltipTrigger as="div">
-            <Button size="iconXs" variant="default" onClick={props.onSave}>
+            <Button
+              size="iconXs"
+              variant="default"
+              aria-label={m.common_save()}
+              data-testid="issue-edit-save"
+              onClick={props.onSave}
+            >
               <CheckIcon class="size-4" />
             </Button>
           </TooltipTrigger>
@@ -29,7 +35,13 @@ export const IssueEditButtons: Component<IssueEditButtonsProps> = (props) => {
 
         <Tooltip>
           <TooltipTrigger as="div">
-            <Button size="iconXs" variant="outline" onClick={props.onCancel}>
+            <Button
+              size="iconXs"
+              variant="outline"
+              aria-label={m.common_cancel()}
+              data-testid="issue-edit-cancel"
+              onClick={props.onCancel}
+            >
               <XIcon class="size-4" />
             </Button>
           </TooltipTrigger>

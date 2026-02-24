@@ -179,6 +179,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
       class="p-0 gap-0 max-h-screen overflow-auto"
       showCloseButton={false}
       onOpenAutoFocus={(e) => e.preventDefault()}
+      data-testid="create-issue-dialog"
     >
       <DialogSingleLineHeader>
         <DialogTitle class="text-sm font-normal leading-none text-foreground">
@@ -208,6 +209,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
                   }}
                   onBlur={field().handleBlur}
                   placeholder={m.create_dialog_summary_placeholder()}
+                  data-testid="create-issue-summary-input"
                   variant="unstyled"
                   class="text-xl"
                 />
@@ -231,6 +233,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
                   variant="plain"
                   placeholder={m.create_dialog_description_placeholder()}
                   class="min-h-24"
+                  testId="create-issue-description-editor"
                 />
                 <TanStackErrorMessages />
               </TextField>
@@ -271,7 +274,12 @@ function CreateDialogContent(props: CreateDialogContentProps) {
         <DialogFooter class="px-4 py-3 border-t">
           <form.Subscribe>
             {(state) => (
-              <Button type="submit" size="sm" disabled={!state().canSubmit}>
+              <Button
+                type="submit"
+                size="sm"
+                data-testid="create-issue-submit-button"
+                disabled={!state().canSubmit}
+              >
                 {m.create_dialog_submit()}
               </Button>
             )}
