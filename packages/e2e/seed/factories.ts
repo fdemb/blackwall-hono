@@ -11,7 +11,7 @@ type JSONContent = {
 };
 
 function emptyDoc(): JSONContent {
-  return { type: "doc", content: [] };
+  return { type: "doc", content: [{ type: "paragraph" }] };
 }
 
 function textDoc(text: string): JSONContent {
@@ -128,7 +128,7 @@ export async function createSprint(
 export type CreateLabelOpts = {
   workspaceId: string;
   name: string;
-  colorKey?: typeof schema.label.$inferInsert["colorKey"];
+  colorKey?: (typeof schema.label.$inferInsert)["colorKey"];
 };
 
 export async function createLabel(
@@ -169,8 +169,7 @@ export async function createInvitation(
       createdById: opts.createdById,
       email: opts.email,
       token: opts.token,
-      expiresAt:
-        opts.expiresAt ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: opts.expiresAt ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
     .returning();
 
@@ -186,9 +185,7 @@ export type CreateUserOpts = {
   teamId?: string;
 };
 
-export async function createUser(
-  opts: CreateUserOpts,
-): Promise<typeof schema.user.$inferSelect> {
+export async function createUser(opts: CreateUserOpts): Promise<typeof schema.user.$inferSelect> {
   const { db } = openTestDb();
 
   const passwordHash = await Bun.password.hash(opts.password, {

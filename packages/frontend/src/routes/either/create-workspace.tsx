@@ -7,9 +7,12 @@ import { m } from "@/paraglide/messages.js";
 import { useNavigate } from "@solidjs/router";
 import { Title, Meta } from "@solidjs/meta";
 import type { CreateWorkspace } from "@blackwall/backend/src/features/workspaces/workspace.zod";
+import { slugify } from "@/lib/utils";
 
 export default function CreateWorkspacePage() {
   const navigate = useNavigate();
+
+  let urlSpan!: HTMLSpanElement;
 
   const form = useAppForm(() => ({
     defaultValues: {
@@ -23,6 +26,17 @@ export default function CreateWorkspacePage() {
 
       const { workspace } = await res.json();
       navigate(`/${workspace.slug}`);
+    },
+    listeners: {
+      onChange: ({ fieldApi, formApi }) => {
+        if (fieldApi.name !== "displayName") {
+          return;
+        }
+
+        const slug = slugify(fieldApi.state.value);
+
+        formApi.setFieldValue("slug", slug);
+      },
     },
   }));
 
@@ -48,10 +62,15 @@ export default function CreateWorkspacePage() {
             {() => (
               <TanStackTextField
                 label={m.either_create_workspace_url_label()}
-                inputClass="pl-[183px]"
+                inputStyle={{
+                  "padding-left": `${urlSpan.offsetWidth + 11}px`,
+                }}
                 beforeInput={
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                    https://blackwallapp.com/
+                  <span
+                    ref={urlSpan}
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                  >
+                    {window.location.origin}/
                   </span>
                 }
               />

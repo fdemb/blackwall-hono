@@ -162,6 +162,7 @@ type TanStackTextFieldProps = {
   type?: Solid.ComponentProps<"input">["type"];
   rootClass?: string;
   inputClass?: string;
+  inputStyle?: Solid.JSX.CSSProperties;
   labelClass?: string;
   autofocus?: boolean;
   beforeInput?: Solid.JSX.Element;
@@ -179,7 +180,12 @@ function parseError(error: any): string {
     return error.map(parseError).join(", ");
   }
 
-  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") {
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
     return error.message;
   }
 
@@ -211,6 +217,7 @@ function TanStackTextField(props: TanStackTextFieldProps) {
           id={props.id}
           type={props.type}
           aria-describedby={props.describedBy}
+          style={props.inputStyle}
           onBlur={(
             event: FocusEvent & {
               currentTarget: HTMLInputElement;

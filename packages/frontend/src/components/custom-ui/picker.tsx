@@ -5,7 +5,16 @@ import CheckIcon from "lucide-solid/icons/check";
 import PlusIcon from "lucide-solid/icons/plus";
 import SearchIcon from "lucide-solid/icons/search";
 import type { JSX } from "solid-js";
-import { createEffect, createSignal, Index, Match, mergeProps, Show, Switch } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  createUniqueId,
+  Index,
+  Match,
+  mergeProps,
+  Show,
+  Switch,
+} from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { Checkbox } from "../ui/checkbox";
 import { TextField } from "../ui/text-field";
@@ -66,6 +75,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
 
   const [searchTerm, setSearchTerm] = createSignal(merged.search ?? "");
   const [highlightedIndex, setHighlightedIndex] = createSignal(0);
+  const listboxId = `picker-listbox-${createUniqueId()}`;
   const navigate = useNavigate();
 
   const filteredOptions = () => {
@@ -258,7 +268,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
           variant="unstyled"
           class={cn("pr-3 pl-7 py-2 text-base border-b shadow-xs", merged.inputClass)}
           aria-expanded={merged.isOpen ? "true" : "false"}
-          aria-controls="picker-listbox"
+          aria-controls={listboxId}
           aria-activedescendant={`option-${lazyHighlightedOption()?.id}`}
           aria-autocomplete="list"
           aria-label={m.picker_search_aria_label()}
@@ -295,7 +305,7 @@ export const Picker = <TId extends string | number | null, TOption extends Picke
           <ScrollArea>
             <div
               class={cn("flex flex-col p-1", merged.boxClass)}
-              id="picker-listbox"
+              id={listboxId}
               role="listbox"
               aria-multiselectable={merged.multiple || undefined}
               data-testid="picker-listbox"

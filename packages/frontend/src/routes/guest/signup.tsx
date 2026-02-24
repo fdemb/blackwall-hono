@@ -4,6 +4,7 @@ import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { api } from "@/lib/api";
 import { validateFields } from "@/lib/form.utils";
+import { slugify } from "@/lib/utils";
 import { m } from "@/paraglide/messages.js";
 import { A, action, redirect, useAction } from "@solidjs/router";
 import { Title, Meta } from "@solidjs/meta";
@@ -43,6 +44,17 @@ const useSignupForm = () => {
       await _action(value);
       formApi.reset();
     },
+    listeners: {
+      onChange: ({ fieldApi, formApi }) => {
+        if (fieldApi.name !== "workspaceDisplayName") {
+          return;
+        }
+
+        const slug = slugify(fieldApi.state.value);
+
+        formApi.setFieldValue("workspaceUrlSlug", slug);
+      },
+    },
   }));
 
   return form;
@@ -57,26 +69,26 @@ export default function SignupPage() {
       <Title>{m.meta_title_signup()}</Title>
       <Meta name="description" content={m.meta_desc_signup()} />
       <AuthCard title={m.auth_signup_title()}>
-      <Switch>
-        <Match when={step() === "account"}>
-          <AccountForm
-            form={form}
-            onContinue={() => {
-              setStep("workspace");
-            }}
-          />
-        </Match>
-        <Match when={step() === "workspace"}>
-          <WorkspaceForm
-            form={form}
-            onBack={() => setStep("account")}
-            onContinue={() => {
-              form.handleSubmit();
-            }}
-          />
-        </Match>
-      </Switch>
-    </AuthCard>
+        <Switch>
+          <Match when={step() === "account"}>
+            <AccountForm
+              form={form}
+              onContinue={() => {
+                setStep("workspace");
+              }}
+            />
+          </Match>
+          <Match when={step() === "workspace"}>
+            <WorkspaceForm
+              form={form}
+              onBack={() => setStep("account")}
+              onContinue={() => {
+                form.handleSubmit();
+              }}
+            />
+          </Match>
+        </Switch>
+      </AuthCard>
     </>
   );
 }
@@ -172,6 +184,8 @@ function AccountForm(props: { form: SignUpFormApi; onContinue: () => void }) {
 }
 
 function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onContinue: () => void }) {
+  let urlSpan!: HTMLSpanElement;
+
   return (
     <form
       onSubmit={(e) => {
@@ -190,7 +204,7 @@ function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onConti
           {() => (
             <TanStackTextField
               label={m.auth_workspace_name_label()}
-              inputClass="p-3 w-72 h-auto !text-base"
+              inputClass="p-3 h-auto !text-base"
               type="text"
               placeholder={m.auth_workspace_name_placeholder()}
               autofocus
@@ -207,9 +221,20 @@ function WorkspaceForm(props: { form: SignUpFormApi; onBack: () => void; onConti
           {() => (
             <TanStackTextField
               label={m.auth_workspace_url_label()}
-              inputClass="p-3 w-72 h-auto !text-base"
+              inputClass="p-3 h-auto !text-base"
               type="text"
               placeholder={m.auth_workspace_url_placeholder()}
+              inputStyle={{
+                "padding-left": `${urlSpan.offsetWidth + 11}px`,
+              }}
+              beforeInput={
+                <span
+                  ref={urlSpan}
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                >
+                  {window.location.origin}/
+                </span>
+              }
             />
           )}
         </props.form.AppField>

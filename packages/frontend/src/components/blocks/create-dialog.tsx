@@ -9,7 +9,7 @@ import { useDialogContext } from "@kobalte/core/dialog";
 import { Popover } from "@kobalte/core/popover";
 import type { Editor, JSONContent } from "@tiptap/core";
 import XIcon from "lucide-solid/icons/x";
-import { createEffect, createSignal, mergeProps, on } from "solid-js";
+import { createEffect, createSignal, mergeProps, on, onCleanup } from "solid-js";
 import * as z from "zod";
 import { useWorkspaceData } from "../../context/workspace-context";
 import { TeamAvatar } from "../custom-ui/avatar";
@@ -91,6 +91,7 @@ function CreateDialogContent(props: CreateDialogContentProps) {
   const _action = useAction(createIssueAction);
   const _uploadAttachmentAction = useAction(uploadAttachmentAction);
   const [editor, setEditor] = createSignal<Editor | null>(null);
+  let resetTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const handleUpload = async (file: File) => {
     const formData = new FormData();
@@ -134,6 +135,11 @@ function CreateDialogContent(props: CreateDialogContentProps) {
   createEffect(
     on([isOpen, summaryInputElement], ([open, summaryInputElement]) => {
       if (open) {
+        if (resetTimeout) {
+          clearTimeout(resetTimeout);
+          resetTimeout = null;
+        }
+
         form.setFieldValue("teamKey", merged.teamKey);
         form.setFieldValue("status", merged.status);
         form.setFieldValue("assignedToId", merged.assignedToId ?? null);
@@ -149,14 +155,25 @@ function CreateDialogContent(props: CreateDialogContentProps) {
       }
 
       if (!open) {
-        setTimeout(() => {
+        if (resetTimeout) {
+          clearTimeout(resetTimeout);
+        }
+
+        resetTimeout = setTimeout(() => {
           form.reset();
         }, 200);
 
         return;
       }
-    }),
+    }, { defer: true }),
   );
+
+  onCleanup(() => {
+    if (resetTimeout) {
+      clearTimeout(resetTimeout);
+      resetTimeout = null;
+    }
+  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -164,6 +181,12 @@ function CreateDialogContent(props: CreateDialogContentProps) {
 
     if (!editor()) {
       return;
+    }
+
+    const summaryInput = summaryInputElement();
+    if (summaryInput) {
+      // Keep submit resilient to fast "type + submit" flows by syncing the latest DOM value.
+      form.setFieldValue("summary", summaryInput.value);
     }
 
     // Imperatively set the value of the description field just before submitting the form.

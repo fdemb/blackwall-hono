@@ -54,7 +54,7 @@ const moveIssue = action(async (issueKeys: string[], status: IssueStatus) => {
     json: { issueKeys, status },
   });
 
-  throw reload({ revalidate: ["boardIssues"] });
+  throw reload({ revalidate: ["boardIssues", "issueShow"] });
 });
 
 const startSprintAction = action(async (teamKey: string, sprintId: string) => {
@@ -161,60 +161,63 @@ export default function BoardPage() {
       <Title>{m.meta_title_board()}</Title>
       <Meta name="description" content={m.meta_desc_board()} />
       <BoardDnDContext.Provider value={{ ...dnd, onDrop: handleDrop }}>
-      <div class="flex flex-col h-full">
-        <div class="flex flex-col">
-          <PageHeader>
-            <div class="flex flex-1 flex-row items-center justify-between">
-              <Breadcrumbs>
-                <BreadcrumbsItem>
-                  <div class="flex flex-row items-center gap-1">
-                    <TeamAvatar team={teamData()} size="5" />
-                    {teamData().name}
+        <div class="flex flex-col h-full">
+          <div class="flex flex-col">
+            <PageHeader>
+              <div class="flex flex-1 flex-row items-center justify-between">
+                <Breadcrumbs>
+                  <BreadcrumbsItem>
+                    <div class="flex flex-row items-center gap-1">
+                      <TeamAvatar team={teamData()} size="5" />
+                      {teamData().name}
+                    </div>
+                  </BreadcrumbsItem>
+                  <BreadcrumbsItem>{m.team_issues_board_breadcrumb()}</BreadcrumbsItem>
+                </Breadcrumbs>
+
+                <SprintSection sprint={activeSprint()} />
+              </div>
+            </PageHeader>
+          </div>
+          <Show
+            when={activeSprint()}
+            fallback={
+              <div class="p-4">
+                <BoardEmpty
+                  plannedSprint={firstPlannedSprint()}
+                  onStartPlannedSprint={(sprintId) => _startSprint(params.teamKey!, sprintId)}
+                />
+              </div>
+            }
+          >
+            <ScrollContainer>
+              <div ref={(el) => (boardContainerRef = el)} class="p-4 min-h-full">
+                <ScrollArea
+                  rootClass="min-h-full"
+                  viewportRef={(el) => dnd.setScrollContainerRef(el)}
+                >
+                  <div class="flex flex-row gap-4 relative min-h-full">
+                    <For each={columns}>
+                      {(col) => (
+                        <BoardList
+                          statusName={issueMappings.status[col.id].label}
+                          statusId={col.id}
+                          issues={data()[col.id] ?? []}
+                          statusIcon={col.icon}
+                        />
+                      )}
+                    </For>
+
+                    <Show when={dragState.isDragging && dragState.initialRect}>
+                      <DragOverlay ref={(el) => (overlayRef = el)} issues={loaderData() ?? []} />
+                    </Show>
                   </div>
-                </BreadcrumbsItem>
-                <BreadcrumbsItem>{m.team_issues_board_breadcrumb()}</BreadcrumbsItem>
-              </Breadcrumbs>
-
-              <SprintSection sprint={activeSprint()} />
-            </div>
-          </PageHeader>
+                </ScrollArea>
+              </div>
+            </ScrollContainer>
+          </Show>
         </div>
-        <Show
-          when={activeSprint()}
-          fallback={
-            <div class="p-4">
-              <BoardEmpty
-                plannedSprint={firstPlannedSprint()}
-                onStartPlannedSprint={(sprintId) => _startSprint(params.teamKey!, sprintId)}
-              />
-            </div>
-          }
-        >
-          <ScrollContainer>
-            <div ref={(el) => (boardContainerRef = el)} class="p-4 min-h-full">
-              <ScrollArea rootClass="min-h-full" viewportRef={(el) => dnd.setScrollContainerRef(el)}>
-                <div class="flex flex-row gap-4 relative min-h-full">
-                  <For each={columns}>
-                    {(col) => (
-                      <BoardList
-                        statusName={issueMappings.status[col.id].label}
-                        statusId={col.id}
-                        issues={data()[col.id] ?? []}
-                        statusIcon={col.icon}
-                      />
-                    )}
-                  </For>
-
-                  <Show when={dragState.isDragging && dragState.initialRect}>
-                    <DragOverlay ref={(el) => (overlayRef = el)} issues={loaderData() ?? []} />
-                  </Show>
-                </div>
-              </ScrollArea>
-            </div>
-          </ScrollContainer>
-        </Show>
-      </div>
-    </BoardDnDContext.Provider>
+      </BoardDnDContext.Provider>
     </>
   );
 }

@@ -6,6 +6,7 @@ import { action, reload, useAction } from "@solidjs/router";
 import { api } from "@/lib/api";
 import { IssueStatusBadge } from "../issue-badges";
 import type { JSX } from "solid-js";
+import { m } from "@/paraglide/messages.js";
 
 const updateStatus = action(async (issueKey: string, status: IssueStatus) => {
   await api.api.issues[":issueKey"].$patch({
@@ -48,7 +49,11 @@ export function StatusPickerPopover(props: StatusPickerPopoverProps) {
 
   return (
     <Popover placement="bottom-start" gutter={8}>
-      <Popover.Trigger class="rounded-full hover:[&>span]:bg-accent">
+      <Popover.Trigger
+        class="rounded-full hover:[&>span]:bg-accent"
+        aria-label={m.issue_sidebar_label_status()}
+        aria-haspopup="listbox"
+      >
         {props.trigger ?? <IssueStatusBadge status={props.status} />}
       </Popover.Trigger>
 

@@ -17,10 +17,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  timeout: 30_000,
-  expect: {
-    timeout: 10000,
-  },
+  timeout: 5_000,
   reporter: [["html"], ["list"], ["json", { outputFile: "test-results/results.json" }]],
   globalSetup: "./global-setup.ts",
   globalTeardown: "./global-teardown.ts",

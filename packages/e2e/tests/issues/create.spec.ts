@@ -60,8 +60,14 @@ test("create issue with custom status", async ({ page }) => {
 
   await dialog.getByTestId("create-issue-summary-input").fill("Full Issue");
 
-  await dialog.getByRole("button", { name: /to do/i }).click();
-  await page.getByRole("option", { name: /in progress/i }).click();
+  const statusTrigger = dialog.getByRole("button", { name: /status/i });
+  await statusTrigger.focus();
+  await statusTrigger.press("Enter");
+
+  const pickerSearch = page.getByTestId("picker-search-input");
+  await expect(pickerSearch).toBeVisible();
+  await pickerSearch.press("ArrowDown");
+  await pickerSearch.press("Enter");
 
   await dialog.getByTestId("create-issue-submit-button").click();
 
