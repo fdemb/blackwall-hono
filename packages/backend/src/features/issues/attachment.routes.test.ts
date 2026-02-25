@@ -1,3 +1,4 @@
+import "../../test/env.test";
 import { describe, it, expect, afterEach } from "bun:test";
 import { rmSync } from "node:fs";
 import { useTestContext } from "../../test/context";

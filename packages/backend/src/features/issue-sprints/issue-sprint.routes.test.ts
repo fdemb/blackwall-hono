@@ -1,3 +1,4 @@
+import "../../test/env.test";
 import { describe, expect, it } from "bun:test";
 import { eq } from "drizzle-orm";
 import { dbSchema } from "@blackwall/database";

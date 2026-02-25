@@ -1,3 +1,4 @@
+import "../../test/env.test";
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { jobService } from "./job.service";
 import { createTestDb, cleanupTestDb, type TestDb } from "../../test/setup";

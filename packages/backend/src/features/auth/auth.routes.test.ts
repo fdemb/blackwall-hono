@@ -1,3 +1,4 @@
+import "../../test/env.test";
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { testClient } from "hono/testing";
 import { app } from "../../index";

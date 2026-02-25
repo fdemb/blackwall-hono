@@ -1,3 +1,4 @@
+import "../../test/env.test";
 import { describe, it, expect } from "bun:test";
 import { dbSchema } from "@blackwall/database";
 import { useTestContext } from "../../test/context";
