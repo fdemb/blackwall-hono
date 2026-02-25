@@ -126,6 +126,8 @@
   "either_invite_password_min": "Password must be at least 8 characters",
   "either_invite_password_placeholder": "Your secure password...",
   "either_invite_submit": "Join Workspace",
+  "workspace_no_teams_title": "You're in!",
+  "workspace_no_teams_description": "You don't belong to any teams yet. Ask a team member to add you so you can start collaborating.",
   "either_invite_already_have_account": "Already have an account?",
   "either_invite_signin_link": "Sign in",
   "either_invite_join_as": "Join as {name}",

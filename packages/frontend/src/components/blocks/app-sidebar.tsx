@@ -66,7 +66,7 @@ function createNavItems(): () => NavGroup[] {
   const workspaceData = useWorkspaceData();
   const teams = () => workspaceData().teams;
 
-  return () => [
+  return () => teams().length === 0 ? [] : [
     {
       children: [
         {
@@ -83,7 +83,7 @@ function createNavItems(): () => NavGroup[] {
         },
       ],
     },
-    {
+    ...(teams().length > 0 ? [{
       title: m.app_sidebar_group_teams(),
       children: teams().map((team) => ({
         id: `team-${team.key}`,
@@ -123,7 +123,7 @@ function createNavItems(): () => NavGroup[] {
           },
         ],
       })),
-    },
+    }] as NavGroup[] : []),
   ];
 }
 
@@ -148,6 +148,7 @@ function useLocalStorageCollapsibleState() {
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const workspaceData = useWorkspaceData();
+  const teams = () => workspaceData().teams;
   const groups = createNavItems();
   const [collapsibleStateStore, setCollapsibleStateStore] = useLocalStorageCollapsibleState();
   const { open } = useCreateDialog();
@@ -161,27 +162,29 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
         </div>
 
         <div class="flex flex-row gap-2">
-          <Tooltip>
-            <TooltipTrigger as="div" class="w-full">
-              <Button
-                size="sm"
-                class="w-full"
-                data-testid="sidebar-create-button"
-                onClick={() => open()}
-              >
-                <PlusIcon class="size-4" strokeWidth={2.75} />
-                {m.common_create()}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <span class="mr-2">{m.app_sidebar_create_issue_tooltip()}</span>
-              <KbdGroup>
-                <Kbd>C</Kbd>
-                {m.common_then()}
-                <Kbd>R</Kbd>
-              </KbdGroup>
-            </TooltipContent>
-          </Tooltip>
+          <Show when={teams().length > 0}>
+            <Tooltip>
+              <TooltipTrigger as="div" class="w-full">
+                <Button
+                  size="sm"
+                  class="w-full"
+                  data-testid="sidebar-create-button"
+                  onClick={() => open()}
+                >
+                  <PlusIcon class="size-4" strokeWidth={2.75} />
+                  {m.common_create()}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span class="mr-2">{m.app_sidebar_create_issue_tooltip()}</span>
+                <KbdGroup>
+                  <Kbd>C</Kbd>
+                  {m.common_then()}
+                  <Kbd>R</Kbd>
+                </KbdGroup>
+              </TooltipContent>
+            </Tooltip>
+          </Show>
 
           <GlobalSearchDialog workspaceSlug={workspaceData().workspace.slug} />
         </div>

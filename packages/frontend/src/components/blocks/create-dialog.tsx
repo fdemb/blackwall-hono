@@ -87,7 +87,9 @@ function CreateDialogContent(props: CreateDialogContentProps) {
 
   const { isOpen, close } = useDialogContext();
   const [summaryInputElement, setSummaryInputElement] = createSignal<HTMLInputElement | null>(null);
-  const assignableUsers = createAsync(() => getTeamUsers(merged.teamKey));
+  const assignableUsers = createAsync(() =>
+    merged.teamKey ? getTeamUsers(merged.teamKey) : Promise.resolve([]),
+  );
   const _action = useAction(createIssueAction);
   const _uploadAttachmentAction = useAction(uploadAttachmentAction);
   const [editor, setEditor] = createSignal<Editor | null>(null);

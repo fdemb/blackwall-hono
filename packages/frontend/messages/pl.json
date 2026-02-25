@@ -126,6 +126,8 @@
   "either_invite_password_min": "Hasło musi mieć co najmniej 8 znaków",
   "either_invite_password_placeholder": "Twoje bezpieczne hasło...",
   "either_invite_submit": "Dołącz do przestrzeni roboczej",
+  "workspace_no_teams_title": "Jesteś już w środku!",
+  "workspace_no_teams_description": "Nie należysz jeszcze do żadnego zespołu. Poproś członka zespołu, żeby Cię dodał i zacznij współpracę.",
   "either_invite_already_have_account": "Masz już konto?",
   "either_invite_signin_link": "Zaloguj się",
   "either_invite_join_as": "Dołącz jako {name}",

@@ -97,6 +97,8 @@ async function acceptInvitation(input: { token: string; userId: string; userEmai
     });
   }
 
+  await invitationData.deleteInvitation(invitation.id);
+
   return { workspaceSlug: invitation.workspace.slug };
 }
 
