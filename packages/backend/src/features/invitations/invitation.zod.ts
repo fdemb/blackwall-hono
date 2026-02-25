@@ -32,6 +32,7 @@ export const invitationResponseSchema = z.object({
 export const publicInvitationResponseSchema = z.object({
   invitation: z.object({
     email: z.string(),
+    isMember: z.boolean(),
     workspace: z.object({
       displayName: z.string(),
       slug: z.string(),

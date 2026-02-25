@@ -5,11 +5,11 @@ import { TanStackTextField } from "@/components/ui/text-field";
 import { useAppForm } from "@/context/form-context";
 import { authClient } from "@/lib/auth-client";
 import { m } from "@/paraglide/messages.js";
-import { A, action, redirect, useAction } from "@solidjs/router";
+import { A, action, redirect, useAction, useSearchParams } from "@solidjs/router";
 import { Title, Meta } from "@solidjs/meta";
 import * as z from "zod";
 
-const signinAction = action(async (email: string, password: string) => {
+const signinAction = action(async (email: string, password: string, back?: string) => {
   const result = await authClient.signIn.email({
     email,
     password,
@@ -20,11 +20,13 @@ const signinAction = action(async (email: string, password: string) => {
     return;
   }
 
-  throw redirect("/");
+  const safeBack = back && back.startsWith("/") ? back : "/";
+  throw redirect(safeBack);
 });
 
 export default function SignInPage() {
   const _action = useAction(signinAction);
+  const [searchParams] = useSearchParams();
 
   const form = useAppForm(() => ({
     defaultValues: {
@@ -38,7 +40,7 @@ export default function SignInPage() {
       }),
     },
     onSubmit: async ({ value }) => {
-      _action(value.email, value.password);
+      _action(value.email, value.password, searchParams.back as string | undefined);
     },
   }));
 

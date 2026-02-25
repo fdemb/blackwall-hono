@@ -84,9 +84,19 @@ const publicInvitationRoutes = new Hono<AppEnv>()
         throw new HTTPException(404, { message: "Invitation not found or expired" });
       }
 
+      const session = await auth.api.getSession({ headers: c.req.header() });
+      let isMember = false;
+      if (session?.user) {
+        isMember = await workspaceData.isWorkspaceMember({
+          userId: session.user.id,
+          workspaceId: invitation.workspaceId,
+        });
+      }
+
       return c.json({
         invitation: {
           email: invitation.email,
+          isMember,
           workspace: {
             displayName: invitation.workspace.displayName,
             slug: invitation.workspace.slug,
@@ -174,6 +184,7 @@ const protectedInvitationRoutes = new Hono<AppEnv>()
       const result = await invitationService.acceptInvitation({
         token,
         userId: user.id,
+        userEmail: user.email,
       });
 
       return c.json({

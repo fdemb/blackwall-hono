@@ -9,7 +9,12 @@ export const redirectIfSession = query(async () => {
   }
 
   if (session.data) {
-    throw redirect("/");
+    const back =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("back")
+        : null;
+    const safeBack = back && back.startsWith("/") ? back : "/";
+    throw redirect(safeBack);
   }
 
   return session.data;

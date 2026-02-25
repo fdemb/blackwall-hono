@@ -74,17 +74,28 @@ async function getInvitationByToken(token: string) {
  * @returns workspace slug
  * @throws Error if invitation not found or expired
  */
-async function acceptInvitation(input: { token: string; userId: string }) {
+async function acceptInvitation(input: { token: string; userId: string; userEmail: string }) {
   const invitation = await getInvitationByToken(input.token);
 
   if (!invitation) {
     throw new Error("Invitation not found or expired");
   }
 
-  await workspaceData.addUserToWorkspace({
+  if (invitation.email.toLowerCase() !== input.userEmail.toLowerCase()) {
+    throw new Error("This invitation was sent to a different email address");
+  }
+
+  const alreadyMember = await workspaceData.isWorkspaceMember({
     userId: input.userId,
     workspaceId: invitation.workspaceId,
   });
+
+  if (!alreadyMember) {
+    await workspaceData.addUserToWorkspace({
+      userId: input.userId,
+      workspaceId: invitation.workspaceId,
+    });
+  }
 
   return { workspaceSlug: invitation.workspace.slug };
 }
