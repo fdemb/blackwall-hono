@@ -45,7 +45,8 @@ export default defineConfig({
       },
     },
     {
-      command: "bun --no-env run --bun vite dev --host 127.0.0.1 --port 3100",
+      command:
+        "bun --no-env run --bun vite build && bun --no-env run --bun vite preview --host 127.0.0.1 --port 3100",
       cwd: "../../packages/frontend",
       url: APP_BASE_URL,
       timeout: 180_000,
