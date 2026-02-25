@@ -33,7 +33,20 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Run e2e tests
+      - name: Print e2e diagnostics
+        run: |
+          echo "PWD: $(pwd)"
+          bun --version
+          uname -a
+          ls -la
+          ls -la packages/e2e
+          echo "---- packages/e2e/.env.e2e ----"
+          cat packages/e2e/.env.e2e
+
+      - name: Run e2e tests (debug web server startup)
+        env:
+          CI: "1"
+          DEBUG: "pw:webserver"
         run: bun run test:e2e
 
       - name: Upload Playwright artifacts
