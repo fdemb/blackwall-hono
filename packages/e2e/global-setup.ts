@@ -16,11 +16,11 @@ export default async function globalSetup() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
-  await page.goto("http://localhost:3000/signin");
+  await page.goto("http://localhost:3100/signin");
   await page.getByLabel(/email/i).fill("e2e@test.com");
   await page.getByLabel(/password/i).fill("TestPassword1!");
   await page.getByRole("button", { name: /sign in/i }).click();
-  await page.waitForURL("**/e2e-workspace/**");
+  await page.waitForURL((url) => !url.pathname.startsWith("/signin"));
 
   await page.context().storageState({ path: AUTH_STATE_PATH });
   await browser.close();

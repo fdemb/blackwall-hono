@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { serve } from "./commands/serve";
 import { migrate } from "./commands/migrate";
 import { worker } from "./commands/worker";
-import { add, stats, list, get, processJob, recoverStale, cleanup } from "./commands/jobs";
+import { add, stats, list, get, processJob, recoverStale, cleanup, clear } from "./commands/jobs";
 import { jobStatusValues } from "@blackwall/queue";
 
 const program = new Command();
@@ -79,6 +79,19 @@ jobs
   .command("recover-stale")
   .description("Recover stale jobs")
   .action(recoverStale);
+
+jobs
+  .command("clear")
+  .description("Clear pending jobs")
+  .option("--queue <queue>", "Queue name")
+  .option("--all", "Clear jobs of all statuses")
+  .action(clear);
+
+jobs
+  .command("clear:all")
+  .description("Clear all jobs")
+  .option("--queue <queue>", "Queue name")
+  .action((options) => clear({ ...options, all: true }));
 
 jobs
   .command("cleanup")

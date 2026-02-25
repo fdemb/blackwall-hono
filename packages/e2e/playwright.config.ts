@@ -5,7 +5,7 @@ import { DB_PATH, UPLOADS_PATH } from "./paths.ts";
 
 mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
-const APP_BASE_URL = process.env.APP_BASE_URL ?? "http://localhost:3000";
+const APP_BASE_URL = process.env.APP_BASE_URL ?? "http://localhost:3100";
 const VITE_BACKEND_URL = process.env.VITE_BACKEND_URL ?? "http://localhost:8000";
 const APP_SECRET = process.env.APP_SECRET ?? "e2e-test-secret";
 const ARGON2_MEMORY_COST = process.env.ARGON2_MEMORY_COST ?? "8192";
@@ -45,7 +45,7 @@ export default defineConfig({
       },
     },
     {
-      command: "bun --no-env run --bun vite dev --port 3000",
+      command: "bun --no-env run --bun vite dev --port 3100",
       cwd: "../../packages/frontend",
       url: APP_BASE_URL,
       reuseExistingServer: !process.env.CI,

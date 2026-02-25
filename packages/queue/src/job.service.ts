@@ -110,6 +110,15 @@ async function cleanupJobs(opts?: { completedOlderThanMs?: number; failedOlderTh
 }
 
 /**
+ * Clear jobs from the queue.
+ * @param opts optional queue and status filters
+ * @returns number of deleted jobs
+ */
+async function clearJobs(opts?: { queue?: string; statuses?: JobStatus[] }) {
+  return jobData.clearJobs(opts);
+}
+
+/**
  * Get statistics about jobs in a queue.
  * @param queue optional queue name filter
  * @returns job statistics
@@ -264,6 +273,7 @@ export const jobService = {
   failJob,
   recoverStaleJobs,
   cleanupJobs,
+  clearJobs,
   getJobStats,
   listJobs,
   getJobById,

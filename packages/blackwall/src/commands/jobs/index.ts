@@ -116,3 +116,21 @@ export async function cleanup(options: CleanupOptions) {
 
   printJson({ success: true });
 }
+
+interface ClearOptions {
+  queue?: string;
+  all?: boolean;
+}
+
+export async function clear(options: ClearOptions) {
+  const deleted = await jobService.clearJobs({
+    queue: options.queue,
+    statuses: options.all ? undefined : ["pending"],
+  });
+
+  printJson({
+    success: true,
+    deleted,
+    scope: options.all ? "all" : "pending",
+  });
+}

@@ -160,6 +160,7 @@ type TanStackTextFieldProps = {
   autocomplete?: string;
   placeholder?: string;
   type?: Solid.ComponentProps<"input">["type"];
+  disabled?: boolean;
   rootClass?: string;
   inputClass?: string;
   inputStyle?: Solid.JSX.CSSProperties;
@@ -216,6 +217,7 @@ function TanStackTextField(props: TanStackTextFieldProps) {
         <TextField.Input
           id={props.id}
           type={props.type}
+          disabled={props.disabled}
           aria-describedby={props.describedBy}
           style={props.inputStyle}
           onBlur={(

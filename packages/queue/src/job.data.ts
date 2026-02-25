@@ -1,4 +1,4 @@
-import { and, eq, lte, sql } from "drizzle-orm";
+import { and, eq, inArray, lte, sql } from "drizzle-orm";
 import { db, dbSchema, type Job, type JobStatus } from "@blackwall/database";
 
 async function addJob<T>(input: {
@@ -123,6 +123,23 @@ async function cleanupJobs(opts?: { completedOlderThanMs?: number; failedOlderTh
     .where(and(eq(dbSchema.job.status, "failed"), lte(dbSchema.job.createdAt, failedCutoff)));
 }
 
+async function clearJobs(opts?: { queue?: string; statuses?: JobStatus[] }) {
+  const conditions = [];
+  if (opts?.queue) {
+    conditions.push(eq(dbSchema.job.queue, opts.queue));
+  }
+  if (opts?.statuses && opts.statuses.length > 0) {
+    conditions.push(inArray(dbSchema.job.status, opts.statuses));
+  }
+
+  const deleted = await db
+    .delete(dbSchema.job)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .returning({ id: dbSchema.job.id });
+
+  return deleted.length;
+}
+
 async function getJobStats(queue?: string) {
   const rows = db.all<{ status: JobStatus; count: number }>(sql`
     SELECT status, COUNT(*) as count
@@ -161,6 +178,7 @@ export const jobData = {
   getJobById,
   recoverStaleJobs,
   cleanupJobs,
+  clearJobs,
   getJobStats,
   listJobs,
 };
