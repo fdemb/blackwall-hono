@@ -19,6 +19,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install unzip
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends unzip
+          rm -rf /var/lib/apt/lists/*
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
