@@ -1,4 +1,5 @@
 import { test, expect } from "../../fixtures/index.ts";
+import type { Page } from "@playwright/test";
 import { resetAllTables } from "../../seed/index.ts";
 import { insertBaseFixtures } from "../../seed/base.ts";
 import { createIssue } from "../../seed/factories.ts";
@@ -8,6 +9,18 @@ let teamId: string;
 let userId: string;
 let issueKey: string;
 const SELECT_ALL_SHORTCUT = process.platform === "darwin" ? "Meta+a" : "Control+a";
+
+async function changeIssueStatus(page: Page, statusLabel: RegExp) {
+  const statusTrigger = page.getByRole("button", { name: /status/i });
+  await expect(statusTrigger).toBeVisible();
+  await statusTrigger.click();
+
+  const statusOption = page.getByRole("option", { name: statusLabel });
+  await expect(statusOption).toBeVisible();
+  await statusOption.click();
+
+  await expect(statusTrigger).toContainText(statusLabel);
+}
 
 test.beforeAll(async () => {
   await resetAllTables();
@@ -49,19 +62,13 @@ test("edit issue title inline", async ({ page }) => {
 test("change status to In Progress", async ({ page }) => {
   await page.goto(`/e2e-workspace/issue/${issueKey}`);
 
-  await page.getByRole("button", { name: /to do|in progress|done/i }).first().click();
-  await page.getByRole("option", { name: /in progress/i }).click();
-
-  await expect(page.getByRole("button", { name: /in progress/i })).toBeVisible();
+  await changeIssueStatus(page, /in progress/i);
 });
 
 test("change status to Done", async ({ page }) => {
   await page.goto(`/e2e-workspace/issue/${issueKey}`);
 
-  await page.getByRole("button", { name: /to do|in progress|done/i }).first().click();
-  await page.getByRole("option", { name: /^done$/i }).click();
-
-  await expect(page.getByRole("button", { name: /^done$/i })).toBeVisible();
+  await changeIssueStatus(page, /^done$/i);
 });
 
 test("change priority to Urgent", async ({ page }) => {
