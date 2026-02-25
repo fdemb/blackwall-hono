@@ -6,7 +6,8 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "bun run --filter '*' dev",
+    "dev:all": "bun run --filter '*' dev",
+    "blackwall": "bun run --elide-lines=0 --filter blackwall blackwall",
     "dev:backend": "bun run --filter '@blackwall/backend' dev",
     "dev:frontend": "bun run --filter 'frontend' dev",
     "build": "bun run --filter blackwall build",
