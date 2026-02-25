@@ -132,6 +132,7 @@
   "invite_dialog_description": "Wpisz adres e-mail użytkownika, którego chcesz zaprosić.",
   "invite_dialog_email_required": "Adres e-mail jest wymagany",
   "invite_dialog_title": "Zaproś użytkownika",
+  "issue_description_placeholder": "Dodaj opis zgłoszenia...",
   "issue_activity_entity_nobody": "nikt",
   "issue_activity_entity_themselves": "siebie",
   "issue_activity_event_assigned_to": "przypisał zgłoszenie do",

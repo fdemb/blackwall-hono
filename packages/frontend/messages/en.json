@@ -132,6 +132,7 @@
   "invite_dialog_description": "Enter the email address of the user you want to invite.",
   "invite_dialog_email_required": "Email is required",
   "invite_dialog_title": "Invite user",
+  "issue_description_placeholder": "Add a description...",
   "issue_activity_entity_nobody": "nobody",
   "issue_activity_entity_themselves": "themselves",
   "issue_activity_event_assigned_to": "assigned the issue to",

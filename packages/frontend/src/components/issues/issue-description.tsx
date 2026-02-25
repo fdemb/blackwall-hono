@@ -2,14 +2,11 @@ import { TiptapEditor } from "@/components/tiptap/tiptap-editor";
 import { useWorkspaceData } from "@/context/workspace-context";
 import type { SerializedIssue } from "@blackwall/database/schema";
 import { api, apiFetch } from "@/lib/api";
-import { actionWrapper } from "@/lib/form.utils";
 import type { Editor, JSONContent } from "@tiptap/core";
-import CheckIcon from "lucide-solid/icons/check";
-import XIcon from "lucide-solid/icons/x";
-import { createEffect, createSignal, Show } from "solid-js";
-import { Button } from "../ui/button";
+import { createEffect, createSignal } from "solid-js";
 import { IssueEditButtons } from "./issue-edit-buttons";
 import { action, reload, useAction } from "@solidjs/router";
+import { m } from "@/paraglide/messages";
 
 const changeDescriptionAction = action(async (issueKey: string, description: JSONContent) => {
   await api.api.issues[":issueKey"].$patch({
@@ -76,6 +73,7 @@ export function IssueDescription(props: { issue: SerializedIssue }) {
         workspaceSlug={workspaceData().workspace.slug}
         variant="plain"
         testId="issue-description-editor"
+        placeholder={m.issue_description_placeholder()}
       />
 
       <IssueEditButtons isEditing={isEditing()} onSave={handleSave} onCancel={handleCancel} />
