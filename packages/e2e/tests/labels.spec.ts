@@ -22,7 +22,7 @@ function issueLabelBadge(page: PWPage, labelName: string) {
 
 async function toggleLabel(page: PWPage, labelName: string) {
   await openLabelsPicker(page);
-  await page.getByRole("option", { name: labelName }).click();
+  await page.getByRole("option", { name: labelName, exact: true }).click();
   await page.keyboard.press("Escape");
 }
 
@@ -95,7 +95,7 @@ test("delete label removes it from workspace", async ({ page }) => {
   await page.goto(`/e2e-workspace/issue/${issueKey}`);
   await openLabelsPicker(page);
   await page.getByTestId("picker-search-input").last().fill(label.name);
-  await expect(page.getByRole("option", { name: label.name })).toBeVisible();
+  await expect(page.getByRole("option", { name: label.name, exact: true })).toHaveCount(1);
   await page.keyboard.press("Escape");
 
   const { db } = openTestDb();
@@ -104,5 +104,5 @@ test("delete label removes it from workspace", async ({ page }) => {
   await page.reload();
   await openLabelsPicker(page);
   await page.getByTestId("picker-search-input").last().fill(label.name);
-  await expect(page.getByRole("option", { name: label.name })).not.toBeVisible();
+  await expect(page.getByRole("option", { name: label.name, exact: true })).toHaveCount(0);
 });

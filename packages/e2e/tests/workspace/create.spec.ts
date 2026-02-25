@@ -14,7 +14,11 @@ test("create additional workspace", async ({ page }) => {
   await page.getByRole("button", { name: "Create Workspace" }).click();
 
   await page.waitForURL("**/secondws/**");
-  await expect(page.getByText("Second Workspace")).toBeVisible();
+  await expect(page).toHaveURL(/\/secondws\/my-issues/);
+  await expect(page.getByRole("link", { name: "My issues" })).toHaveAttribute(
+    "href",
+    "/secondws/my-issues",
+  );
 });
 
 test("existing slug is rejected", async ({ page }) => {

@@ -23,13 +23,21 @@ test("invite member creates pending invitation", async ({ page }) => {
 
   await page.goto("/e2e-workspace/members");
   await page.getByTestId("workspace-members-invite-trigger").click();
-  const dialog = page.getByRole("dialog");
-  await dialog.getByLabel(/email/i).fill(invitedEmail);
-  const inviteRequest = page.waitForResponse(
-    (res) => res.url().includes("/api/invitations") && res.request().method() === "POST",
-  );
-  await dialog.getByTestId("invite-dialog-submit").click();
-  await inviteRequest;
+  const dialog = page.getByRole("alertdialog", { name: /invite user/i });
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel(/email address/i).fill(invitedEmail);
+  const submit = dialog.getByTestId("invite-dialog-submit");
+  await expect(submit).toBeEnabled();
+  await Promise.all([
+    page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/invitations") &&
+        res.request().method() === "POST" &&
+        res.ok(),
+    ),
+    submit.click(),
+  ]);
+  await expect(dialog).not.toBeVisible();
 
   const { db } = openTestDb();
   const invitations = await db
